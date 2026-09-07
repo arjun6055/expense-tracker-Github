@@ -1,0 +1,762 @@
+<!doctype html>
+<html>
+<head>
+<base target="_top">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
+<title>My Expense Analyzer</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 128 128'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop stop-color='%23172554'/%3E%3Cstop offset='.55' stop-color='%232563eb'/%3E%3Cstop offset='1' stop-color='%2306b6d4'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='128' height='128' rx='30' fill='url(%23g)'/%3E%3Ccircle cx='64' cy='64' r='39' fill='white' opacity='.95'/%3E%3Ctext x='64' y='78' text-anchor='middle' font-size='46'%3E%F0%9F%92%B0%3C/text%3E%3C/svg%3E">
+<meta name="theme-color" content="#101a2c">
+
+<style>
+:root{--bg:#f4f7fb;--card:#fff;--ink:#152238;--muted:#718096;--line:#e7ecf3;--dark:#101a2c;--blue:#2563eb;--cyan:#06b6d4;--green:#16a34a;--orange:#f59e0b;--pink:#ec4899;--purple:#7c3aed;--red:#dc2626;--shadow:0 10px 35px rgba(20,32,55,.07)}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:linear-gradient(180deg,#eef4ff 0,#f7f9fc 38%,#f4f7fb 100%);color:var(--ink);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;-webkit-tap-highlight-color:transparent}button,input,select,textarea{font:inherit}button{cursor:pointer;border:0}button:focus,input:focus,select:focus,textarea:focus{outline:3px solid #2563eb25;outline-offset:1px}.app{max-width:1050px;margin:auto;padding-bottom:125px}.top{color:#fff;padding:22px 17px 19px;border-radius:0 0 30px 30px;background:radial-gradient(circle at 92% 10%,#38bdf8 0,#2563eb 23%,transparent 45%),radial-gradient(circle at 60% 120%,#1d4ed8 0,#101827 58%);position:relative;overflow:hidden}.top:after{content:"";position:absolute;width:220px;height:220px;border:1px solid #ffffff20;border-radius:50%;right:-90px;bottom:-125px;box-shadow:0 0 0 32px #ffffff08,0 0 0 64px #ffffff05}.brand{position:relative;z-index:1}.brand h1{font-size:26px;margin:0;font-weight:900;letter-spacing:-.8px}.brand p{margin:4px 0 0;color:#dbeafe;font-size:11px}.content{padding:12px}.screen{display:none}.screen.active{display:block}.card{background:rgba(255,255,255,.97);border:1px solid var(--line);border-radius:24px;padding:15px;margin-bottom:12px;box-shadow:var(--shadow)}.card h2{font-size:21px;margin:0 0 13px;letter-spacing:-.45px}.card h3{font-size:17px;margin:0 0 11px;letter-spacing:-.25px}.hero{color:#fff;background:linear-gradient(135deg,#0f1b32 0,#173d8f 46%,#0ea5c9 100%);position:relative;overflow:hidden}.hero:after{content:"";position:absolute;width:180px;height:180px;border-radius:50%;right:-90px;top:-100px;background:#ffffff0d;box-shadow:0 0 0 28px #ffffff06,0 0 0 56px #ffffff04}.hero>*{position:relative;z-index:1}.hero .label{color:#bfdbfe}.hero .big{font-size:38px;font-weight:950;letter-spacing:-1.4px;margin:3px 0 12px}.label{font-size:9px;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);font-weight:850}.grid2,.grid3,.grid4{display:grid;gap:9px}.grid2{grid-template-columns:1fr 1fr}.grid3{grid-template-columns:repeat(3,1fr)}.grid4{grid-template-columns:repeat(2,1fr)}@media(min-width:720px){.grid4{grid-template-columns:repeat(4,1fr)}}.stat{background:#f7f9fc;border:1px solid #edf1f6;border-radius:17px;padding:12px;min-width:0}.hero .stat{background:#ffffff14;border-color:#ffffff22}.stat b{display:block;font-size:18px;font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.stat span{display:block;color:var(--muted);font-size:10px;margin-top:3px;line-height:1.35}.hero .stat span{color:#dbeafe}.iconstat{display:flex;gap:10px;align-items:center;min-width:0}.ico{width:40px;height:40px;min-width:40px;border-radius:13px;display:grid;place-items:center;font-size:19px}.blue{background:#dbeafe}.green{background:#dcfce7}.orange{background:#fef3c7}.pink{background:#fce7f3}.purple{background:#ede9fe}.cyan{background:#cffafe}.actions{display:flex;gap:8px;flex-wrap:wrap}button.primary,button.dark{background:var(--dark);color:#fff;border-radius:14px;padding:11px 14px;font-weight:850}button.secondary{background:#edf2f8;color:var(--ink);border-radius:14px;padding:10px 13px;font-weight:800}button.greenbtn{background:#15803d;color:#fff;border-radius:14px;padding:11px 14px;font-weight:850}button.redbtn{background:#fee2e2;color:#991b1b;border-radius:11px;padding:8px 10px;font-weight:850}.field{margin:8px 0}.field label{display:block;font-size:10px;color:var(--muted);font-weight:800;margin-bottom:5px}input,select,textarea{width:100%;padding:11px;border:1px solid #d9e0ea;border-radius:13px;background:#fff;color:var(--ink);outline:none}textarea{min-height:76px;resize:vertical}.row{display:grid;grid-template-columns:1fr 1fr;gap:9px}.listrow{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line)}.listrow:last-child{border-bottom:0}.title{font-weight:850}.meta{font-size:10px;color:var(--muted);margin-top:3px;line-height:1.45}.amt{font-weight:900;white-space:nowrap}.bar{height:8px;border-radius:99px;background:#e8edf4;overflow:hidden;margin-top:6px}.bar i{height:100%;display:block;border-radius:99px;background:linear-gradient(90deg,#2563eb,#06b6d4)}.pill{display:inline-flex;align-items:center;border-radius:99px;padding:5px 9px;font-size:9px;font-weight:850;background:#eef2ff;color:#4338ca}.mini{font-size:10px;color:var(--muted)}.empty{text-align:center;padding:28px 10px;color:var(--muted)}.monthchips{display:flex;gap:7px;overflow:auto;padding-bottom:3px;scrollbar-width:none}.monthchips::-webkit-scrollbar{display:none}.monthchips button{white-space:nowrap;background:#edf2f7;color:#475569;padding:8px 11px;border-radius:99px;font-size:11px;font-weight:850}.monthchips button.on{background:#172554;color:#fff}.sectionhead{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:10px}.sectionhead h3,.sectionhead h2{margin:0}.minihero{border-radius:21px;padding:15px;color:#fff;background:linear-gradient(135deg,#172554,#2563eb 60%,#06b6d4);margin-bottom:11px}.minihero .kpi{font-size:29px;font-weight:950;margin:2px 0}.kpi{font-size:26px;font-weight:950}.positive{color:var(--green)}.negative{color:var(--red)}.cardtile{border-radius:20px;padding:14px;color:#fff;min-height:128px;position:relative;overflow:hidden;box-shadow:0 10px 28px #17203320}.cardtile:after{content:"";position:absolute;width:110px;height:110px;border:17px solid #ffffff12;border-radius:50%;right:-42px;bottom:-52px}.cardtile h4{margin:0;font-size:14px;position:relative;z-index:1}.cardtile .amount{font-size:23px;font-weight:950;margin-top:20px;position:relative;z-index:1}.tile1{background:linear-gradient(135deg,#172554,#2563eb)}.tile2{background:linear-gradient(135deg,#3b0764,#9333ea)}.tile3{background:linear-gradient(135deg,#064e3b,#059669)}.tile4{background:linear-gradient(135deg,#7c2d12,#ea580c)}.tile5{background:linear-gradient(135deg,#164e63,#0891b2)}.tile6{background:linear-gradient(135deg,#4c1d95,#7c3aed)}.monthchart{display:grid;grid-template-columns:repeat(9,minmax(28px,1fr));gap:6px;align-items:end;height:145px;padding:10px 2px 23px;border-bottom:1px solid var(--line);overflow:auto}.mcol{height:100%;display:flex;flex-direction:column;justify-content:end;align-items:center;gap:4px;min-width:0}.mbar{width:100%;max-width:30px;border-radius:8px 8px 3px 3px;background:linear-gradient(180deg,#38bdf8,#2563eb);min-height:4px}.mval{font-size:8px;color:var(--muted);white-space:nowrap}.mlab{font-size:8px;color:var(--muted);white-space:nowrap}.filtergrid{display:grid;grid-template-columns:2fr repeat(4,1fr);gap:7px}.filtergrid .search{grid-column:auto}.sortrow{display:flex;gap:7px;overflow:auto;margin-top:8px}.sortrow button{white-space:nowrap}.data-note{padding:10px 11px;border-radius:14px;background:#f7f9fc;border:1px solid var(--line);font-size:10px;color:var(--muted);line-height:1.45}.notice{padding:11px 12px;border-radius:14px;background:#eff6ff;border:1px solid #dbeafe;color:#1e3a8a;font-size:10px;line-height:1.5}.viewbox{margin:0 12px 4px;background:rgba(255,255,255,.96);border:1px solid var(--line);border-radius:20px;padding:9px;box-shadow:var(--shadow)}.view-switch{display:grid;grid-template-columns:repeat(3,1fr);gap:5px}.view-btn{background:#eef2f7;color:#64748b;padding:8px 5px;border-radius:12px;font-size:10px;font-weight:850}.view-btn.active{background:#172554;color:#fff}.monthbar{display:flex;align-items:center;gap:6px;margin-top:7px}.monthbar button{width:38px;min-width:38px;height:38px;border-radius:12px;background:#edf2f8;color:#172554;font-size:20px;font-weight:900}.monthbar select{padding:9px}.periodbar{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:7px}.periodbar label{font-size:9px;font-weight:800;color:var(--muted)}.periodbar input{margin-top:4px}.viewhint{text-align:center;font-size:9px;color:var(--muted);padding-top:6px;font-weight:750}.nav{position:fixed;bottom:0;left:0;right:0;background:#f4f7fb;border-top:1px solid var(--line);z-index:30;box-shadow:0 -8px 25px #1720330b;padding-bottom:calc(25px + env(safe-area-inset-bottom))}.navin{width:100%;max-width:none;margin:auto;display:grid;grid-template-columns:repeat(6,1fr);padding:7px 4px}.nav button{background:transparent;color:#7b8493;padding:5px 2px;font-size:10px;font-weight:800}.nav button .navico{display:block;font-size:20px;line-height:19px;margin-bottom:2px}.nav button.on{color:#172554}.fab{position:fixed;right:17px;bottom:101px;width:59px;height:59px;border-radius:50%;background:#101827;color:#fff;font-size:29px;box-shadow:0 14px 34px #10182755;z-index:31}.modal{position:fixed;inset:0;background:#0009;display:none;align-items:flex-end;z-index:60}.modal.show{display:flex}.sheet{width:100%;max-width:720px;max-height:94vh;overflow:auto;background:#fff;margin:auto;padding:18px;border-radius:27px 27px 0 0;box-shadow:0 -20px 70px #0003}.close{float:right}.checklist{display:grid;grid-template-columns:1fr 1fr;gap:7px}.settingrow{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:11px 0;border-bottom:1px solid var(--line);font-size:12px}.switch{position:relative;width:46px;height:26px}.switch input{opacity:0;width:0;height:0}.slider{position:absolute;inset:0;background:#cbd5e1;border-radius:99px}.slider:before{content:"";position:absolute;width:20px;height:20px;left:3px;top:3px;background:#fff;border-radius:50%;transition:.2s}.switch input:checked+.slider{background:#2563eb}.switch input:checked+.slider:before{transform:translateX(20px)}.toast{position:fixed;left:50%;bottom:137px;transform:translateX(-50%);background:#101827;color:#fff;padding:10px 15px;border-radius:99px;font-size:11px;font-weight:800;display:none;z-index:80;box-shadow:0 8px 30px #0004}.actionline{display:flex;justify-content:flex-end;gap:7px;margin-top:10px}.txclick{cursor:pointer}.txclick:active{background:#f8fafc}.subtabs{display:flex;gap:7px;overflow:auto;padding-bottom:3px}.subtabs button{white-space:nowrap}.donutwrap{display:grid;grid-template-columns:145px 1fr;gap:15px;align-items:center}.donut{width:140px;height:140px;border-radius:50%;display:grid;place-items:center}.donut span{width:82px;height:82px;border-radius:50%;background:#fff;display:grid;place-items:center;text-align:center;font-weight:900;font-size:18px;line-height:1.1}.legend{display:grid;gap:7px}.legendrow{display:flex;justify-content:space-between;gap:8px;font-size:10px}.dot{width:9px;height:9px;border-radius:50%;display:inline-block;margin-right:5px}.hidden{display:none!important}@media(max-width:520px){.filtergrid{grid-template-columns:1fr 1fr}.filtergrid .search{grid-column:1/-1}.grid3{grid-template-columns:1fr 1fr}.grid3 .stat:last-child{grid-column:1/-1}.donutwrap{grid-template-columns:1fr}.donut{margin:auto}}@media(max-width:390px){.row{grid-template-columns:1fr}.hero .big{font-size:36px}.brand h1{font-size:25px}.card{border-radius:23px;padding:14px}.nav button .navico{font-size:21px}}
+
+/* V2.3 NATIVE PHONE APP SKIN — full viewport, no desktop scaling */
+html,body{width:100%;min-width:0;background:#f5f7fb}
+body{font-size:16px;overflow-x:hidden;-webkit-text-size-adjust:100%;text-rendering:optimizeLegibility}
+.app{width:100%;max-width:none;margin:0;padding-bottom:113px;background:#f5f7fb;min-height:100vh}
+.top{padding:22px 18px 20px;border-radius:0 0 28px 28px;min-height:96px}
+.brand h1{font-size:28px;letter-spacing:-.8px}.brand p{font-size:12px}
+.content{padding:12px 12px 18px}.card{border-radius:25px;padding:16px;margin-bottom:12px;box-shadow:0 6px 22px rgba(20,32,55,.06)}
+.card h2{font-size:23px;margin-bottom:13px}.card h3{font-size:18px;margin-bottom:11px}
+.hero{border-radius:27px;padding:18px}.hero .big{font-size:40px}.minihero{border-radius:21px;padding:15px}.minihero .kpi{font-size:30px}
+.grid2,.grid3,.grid4{gap:10px}.grid2{grid-template-columns:1fr 1fr}.grid3{grid-template-columns:1fr 1fr}.grid4{grid-template-columns:1fr 1fr}
+.stat{border-radius:18px;padding:13px}.stat b{font-size:19px}.stat span{font-size:11px}.ico{width:44px;height:44px;min-width:44px;border-radius:14px;font-size:22px}
+.viewbox{margin:10px 12px 5px;padding:10px;border-radius:22px;box-shadow:0 5px 18px rgba(20,32,55,.055)}
+.view-switch{gap:6px}.view-btn{padding:11px 5px;border-radius:14px;font-size:13px}
+.monthbar{gap:7px}.monthbar button{width:42px;min-width:42px;height:42px;border-radius:13px;font-size:22px}.monthbar select{padding:10px;font-size:15px}
+.periodbar{gap:7px}.periodbar input{padding:10px}.viewhint{font-size:10px}
+.sectionhead{gap:8px;margin-bottom:10px}.sectionhead h3{font-size:17px}
+.listrow{padding:13px 0;gap:10px}.title{font-size:15px}.meta{font-size:11px}.amt{font-size:14px}
+.monthchips{gap:6px}.monthchips button{padding:9px 12px;font-size:12px}
+.filtergrid{grid-template-columns:1fr 1fr;gap:8px}.filtergrid .search{grid-column:1/-1}
+input,select,textarea{padding:13px;border-radius:15px;font-size:15px}.field label{font-size:10px}.row{grid-template-columns:1fr 1fr;gap:8px}
+button.primary,button.dark,button.greenbtn{padding:12px 15px;border-radius:15px;font-size:13px}button.secondary{padding:11px 14px;border-radius:14px;font-size:13px}
+.nav{left:0;right:0;width:100%;max-width:none;transform:none;border-radius:20px 20px 0 0;background:#f5f7fb}
+.navin{width:100%;max-width:none;grid-template-columns:repeat(6,1fr);padding:7px 4px}
+.nav button{padding:6px 1px;font-size:10px;min-width:0}.nav button .navico{font-size:22px;line-height:22px;margin-bottom:3px}
+.fab{right:18px;bottom:103px;width:62px;height:62px;font-size:31px}
+.sheet{max-width:none;padding:20px;border-radius:28px 28px 0 0}
+.fab{right:max(14px,calc((100vw - 480px)/2 + 14px));bottom:98px;width:55px;height:55px;font-size:27px}
+.sheet{width:100%;max-width:480px;max-height:92vh;padding:15px;border-radius:24px 24px 0 0}.checklist{grid-template-columns:1fr 1fr}
+.cardtile{min-height:112px;border-radius:17px;padding:12px}.cardtile .amount{font-size:20px;margin-top:17px}
+.monthchart{height:125px;gap:4px;padding-bottom:20px}.mval{font-size:7px}.mlab{font-size:7px}.mbar{max-width:24px}
+.donutwrap{grid-template-columns:110px 1fr;gap:10px}.donut{width:105px;height:105px}.donut span{width:64px;height:64px;font-size:15px}
+/* Category icon presentation */
+.catrow{display:flex;align-items:center;gap:9px;min-width:0;flex:1}.caticon{width:36px;height:36px;min-width:36px;border-radius:12px;display:grid;place-items:center;font-size:19px;box-shadow:inset 0 0 0 1px rgba(255,255,255,.45)}
+.catname{min-width:0;flex:1}.catname .title{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.catrow .bar{margin-top:5px}
+/* Phone-width layout: no desktop/tablet expansion */
+@media(max-width:390px){.content{padding:7px 6px}.viewbox{margin-left:6px;margin-right:6px}.top{padding-left:13px;padding-right:13px}.hero .big{font-size:31px}.card{padding:12px;border-radius:18px}.nav button .navico{font-size:17px}.nav button{font-size:7.5px}}
+@media(min-width:481px){body{background:#dfe5ee}.app{box-shadow:0 0 35px rgba(15,23,42,.12)}}
+</style>
+
+<style id="native-mobile-ui">
+/* Native mobile app UI: designed for the phone viewport at 100% zoom. */
+html,body{width:100%;min-width:0;margin:0;padding:0;overflow-x:hidden;-webkit-text-size-adjust:100%;text-size-adjust:100%;}
+body{font-size:16px;background:#f3f6fb;}
+.app{width:100%;max-width:none;min-height:100svh;margin:0;padding-bottom:113px;}
+.top{width:100%;padding:20px 18px 18px;border-radius:0 0 26px 26px;}
+.brand h1{font-size:24px;letter-spacing:-.6px;}
+.brand p{font-size:11px;margin-top:5px;}
+.content{padding:10px 12px 14px;}
+.viewbox{margin:0 0 10px;padding:9px;border-radius:18px;}
+.view-switch{gap:6px}.view-btn{padding:10px 5px;font-size:11px;border-radius:11px;min-height:38px;}
+.monthbar{gap:7px}.monthbar button{width:40px;min-width:40px;height:40px;font-size:21px}.monthbar select{height:40px;padding:8px 11px;font-size:14px;}
+.viewhint{font-size:10px;padding-top:7px;}
+.card{border-radius:21px;padding:15px;margin-bottom:11px;}
+.card h2{font-size:21px;margin-bottom:12px}.card h3{font-size:17px;margin-bottom:10px;}
+.hero .big{font-size:35px}.label{font-size:10px}.mini{font-size:11px}.meta{font-size:11px;line-height:1.4}.title{font-size:15px}.amt{font-size:14px;}
+.stat{padding:12px;border-radius:16px}.stat b{font-size:18px}.stat span{font-size:10px}.ico{width:42px;height:42px;min-width:42px;border-radius:13px;font-size:21px;}
+.grid2{gap:10px}.grid3,.grid4{gap:10px}
+button.primary,button.dark{padding:11px 14px;border-radius:14px;font-size:14px;}
+button.secondary{padding:10px 13px;font-size:14px;}
+input,select,textarea{font-size:16px;padding:12px;border-radius:14px;min-height:44px;}
+textarea{min-height:90px}.field label{font-size:11px;margin-bottom:6px;}
+.listrow{padding:13px 0;gap:9px;}.caticon{width:42px;height:42px;min-width:42px;border-radius:13px;font-size:22px;}
+.bar{height:7px;margin-top:7px}.pill{padding:6px 10px;font-size:10px;}
+.empty{padding:30px 10px;font-size:13px;}
+.filtergrid{grid-template-columns:1fr 1fr;gap:8px}.filtergrid .search{grid-column:1/-1}.filtergrid .search input{height:48px;font-size:16px;}
+.sortrow{gap:8px}.sortrow button{font-size:13px;}
+.nav{left:0;right:0;bottom:0;width:100%;max-width:none;transform:none;border-radius:18px 18px 0 0;padding-bottom:calc(25px + env(safe-area-inset-bottom));background:#f3f6fb;}
+.navin{width:100%;max-width:none;grid-template-columns:repeat(6,1fr);padding:7px 4px 5px;}
+.nav button{min-height:48px;padding:4px 1px;font-size:10px;}
+.nav button .navico{font-size:21px;line-height:21px;margin-bottom:3px;}
+.fab{right:16px;bottom:103px;width:56px;height:56px;font-size:28px;}
+.sheet{width:100%;max-width:none;max-height:92svh;padding:18px 15px;border-radius:24px 24px 0 0;}
+.modal{align-items:flex-end;}
+.checklist{gap:8px}.settingrow{padding:13px 0;font-size:14px;}
+.monthchart{height:140px;gap:5px}.mval,.mlab{font-size:9px}.mbar{max-width:26px;}
+.donutwrap{grid-template-columns:110px 1fr;gap:12px}.donut{width:105px;height:105px}.donut span{width:64px;height:64px;font-size:16px;}
+@media(max-width:380px){
+ .content{padding:8px 9px 12px}.top{padding-left:15px;padding-right:15px}.brand h1{font-size:22px}.card{padding:13px;border-radius:19px}.card h2{font-size:20px}.hero .big{font-size:32px}.grid2{gap:8px}.stat{padding:10px}.stat b{font-size:16px}.stat span{font-size:9px}.ico{width:39px;height:39px;min-width:39px;font-size:19px}.caticon{width:39px;height:39px;min-width:39px;font-size:20px}.title{font-size:14px}.meta{font-size:10px}.amt{font-size:13px}.nav button{font-size:9px}.nav button .navico{font-size:19px;}
+}
+</style>
+<style id="true-phone-app-v24fix">
+/* TRUE PHONE MODE: Android/mobile browser proportions, inspired by V15.4.14 mobile layout.
+   Do not shrink a desktop layout; enlarge the controls and information density for touch. */
+.phone-device .app{font-size:18px}
+.phone-device .top{min-height:128px;padding:34px 28px 28px;border-radius:0 0 34px 34px}
+.phone-device .brand h1{font-size:36px;line-height:1.08;letter-spacing:-1px}
+.phone-device .brand p{font-size:14px;margin-top:8px}
+.phone-device .content{padding:18px 28px 125px}
+.phone-device .viewbox{margin:0 28px 16px;padding:14px;border-radius:28px}
+.phone-device .view-switch{gap:9px}
+.phone-device .view-btn{min-height:58px;padding:13px 8px;border-radius:18px;font-size:17px}
+.phone-device .monthbar{gap:10px;margin-top:10px}
+.phone-device .monthbar button{width:54px;min-width:54px;height:54px;border-radius:17px;font-size:28px}
+.phone-device .monthbar select{height:54px;padding:10px 16px;font-size:19px;border-radius:17px}
+.phone-device .viewhint{font-size:13px;padding-top:9px}
+.phone-device .card{border-radius:30px;padding:22px;margin-bottom:16px;box-shadow:0 8px 28px rgba(20,32,55,.08)}
+.phone-device .card h2{font-size:29px;margin-bottom:17px}
+.phone-device .card h3{font-size:23px;margin-bottom:14px}
+.phone-device .hero{border-radius:31px;padding:24px}
+.phone-device .hero .big{font-size:47px;margin:4px 0 16px}
+.phone-device .label{font-size:12px}
+.phone-device .mini{font-size:13px}
+.phone-device .grid2,.phone-device .grid3,.phone-device .grid4{gap:13px}
+.phone-device .stat{border-radius:22px;padding:17px}
+.phone-device .stat b{font-size:24px}
+.phone-device .stat span{font-size:12px;margin-top:5px}
+.phone-device .ico{width:55px;height:55px;min-width:55px;border-radius:17px;font-size:28px}
+.phone-device .listrow{padding:17px 0;gap:13px}
+.phone-device .title{font-size:19px}
+.phone-device .meta{font-size:13px;line-height:1.45}
+.phone-device .amt{font-size:18px}
+.phone-device .caticon{width:52px;height:52px;min-width:52px;border-radius:16px;font-size:28px}
+.phone-device .bar{height:9px;margin-top:9px}
+.phone-device .pill{padding:8px 12px;font-size:12px}
+.phone-device .monthchips{gap:9px}
+.phone-device .monthchips button{padding:11px 14px;font-size:13px}
+.phone-device .filtergrid{gap:10px}
+.phone-device .filtergrid .search input{height:56px;font-size:18px}
+.phone-device .filtergrid select{height:54px;font-size:17px}
+.phone-device input,.phone-device select,.phone-device textarea{font-size:18px;min-height:54px;padding:14px 15px;border-radius:17px}
+.phone-device button.primary,.phone-device button.dark,.phone-device button.greenbtn{padding:14px 18px;border-radius:17px;font-size:17px}
+.phone-device button.secondary{padding:13px 17px;border-radius:16px;font-size:16px}
+.phone-device .nav{border-radius:27px 27px 0 0;box-shadow:0 -10px 32px rgba(15,23,42,.12);background:#f3f6fb;}
+.phone-device .navin{padding:10px 8px 8px}
+.phone-device .nav button{min-height:68px;padding:5px 2px;font-size:13px}
+.phone-device .nav button .navico{font-size:29px;line-height:29px;margin-bottom:5px}
+.phone-device .fab{right:22px;bottom:121px;width:70px;height:70px;font-size:36px}
+.phone-device .sheet{padding:24px 20px;border-radius:32px 32px 0 0}
+.phone-device .settingrow{padding:17px 0;font-size:16px}
+.phone-device .empty{padding:38px 12px;font-size:16px}
+/* Keep the phone app visually centred if a host iframe supplies a wider CSS viewport. */
+@media (min-width:700px) and (max-width:1200px){
+  .phone-device .app{width:100%;max-width:none}
+}
+
+/* V2.3 FINAL MOBILE-APP PROPORTION SKIN
+   Reference: original V15 phone UI. This intentionally uses fewer, larger elements,
+   larger touch targets and app-like spacing. */
+.phone-device body{}
+.phone-device .app{width:100%;max-width:none;min-height:100svh;padding-bottom:117px}
+.phone-device .top{min-height:145px;padding:28px 28px 24px;border-radius:0 0 38px 38px}
+.phone-device .brand h1{font-size:36px;line-height:1.08;letter-spacing:-1.2px}
+.phone-device .brand p{font-size:14px;margin-top:8px}
+.phone-device .content{padding:16px 28px 24px}
+.phone-device .viewbox{margin:0 0 18px;padding:10px;border-radius:26px}
+.phone-device .view-switch{gap:5px}
+.phone-device .view-btn{min-height:58px;padding:12px 8px;border-radius:18px;font-size:18px}
+.phone-device .monthbar{margin-top:10px;gap:9px}
+.phone-device .monthbar button{width:52px;min-width:52px;height:52px;border-radius:17px;font-size:28px}
+.phone-device .monthbar select{height:52px;padding:10px 16px;font-size:19px;border-radius:17px}
+.phone-device .viewhint{font-size:13px;padding-top:9px}
+.phone-device .card{border-radius:30px;padding:22px;margin-bottom:16px;box-shadow:0 8px 28px rgba(20,32,55,.07)}
+.phone-device .card h2{font-size:27px;margin-bottom:16px}
+.phone-device .card h3{font-size:22px;margin-bottom:14px}
+.phone-device .hero{padding:28px;border-radius:32px}
+.phone-device .hero .label{font-size:13px}
+.phone-device .hero .big{font-size:52px;line-height:1.05;margin:6px 0 18px}
+.phone-device .hero .minihero{padding:16px 18px;border-radius:22px}
+.phone-device .hero .minihero .label{font-size:11px}
+.phone-device .hero .minihero div:last-child{font-size:13px!important}
+.phone-device .hero .grid2{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:12px!important}
+.phone-device .hero .stat{padding:17px;border-radius:21px;min-height:76px}
+.phone-device .hero .stat b{font-size:23px}
+.phone-device .hero .stat span{font-size:12px}
+.phone-device .grid2{gap:12px}
+.phone-device .grid3{grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.phone-device .grid4{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.phone-device .stat{padding:17px;border-radius:21px}
+.phone-device .stat b{font-size:22px}.phone-device .stat span{font-size:12px}
+.phone-device .ico{width:54px;height:54px;min-width:54px;border-radius:17px;font-size:28px}
+.phone-device .sectionhead{margin-bottom:14px}.phone-device .sectionhead h3{font-size:21px}
+.phone-device .listrow{padding:16px 0;gap:14px;min-height:72px}
+.phone-device .caticon{width:54px;height:54px;min-width:54px;border-radius:17px;font-size:28px}
+.phone-device .title{font-size:18px;line-height:1.25}
+.phone-device .meta{font-size:12px;line-height:1.45;margin-top:5px}
+.phone-device .amt{font-size:17px}
+.phone-device .bar{height:9px;margin-top:9px}
+.phone-device .monthchips{gap:8px}.phone-device .monthchips button{padding:12px 15px;font-size:13px}
+.phone-device .filtergrid{gap:10px}.phone-device .filtergrid .search input{height:58px;font-size:18px}
+.phone-device .filtergrid select{height:54px;font-size:17px}
+.phone-device .filtergrid{grid-template-columns:1fr 1fr}
+.phone-device .input, .phone-device input,.phone-device select,.phone-device textarea{font-size:18px;min-height:54px;padding:14px 15px;border-radius:17px}
+.phone-device .nav{border-radius:28px 28px 0 0;min-height:84px;padding-bottom:calc(25px + env(safe-area-inset-bottom));background:#f3f6fb}
+.phone-device .navin{grid-template-columns:repeat(6,1fr);padding:8px 8px 6px}
+.phone-device .nav button{min-height:68px;padding:5px 1px;font-size:12px;font-weight:850}
+.phone-device .nav button .navico{font-size:28px;line-height:30px;margin-bottom:5px}
+.phone-device .fab{right:22px;bottom:129px;width:70px;height:70px;font-size:37px}
+.phone-device .pill{padding:7px 11px;font-size:11px}
+.phone-device .mini{font-size:12px}
+.phone-device .empty{padding:40px 12px;font-size:16px}
+/* On phones the main five destinations are the primary app tabs; More contains Cards. */
+@media(max-width:600px){
+ .phone-device .navin{grid-template-columns:repeat(6,1fr)}
+ .phone-device .nav button[data-screen="investment"] .navico{font-size:27px}
+}
+
+</style>
+<script>
+// --- GITHUB TO GOOGLE SCRIPT BRIDGE ---
+const SCRIPT_API_URL = "https://script.google.com/macros/s/AKfycbwnBVOVjMfGkd9bB8-qU6SvQ0z_KD9kMFCLm6qu20DA8K2ikm73qB8dpVRIx0sXX4Y/exec";
+
+const google = {
+  script: {
+    run: new Proxy({}, {
+      get(target, prop) {
+        let onSuccess = () => {};
+        let onFailure = (err) => console.error(err);
+        const chain = {
+          withSuccessHandler(fn) { onSuccess = fn; return chain; },
+          withFailureHandler(fn) { onFailure = fn; return chain; }
+        };
+        return new Proxy(chain, {
+          get(cTarget, cProp) {
+            if (cProp in cTarget) return cTarget[cProp];
+            return function(...args) {
+              fetch(SCRIPT_API_URL, {
+                method: "POST",
+                body: JSON.stringify({ action: cProp, args: args })
+              })
+              .then(res => res.json())
+              .then(data => {
+                if (data.error) onFailure(new Error(data.error));
+                else onSuccess(data.result);
+              })
+              .catch(err => onFailure(err));
+            };
+          }
+        });
+      }
+    })
+  }
+};
+// --- END BRIDGE ---
+
+(function(){
+  var ua=navigator.userAgent||'';
+  var mobile=/Android|iPhone|iPad|iPod|Mobile|Silk|Kindle/i.test(ua);
+  function apply(){if(mobile && document.body) document.body.classList.add('phone-device');}
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',apply); else apply();
+})();
+</script>
+
+
+<style id="mobile-overflow-fix-v25">
+/* MOBILE OVERFLOW FIX: force every two-column card/stat grid to fit the actual phone width. */
+.phone-device .content,
+.phone-device .screen,
+.phone-device .card,
+.phone-device .grid2,
+.phone-device .grid3,
+.phone-device .grid4,
+.phone-device .stat,
+.phone-device .iconstat {
+  min-width:0;
+  max-width:100%;
+}
+.phone-device .grid2 {
+  grid-template-columns:minmax(0,1fr) minmax(0,1fr);
+  width:100%;
+}
+.phone-device .grid3 {
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  width:100%;
+}
+.phone-device .grid4 {
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  width:100%;
+}
+.phone-device .iconstat {
+  width:100%;
+  overflow:hidden;
+}
+.phone-device .iconstat > div:last-child {
+  min-width:0;
+  max-width:100%;
+  overflow:hidden;
+}
+.phone-device .iconstat .stat,
+.phone-device .stat {
+  overflow:hidden;
+}
+.phone-device .stat b {
+  min-width:0;
+  max-width:100%;
+}
+.phone-device .sectionhead {
+  min-width:0;
+}
+.phone-device .sectionhead > * {
+  min-width:0;
+}
+.phone-device .card h2,
+.phone-device .card h3,
+.phone-device .title,
+.phone-device .meta {
+  max-width:100%;
+  overflow-wrap:anywhere;
+}
+@media(max-width:390px){
+  .phone-device .grid2,.phone-device .grid3,.phone-device .grid4 {gap:9px;}
+  .phone-device .stat {padding:11px;}
+  .phone-device .iconstat {gap:7px;}
+  .phone-device .ico {width:42px;height:42px;min-width:42px;font-size:21px;}
+  .phone-device .stat b {font-size:17px;}
+  .phone-device .stat span {font-size:10px;}
+}
+</style>
+
+<style id="investment-money-text-final-fix">
+/* Targeted fix: Investment + Money summary cards. Keep the cards aligned, but let their text use the full inner width. */
+@media (max-width:520px){
+  .phone-device .focusstat{
+    display:grid !important;
+    grid-template-columns:42px minmax(0,1fr) !important;
+    gap:9px !important;
+    align-items:center !important;
+    overflow:hidden !important;
+    min-width:0 !important;
+  }
+  .phone-device .focusstat > div:last-child{
+    min-width:0 !important;
+    width:100% !important;
+    max-width:none !important;
+    overflow:visible !important;
+  }
+  .phone-device .focusstat b{
+    display:block !important;
+    width:100% !important;
+    max-width:none !important;
+    font-size:17px !important;
+    line-height:1.15 !important;
+    letter-spacing:-.25px !important;
+    white-space:normal !important;
+    overflow:visible !important;
+    text-overflow:clip !important;
+    word-break:keep-all !important;
+    overflow-wrap:normal !important;
+  }
+  .phone-device .focusstat span{
+    display:block !important;
+    width:100% !important;
+    max-width:none !important;
+    font-size:10px !important;
+    line-height:1.25 !important;
+    white-space:normal !important;
+    overflow:visible !important;
+    overflow-wrap:anywhere !important;
+  }
+}
+@media (max-width:390px){
+  .phone-device .focusstat{grid-template-columns:38px minmax(0,1fr) !important;gap:7px !important;padding:11px 9px !important;}
+  .phone-device .focusstat .ico{width:38px !important;min-width:38px !important;height:38px !important;font-size:19px !important;}
+  .phone-device .focusstat b{font-size:15px !important;}
+  .phone-device .focusstat span{font-size:9px !important;}
+}
+</style>
+
+<style id="investment-money-text-final-v2">
+/* FINAL TARGETED FIX: Investment + Money summary cards.
+   Use a vertical card layout so the amount and label each get the full card width. */
+@media(max-width:600px){
+  .phone-device .focusstat{
+    display:flex !important;
+    flex-direction:column !important;
+    justify-content:center !important;
+    align-items:center !important;
+    gap:8px !important;
+    width:100% !important;
+    min-width:0 !important;
+    padding:16px 10px !important;
+    overflow:hidden !important;
+    text-align:center !important;
+  }
+  .phone-device .focusstat .ico{
+    width:46px !important;
+    min-width:46px !important;
+    height:46px !important;
+    flex:none !important;
+    font-size:23px !important;
+  }
+  .phone-device .focusstat > div:last-child{
+    display:flex !important;
+    flex-direction:column !important;
+    align-items:center !important;
+    justify-content:center !important;
+    width:100% !important;
+    min-width:0 !important;
+    max-width:100% !important;
+    overflow:visible !important;
+  }
+  .phone-device .focusstat b{
+    display:block !important;
+    width:100% !important;
+    max-width:100% !important;
+    font-size:18px !important;
+    line-height:1.15 !important;
+    white-space:nowrap !important;
+    overflow:visible !important;
+    text-overflow:clip !important;
+    word-break:normal !important;
+    overflow-wrap:normal !important;
+    letter-spacing:-.35px !important;
+  }
+  .phone-device .focusstat span{
+    display:block !important;
+    width:100% !important;
+    max-width:100% !important;
+    margin-top:2px !important;
+    font-size:10px !important;
+    line-height:1.3 !important;
+    white-space:normal !important;
+    overflow:visible !important;
+    overflow-wrap:anywhere !important;
+    word-break:normal !important;
+  }
+}
+@media(max-width:390px){
+  .phone-device .focusstat{padding:14px 8px !important;gap:7px !important;}
+  .phone-device .focusstat .ico{width:42px !important;min-width:42px !important;height:42px !important;font-size:21px !important;}
+  .phone-device .focusstat b{font-size:16px !important;letter-spacing:-.45px !important;}
+  .phone-device .focusstat span{font-size:9px !important;line-height:1.25 !important;}
+}
+</style>
+
+<style id="family-pin-ui">
+#pinGate{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;padding:24px;background:radial-gradient(circle at 90% 5%,#38bdf8 0,#2563eb 24%,transparent 45%),linear-gradient(145deg,#0b1425,#172554 58%,#0891b2);color:#fff;}
+#pinGate.hidden{display:none}
+.pinbox{width:min(390px,100%);background:rgba(255,255,255,.98);color:#152238;border-radius:34px;padding:28px 22px 24px;box-shadow:0 25px 70px #0006;text-align:center;}
+.pinlogo{width:82px;height:82px;margin:0 auto 15px;border-radius:25px;background:linear-gradient(135deg,#172554,#2563eb,#06b6d4);display:grid;place-items:center;font-size:44px;box-shadow:0 12px 30px #2563eb45;}
+.pinbox h1{margin:0;font-size:27px;letter-spacing:-.8px}.pinbox p{margin:7px 0 20px;color:#718096;font-size:13px}.pin-dots{display:flex;justify-content:center;gap:11px;margin:8px 0 20px}.pin-dot{width:13px;height:13px;border-radius:50%;background:#dbe3ef;border:1px solid #cbd5e1}.pin-dot.on{background:#172554;border-color:#172554;transform:scale(1.08)}
+.pinpad{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;max-width:300px;margin:auto}.pinpad button{height:56px;border-radius:17px;background:#f1f5f9;color:#172554;font-size:22px;font-weight:850;border:1px solid #e5eaf1}.pinpad button:active{transform:scale(.97);background:#dbeafe}.pinpad .pin-del{font-size:18px}.pin-unlock{width:100%;margin-top:14px;height:52px;border-radius:17px;background:#101a2c;color:#fff;font-size:16px;font-weight:900}.pin-msg{min-height:20px;margin-top:10px;color:#dc2626;font-size:12px;font-weight:750}.pin-foot{font-size:10px!important;margin:12px 0 0!important;color:#94a3b8!important}
+body.pin-locked{overflow:hidden}
+</style>
+
+<style id="flex-settings-css">
+.layout-list{display:grid;gap:7px}.layout-item{display:grid;grid-template-columns:1fr auto auto;gap:7px;align-items:center;padding:9px 10px;background:#f7f9fc;border:1px solid #e7ecf3;border-radius:14px}.layout-item .draglabel{font-weight:800;font-size:12px}.layout-item button{min-width:38px;padding:8px 10px}.layout-note{font-size:10px;color:#64748b;line-height:1.45;margin:4px 0 9px}.section-order-box{background:#f7f9fc;border:1px solid #e7ecf3;border-radius:18px;padding:12px;margin-top:10px}.chartbar{cursor:pointer;transition:transform .12s,opacity .12s}.chartbar:active{transform:scaleY(.96);transform-origin:bottom}.charttip{font-size:10px;color:#334155;background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:8px 10px;margin-top:8px;min-height:18px}.monthsummary{overflow:auto}.monthsummary table{min-width:650px}.monthsummary th,.monthsummary td{white-space:nowrap}.section-order-screen{display:contents}.manage-note{font-size:11px;color:#64748b;line-height:1.5;margin:6px 0 10px}.manage-list{display:grid;gap:7px}.manage-item{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:7px;align-items:center}.manage-item input{min-width:0}.manage-add{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:7px;margin-top:8px}.pin-change-box{background:#f7f9fc;border:1px solid #e7ecf3;border-radius:18px;padding:12px;margin-top:12px}.pin-change-box .row{margin-top:7px}.danger-note{color:#991b1b;background:#fef2f2;border-color:#fecaca}.
+@media(max-width:520px){.manage-item{grid-template-columns:minmax(0,1fr) auto auto}.manage-item button{padding:9px 10px}.manage-add{grid-template-columns:1fr auto}}
+</style>
+</head>
+<body class="pin-locked">
+<div id="pinGate"><div class="pinbox"><div class="pinlogo">💰</div><h1>My Expense Analyzer</h1><p>Private family expense tracker</p><div class="pin-dots" id="pinDots"></div><div class="pinpad"><button onclick="pinKey('1')">1</button><button onclick="pinKey('2')">2</button><button onclick="pinKey('3')">3</button><button onclick="pinKey('4')">4</button><button onclick="pinKey('5')">5</button><button onclick="pinKey('6')">6</button><button onclick="pinKey('7')">7</button><button onclick="pinKey('8')">8</button><button onclick="pinKey('9')">9</button><button class="pin-del" onclick="pinClear()">⌫</button><button onclick="pinKey('0')">0</button><button class="pin-del" onclick="pinBack()">←</button></div><button class="pin-unlock" onclick="unlockApp()">Unlock</button><div class="pin-msg" id="pinMsg"></div><p class="pin-foot">Enter your 4–6 digit family PIN</p></div></div>
+<div class="app">
+<header class="top"><div class="brand"><h1 id="brandTitle">My Expense Analyzer</h1><p>Google Sheet master • Mobile Expense Tracker</p></div></header>
+
+<div class="viewbox" id="viewBox">
+ <div class="view-switch">
+  <button class="view-btn active" data-view="monthly" onclick="setGlobalView('monthly')">📅 Monthly</button>
+  <button class="view-btn" data-view="overall" onclick="setGlobalView('overall')">📊 Overall</button>
+  <button class="view-btn" data-view="period" onclick="setGlobalView('period')">🗓️ Period</button>
+ </div>
+ <div class="monthbar" id="monthControls"><button onclick="shiftMonth(-1)">‹</button><select id="globalMonth" onchange="setGlobalMonth(this.value)"></select><button onclick="shiftMonth(1)">›</button></div>
+ <div class="periodbar hidden" id="periodControls"><label>From<input id="periodStart" type="date" onchange="setPeriodDates()"></label><label>To<input id="periodEnd" type="date" onchange="setPeriodDates()"></label></div>
+ <div class="viewhint" id="viewHint">Monthly position</div>
+</div>
+
+<main class="content">
+<section id="home" class="screen active"></section>
+<section id="spends" class="screen"></section>
+<section id="income" class="screen"></section>
+<section id="investment" class="screen"></section>
+<section id="money" class="screen"></section>
+<section id="cc" class="screen"></section>
+<section id="more" class="screen"></section>
+</main>
+</div>
+
+<nav class="nav"><div class="navin">
+ <button data-screen="home" onclick="go('home')" class="on"><span class="navico">⌂</span>Home</button>
+ <button data-screen="spends" onclick="go('spends')"><span class="navico">🧾</span>Spends</button>
+ <button data-screen="income" onclick="go('income')"><span class="navico">💰</span>Income</button>
+ <button data-screen="investment" onclick="go('investment')"><span class="navico">📈</span>Investment</button>
+ <button data-screen="money" onclick="go('money')"><span class="navico">₹</span>Money</button>
+ <button data-screen="more" onclick="go('more')"><span class="navico">•••</span>More</button>
+</div></nav>
+<button class="fab" onclick="openQuick()">＋</button>
+
+<div class="modal" id="quickModal"><div class="sheet"><button class="secondary close" onclick="closeQuick()">Close</button><h2>＋ Add Entry</h2><div class="notice">All entries are written to the same Google Sheet <b>Transactions</b> master.</div><div class="grid2" style="margin-top:12px">
+ <button class="card" onclick="closeQuick();openAdd('spend')"><h3>💸 Spend</h3><div class="meta">Daily expense · category · need</div></button>
+ <button class="card" onclick="closeQuick();openAdd('investment')"><h3>📈 Investment</h3><div class="meta">FD/RD · MF · stocks · gold</div></button>
+ <button class="card" onclick="closeQuick();openAdd('income')"><h3>💰 Income</h3><div class="meta">Salary · reimbursement · other</div></button>
+ <button class="card" onclick="closeQuick();openAdd('cc')"><h3>💳 CC Bill</h3><div class="meta">Card · billing month · amount</div></button>
+ </div></div></div>
+
+<div class="modal" id="entryModal"><div class="sheet"><button class="secondary close" onclick="closeModal()">Close</button><h2 id="entryTitle">Add Spend</h2>
+ <div class="row"><div class="field"><label>Date *</label><input type="date" id="fDate"></div><div class="field"><label>Amount ₹ *</label><input type="text" id="fAmount" inputmode="decimal" autocomplete="off" placeholder="Any amount: positive, zero or negative"></div></div>
+ <div class="row"><div class="field"><label>Account</label><select id="fAccount"></select></div><div class="field"><label>Type</label><select id="fType"></select></div></div>
+ <div class="row"><div class="field"><label>Category *</label><select id="fCategory"></select></div><div class="field"><label>Sub-category</label><select id="fSubcategory"></select></div></div>
+ <div class="row"><div class="field"><label>Need</label><select id="fNeed"></select></div><div class="field"><label>Payment</label><select id="fPayment"></select></div></div>
+ <div class="row"><div class="field"><label>Account / Card</label><select id="fCard"></select></div><div class="field"><label>Bill Month</label><input type="month" id="fBillMonth"></div></div>
+ <div class="field"><label>Description</label><textarea id="fDesc"></textarea></div>
+ <div class="actionline"><button class="redbtn hidden" id="deleteBtn" onclick="deleteEntry()">Delete</button><button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveEntry()">Save</button></div>
+ </div></div>
+
+<div class="modal" id="settingsModal"><div class="sheet"><button class="secondary close" onclick="closeSettings()">Close</button><h2>⚙️ Settings</h2><p class="mini">Customize the app without editing the Google Sheet. Changes are shared across the family app.</p><div class="field"><label>App title</label><input id="setTitle"></div><h3>Bottom navigation order</h3><p class="layout-note">Use ↑ / ↓ to move tabs. The order is saved for everyone using this family app.</p><div id="tabSettings" class="layout-list"></div><h3 style="margin-top:15px">Section order by tab</h3><p class="layout-note">Choose a tab, then move its sections up or down. This applies to the sections/cards inside that tab.</p><div class="field"><label>Tab</label><select id="sectionOrderTab" onchange="sectionSettingsTab=this.value;renderSectionOrderUI()"></select></div><div id="sectionSettings" class="layout-list"></div><h3 style="margin-top:18px">🧩 Dropdown / Master Options</h3><p class="manage-note">Add, rename or remove options used in the entry form. Renaming an existing value also updates matching transactions in the master sheet.</p><div id="optionManager"></div><div class="pin-change-box"><h3>🔐 Change App PIN</h3><p class="manage-note">Use a new 4–6 digit PIN. This changes the PIN for everyone using this family app.</p><div class="row"><div class="field"><label>Current PIN</label><input id="oldPinChange" type="password" inputmode="numeric" maxlength="6"></div><div class="field"><label>New PIN</label><input id="newPinChange" type="password" inputmode="numeric" maxlength="6"></div></div><div class="field"><label>Confirm New PIN</label><input id="confirmPinChange" type="password" inputmode="numeric" maxlength="6"></div><button class="primary" onclick="changePinUI()">Change PIN</button></div><div class="actionline"><button class="secondary" onclick="resetSettings()">Reset View Settings</button><button class="primary" onclick="saveSettingsUI()">Save Settings</button></div></div></div>
+<div class="toast" id="toast"></div>
+
+<script>
+let DATA={rows:[],options:{}},SETTINGS={};
+let globalView='monthly',activeMonth='',periodStart='',periodEnd='',currentScreen='home',editRow=null,entryMode='spend',sectionSettingsTab='home';
+const DEFAULT_TAB_ORDER=['home','spends','income','investment','money','cc','more'];
+const TAB_META={home:['⌂','Home'],spends:['🧾','Spends'],income:['💰','Income'],investment:['📈','Investment'],money:['₹','Money'],cc:['💳','CC Bills'],more:['•••','More']};
+const SECTION_META={
+  home:[['secSnapshot','🎯 Financial Snapshot'],['secAccount','👨‍👩‍👦 Account-wise Expenses'],['secMonth','📅 Explore by Month'],['secCategory','🌈 Where did it go?'],['secRecent','🧾 Recent Spends']],
+  spends:[['spendFilters','🔎 Spend Filters'],['spendTx','🧾 Transactions']],
+  income:[['incomeTx','💰 Income']],
+  investment:[['investmentTx','📈 Investment / Saving']],
+  money:[['moneyPosition','💼 Financial Position'],['moneyChart','📊 Income vs Outgoing'],['moneySummary','📅 Monthwise Summary']],
+  cc:[['ccCards','💳 Your Cards'],['ccTrend','📈 Monthly Bill Trend'],['ccShare','🏆 Card Share'],['ccHistory','🗓️ Bill History']],
+  more:[['moreMain','••• More'],['moreMaster','🗂️ Master Data']]
+};
+const $=id=>document.getElementById(id), money=n=>'₹'+Number(n||0).toLocaleString('en-IN',{maximumFractionDigits:2}), esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
+const today=()=>new Date().toISOString().slice(0,10), monthNow=()=>today().slice(0,7), monthName=m=>{if(!m)return '';let [y,x]=String(m).split('-');return new Date(+y,+x-1,1).toLocaleString('en-IN',{month:'short',year:'numeric'})},sum=a=>a.reduce((x,r)=>x+(Number(r.amount)||0),0);
+const monthKeys=()=>[...new Set(DATA.rows.filter(r=>r.date).map(r=>r.date.slice(0,7)))].sort();
+const OPENING_SAVINGS=407764;
+const OPENING_SAVINGS_DATE='31 March 2026';
+const CAT_ICONS={Food:'🍔',Grocery:'🛒',Shopping:'🛍️',Travel:'✈️',Utility:'💡',Personal:'👤','Gift/Loan':'🎁',Investment:'📈',Transport:'🚗',Home:'🏠',Education:'🎓',Medical:'💊',Health:'💊',Entertainment:'🎬',Other:'📌',ATM:'🏧',Transfer:'↔️'};
+const CAT_BG={Food:'orange',Grocery:'green',Shopping:'pink',Travel:'blue',Utility:'orange',Personal:'purple','Gift/Loan':'pink',Investment:'green',Transport:'blue',Home:'cyan',Education:'blue',Medical:'pink',Health:'pink',Entertainment:'purple',Other:'cyan',ATM:'purple',Transfer:'cyan'};
+const catIcon=c=>CAT_ICONS[c]||'📌';
+const catBg=c=>CAT_BG[c]||'cyan';
+const investmentAdded=()=>sum(DATA.rows.filter(r=>r.type==='Investment' && r.date>='2026-04-01'));
+const savingsBalance=()=>OPENING_SAVINGS+investmentAdded();
+let authToken='',pinValue='';
+function renderPinDots(){let d=$('pinDots');if(!d)return;d.innerHTML=[0,1,2,3,4,5].map(i=>'<span class=\"pin-dot '+(i<pinValue.length?'on':'')+'\"></span>').join('');}
+function pinKey(n){if(pinValue.length>=6)return;pinValue+=n;renderPinDots();if(pinValue.length===6) setTimeout(unlockApp,80);}
+function pinBack(){pinValue=pinValue.slice(0,-1);renderPinDots();}
+function pinClear(){pinValue='';renderPinDots();$('pinMsg').textContent='';}
+function unlockApp(){if(!/^\d{4,6}$/.test(pinValue)){ $('pinMsg').textContent='Enter a 4 to 6 digit PIN.'; return; } $('pinMsg').textContent='Checking…';google.script.run.withSuccessHandler(r=>{authToken=r.token; $('pinGate').classList.add('hidden');document.body.classList.remove('pin-locked');pinValue='';renderPinDots();init();}).withFailureHandler(e=>{$('pinMsg').textContent=(e&&e.message)||'Incorrect PIN.';pinValue='';renderPinDots();}).authenticatePin(pinValue);}
+function init(){activeMonth=monthNow();google.script.run.withSuccessHandler(d=>{DATA=d||{rows:[],options:{}};google.script.run.withSuccessHandler(s=>{SETTINGS=s||{};applySettings();buildForms();initGlobal();renderAll();}).withFailureHandler(showErr).getSettings(authToken);}).withFailureHandler(showErr).getAppData(authToken)}
+function buildForms(){const mp={fAccount:'Account',fType:'Type',fCategory:'Category',fSubcategory:'Sub-category',fNeed:'Need',fPayment:'Payment',fCard:'Account/Card'};Object.entries(mp).forEach(([id,key])=>fillSelect($(id),DATA.options[key]||[],'Select...'));if(entryMode==='income')$('fCategory').value='Income';if(entryMode==='investment')$('fCategory').value='Investment';if(entryMode==='cc'){$('fCategory').value='Credit Card Bill';$('fSubcategory').value='Monthly Bill'}}
+function fillSelect(el,vals,first){el.innerHTML='<option value="">'+esc(first)+'</option>'+vals.map(v=>'<option value="'+esc(v)+'">'+esc(v)+'</option>').join('')}
+function initGlobal(){let ms=monthKeys();if(!ms.includes(activeMonth))activeMonth=ms[ms.length-1]||monthNow();$('globalMonth').innerHTML=ms.slice().reverse().map(m=>'<option value="'+m+'">'+monthName(m)+'</option>').join('')||'<option value="'+activeMonth+'">'+monthName(activeMonth)+'</option>';$('globalMonth').value=activeMonth;periodStart=periodStart||((ms[0]||activeMonth)+'-01');periodEnd=periodEnd||today();updateGlobalUI()}
+function updateGlobalUI(){document.querySelectorAll('.view-btn').forEach(b=>b.classList.toggle('active',b.dataset.view===globalView));$('monthControls').classList.toggle('hidden',globalView!=='monthly');$('periodControls').classList.toggle('hidden',globalView!=='period');$('periodStart').value=periodStart||'';$('periodEnd').value=periodEnd||'';$('globalMonth').value=activeMonth;let hint=globalView==='overall'?'All recorded data':globalView==='period'?('Selected period · '+(periodStart||'—')+' to '+(periodEnd||'—')):('Monthly position · '+monthName(activeMonth));$('viewHint').textContent=hint}
+function setGlobalView(v){globalView=['monthly','overall','period'].includes(v)?v:'monthly';if(globalView==='period'&&!periodStart)periodStart=activeMonth+'-01';if(globalView==='period'&&!periodEnd)periodEnd=today();updateGlobalUI();renderAll()}
+function setGlobalMonth(v){if(!v)return;activeMonth=String(v).slice(0,7);globalView='monthly';updateGlobalUI();renderAll()}
+function shiftMonth(delta){let [y,m]=activeMonth.split('-').map(Number),d=new Date(y,m-1+delta,1);setGlobalMonth(d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0'))}
+function setPeriodDates(){periodStart=$('periodStart').value||'';periodEnd=$('periodEnd').value||'';if(periodStart&&periodEnd&&periodStart>periodEnd)[periodStart,periodEnd]=[periodEnd,periodStart];updateGlobalUI();renderAll()}
+function inScope(r){if(globalView==='overall')return true;if(globalView==='monthly')return String(r.date||'').startsWith(activeMonth);let d=String(r.date||'');return (!periodStart||d>=periodStart)&&(!periodEnd||d<=periodEnd)}
+function scopedRows(type){return DATA.rows.filter(r=>(!type||r.type===type)&&inScope(r))}
+function renderAll(){renderHome();renderSpends();renderIncome();renderInvestment();renderMoney();renderCC();renderMore();applyAllSectionOrders();}
+function go(id){currentScreen=id;document.querySelectorAll('.screen').forEach(x=>x.classList.remove('active'));$(id).classList.add('active');document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('on',b.dataset.screen===id));if(id==='income')renderIncome();if(id==='investment')renderInvestment();if(id==='spends')renderSpends();if(id==='money')renderMoney();if(id==='cc')renderCC();if(id==='more')renderMore();applyScreenSectionOrder(id);window.scrollTo({top:0,behavior:'smooth'})}
+function currentLabel(){return globalView==='overall'?'Overall':globalView==='period'?'Selected Period':monthName(activeMonth)}
+function renderHome(){let all=scopedRows(),inc=sum(all.filter(r=>r.type==='Income')),sp=sum(all.filter(r=>r.type==='Spend')),inv=sum(all.filter(r=>r.type==='Investment')),cc=sum(all.filter(r=>r.type==='CC Bill')),out=sp+inv,ess=sum(all.filter(r=>r.type==='Spend'&&r.need==='Essential')),non=sum(all.filter(r=>r.type==='Spend'&&r.need==='Non-Essential'));$('home').innerHTML=`
+ <div class="card hero"><div class="label">${globalView==='overall'?'Overall position':globalView==='period'?'Period position':'Monthly position'}</div><div class="big">${money(out)}</div><div class="minihero" style="margin:0;background:#ffffff10;border:1px solid #ffffff1c"><div class="label">Total outgoing</div><div style="font-size:10px;color:#dbeafe">Spends + Investment</div></div><div class="grid2" style="margin-top:9px"><div class="stat"><b>${money(sp)}</b><span>Spends</span></div><div class="stat"><b>${money(inv)}</b><span>Investment</span></div><div class="stat"><b>${money(inc)}</b><span>Money In</span></div><div class="stat"><b>${money(inc-out)}</b><span>Net position</span></div><div class="stat"><b>${money(savingsBalance())}</b><span>Total savings / investment</span></div></div></div>
+ <div class="card" id="secSnapshot"><div class="sectionhead"><h3>🎯 Financial Snapshot</h3><span class="pill">${currentLabel()}</span></div><div class="grid4"><div class="stat iconstat"><div class="ico blue">💰</div><div><b>${money(inc)}</b><span>Income</span></div></div><div class="stat iconstat"><div class="ico orange">🧾</div><div><b>${money(sp)}</b><span>Spends</span></div></div><div class="stat iconstat"><div class="ico green">📈</div><div><b>${money(inv)}</b><span>Investment</span></div></div><div class="stat iconstat"><div class="ico purple">💳</div><div><b>${money(cc)}</b><span>CC Bills</span></div></div></div></div>
+ <div class="card" id="secAccount"><div class="sectionhead"><h3>👨‍👩‍👦 Account-wise Expenses</h3><span class="pill">Spends</span></div>${summary(all.filter(r=>r.type==='Spend'),'account')}</div>
+ <div class="card" id="secMonth"><div class="sectionhead"><h3>📅 Explore by Month</h3></div><div class="monthchips">${monthKeys().slice().reverse().slice(0,12).map(m=>'<button class="'+(m===activeMonth&&globalView==='monthly'?'on':'')+'" onclick="setGlobalMonth(\''+m+'\')">'+monthName(m)+'</button>').join('')||'<span class="mini">No month data</span>'}</div></div>
+ <div class="card" id="secCategory"><div class="sectionhead"><h3>🌈 Where did it go?</h3><span class="pill">Top categories</span></div>${summary(all.filter(r=>r.type==='Spend'),'category')}</div>
+ <div class="card" id="secRecent"><div class="sectionhead"><h3>🧾 Recent Spends</h3><button class="secondary" onclick="go('spends')">View all</button></div>${txRows(all.filter(r=>r.type==='Spend').sort((a,b)=>b.date.localeCompare(a.date)||b.row-a.row).slice(0,7))}</div>`;applyHomeSections()}
+function summary(rs,key){let a={};rs.forEach(r=>{let k=r[key]||'Unspecified';a[k]=(a[k]||0)+Number(r.amount||0)});let ar=Object.entries(a).sort((x,y)=>y[1]-x[1]),mx=ar[0]?.[1]||1;if(!ar.length)return '<div class="empty">No data</div>';return ar.slice(0,8).map(x=>{let c=x[0];return '<div class="listrow"><div class="catrow"><div class="caticon '+catBg(c)+'">'+catIcon(c)+'</div><div class="catname"><div class="title">'+esc(c)+'</div><div class="bar"><i style="width:'+Math.max(2,x[1]/mx*100)+'%"></i></div></div></div><div class="amt">'+money(x[1])+'</div></div>'}).join('')}
+function txRows(rs){return rs.length?rs.map(txHtml).join(''):'<div class="empty">No matching entries</div>'}
+function txHtml(r){let c=r.category||r.type||'Transaction';return '<div class="listrow txclick" onclick="editTx('+r.row+')"><div class="catrow"><div class="caticon '+catBg(c)+'">'+catIcon(c)+'</div><div class="catname"><div class="title">'+esc(r.description||c)+'</div><div class="meta">'+esc(r.date)+' · '+esc(r.type)+' · '+esc(c)+(r.account?' · '+esc(r.account):'')+(r.accountCard?' · '+esc(r.accountCard):'')+'</div></div></div><div class="amt">'+money(r.amount)+'</div></div>'}
+function spendFilteredRows(qOverride){let rs=scopedRows('Spend'),q=(qOverride!==undefined?qOverride:($('spSearch')?.value||'')).toLowerCase(),a=$('spAccount')?.value||'',c=$('spCategory')?.value||'',n=$('spNeed')?.value||'',sort=$('spSort')?.value||'new';rs=rs.filter(r=>(!a||r.account===a)&&(!c||r.category===c)&&(!n||r.need===n)&&(!q||[r.description,r.category,r.subcategory,r.accountCard,r.payment,r.account].join(' ').toLowerCase().includes(q)));if(sort==='amount')rs.sort((a,b)=>b.amount-a.amount);else if(sort==='old')rs.sort((a,b)=>a.date.localeCompare(b.date)||a.row-b.row);else rs.sort((a,b)=>b.date.localeCompare(a.date)||b.row-a.row);return rs}
+function renderSpends(){let rs=spendFilteredRows();let q=($('spSearch')?.value||'').toLowerCase(),a=$('spAccount')?.value||'',c=$('spCategory')?.value||'',n=$('spNeed')?.value||'',sort=$('spSort')?.value||'new';$('spends').innerHTML=`<div class="card" id="spendFilters"><div class="sectionhead"><h2>🧾 Spends</h2><button class="primary" onclick="openAdd('spend')">＋ Add</button></div><div class="data-note" id="spSummary">${currentLabel()} · ${rs.length} transaction${rs.length===1?'':'s'} · ${money(sum(rs))}</div><div class="field"><input id="spSearch" placeholder="🔎 Search description, category, card..." value="${esc(q)}" oninput="liveSpendSearch(this)"></div><div class="filtergrid"><select id="spAccount" onchange="renderSpends()"><option value="">All accounts</option>${(DATA.options.Account||[]).map(v=>'<option '+(v===a?'selected':'')+'>'+esc(v)+'</option>').join('')}</select><select id="spCategory" onchange="renderSpends()"><option value="">All categories</option>${(DATA.options.Category||[]).map(v=>'<option '+(v===c?'selected':'')+'>'+esc(v)+'</option>').join('')}</select><select id="spNeed" onchange="renderSpends()"><option value="">All need</option>${(DATA.options.Need||[]).map(v=>'<option '+(v===n?'selected':'')+'>'+esc(v)+'</option>').join('')}</select><select id="spSort" onchange="renderSpends()"><option value="new" ${sort==='new'?'selected':''}>Newest</option><option value="old" ${sort==='old'?'selected':''}>Oldest</option><option value="amount" ${sort==='amount'?'selected':''}>Amount high</option></select></div></div><div class="card" id="spendTx"><div class="sectionhead"><h3>Transactions</h3><span class="pill">Tap to edit</span></div><div id="spTxList">${txRows(rs)}</div></div>`}
+function liveSpendSearch(input){let rs=spendFilteredRows(input.value),summary=$('spSummary'),list=$('spTxList');if(summary)summary.textContent=currentLabel()+' · '+rs.length+' transaction'+(rs.length===1?'':'s')+' · '+money(sum(rs));if(list)list.innerHTML=txRows(rs);if(document.activeElement!==input){input.focus()} }
+function renderIncome(){let rs=scopedRows('Income').sort((a,b)=>b.date.localeCompare(a.date)||b.row-a.row),total=sum(rs);$('income').innerHTML=`<div class="minihero"><div class="label" style="color:#bfdbfe">${globalView==='overall'?'Overall income':globalView==='period'?'Period income':'Monthly income'}</div><div class="kpi">${money(total)}</div><div style="font-size:10px;color:#dbeafe">${rs.length} income entr${rs.length===1?'y':'ies'}</div></div><div class="card" id="incomeTx"><div class="sectionhead"><h3>💰 Income</h3><button class="primary" onclick="openAdd('income')">＋ Add</button></div>${txRows(rs)}</div>`}
+function renderInvestment(){let rs=scopedRows('Investment').sort((a,b)=>b.date.localeCompare(a.date)||b.row-a.row),added=investmentAdded(),balance=OPENING_SAVINGS+added,monthlyInv=sum(rs);let monthlyLabel=globalView==='overall'?'Total investments recorded':globalView==='period'?'Investment in selected period':'Investment in '+monthName(activeMonth);$('investment').innerHTML=`<div class="minihero"><div class="label" style="color:#bfdbfe">Total Savings / Investment</div><div class="kpi">${money(balance)}</div><div style="font-size:11px;color:#dbeafe">Opening balance + investments added after 31 Mar 2026</div></div><div class="grid2"><div class="card"><div class="stat iconstat focusstat"><div class="ico purple">🏦</div><div><b>${money(OPENING_SAVINGS)}</b><span>Balance as on ${OPENING_SAVINGS_DATE}</span></div></div></div><div class="card"><div class="stat iconstat focusstat"><div class="ico green">📈</div><div><b>${money(monthlyInv)}</b><span>${monthlyLabel}</span></div></div></div></div><div class="card" id="investmentTx"><div class="sectionhead"><h3>📈 Investment / Saving</h3><button class="primary" onclick="openAdd('investment')">＋ Add</button></div><div class="data-note">Current savings/investment balance: <b>${money(balance)}</b></div><div style="height:8px"></div>${txRows(rs)}</div>`}
+function renderMoney(){
+ let all=scopedRows(),inc=sum(all.filter(r=>r.type==='Income')),sp=sum(all.filter(r=>r.type==='Spend')),inv=sum(all.filter(r=>r.type==='Investment')),net=inc-sp-inv;
+ let months=monthKeys().slice(-12);
+ let bars=months.map(m=>{let I=sum(DATA.rows.filter(r=>r.type==='Income'&&r.date.startsWith(m))),O=sum(DATA.rows.filter(r=>(r.type==='Spend'||r.type==='Investment')&&r.date.startsWith(m)));let mx=Math.max(Math.abs(I),Math.abs(O),1);return `<div class="mcol" onclick="showChartValue('${m}',${I},${O})" title="Tap to view values"><div style="width:100%;display:flex;gap:4px;align-items:end;justify-content:center;height:110px"><div class="mbar chartbar" style="height:${Math.max(4,Math.abs(I)/mx*100)}px;background:linear-gradient(180deg,#22c55e,#16a34a)" aria-label="Income"></div><div class="mbar chartbar" style="height:${Math.max(4,Math.abs(O)/mx*100)}px;background:linear-gradient(180deg,#ef4444,#dc2626)" aria-label="Outgoing"></div></div><div class="mlab">${esc(monthName(m).split(' ')[0])}</div></div>`}).join('');
+ let rows=months.slice().reverse().map(m=>{let I=sum(DATA.rows.filter(r=>r.type==='Income'&&r.date.startsWith(m))),S=sum(DATA.rows.filter(r=>r.type==='Spend'&&r.date.startsWith(m))),V=sum(DATA.rows.filter(r=>r.type==='Investment'&&r.date.startsWith(m))),O=S+V,C=sum(DATA.rows.filter(r=>r.type==='CC Bill'&&r.date.startsWith(m)));return `<tr><td>${esc(monthName(m))}</td><td>${money(I)}</td><td>${money(S)}</td><td>${money(V)}</td><td>${money(O)}</td><td>${money(C)}</td></tr>`}).join('');
+ $('money').innerHTML=`<div class="minihero"><div class="label" style="color:#bfdbfe">${currentLabel()} financial position</div><div class="kpi ${net<0?'negative':''}">${money(net)}</div><div style="font-size:10px;color:#dbeafe">Money In − Total Outgoing (Spends + Investment)</div></div>
+ <div class="card" id="moneyPosition"><div class="sectionhead"><h3>💼 Financial Position</h3><span class="pill">${currentLabel()}</span></div><div class="grid2"><div class="stat iconstat"><div class="ico blue">💰</div><div><b>${money(inc)}</b><span>Money In</span></div></div><div class="stat iconstat"><div class="ico orange">🧾</div><div><b>${money(sp)}</b><span>Spends</span></div></div><div class="stat iconstat"><div class="ico green">📈</div><div><b>${money(inv)}</b><span>Investment</span></div></div><div class="stat iconstat"><div class="ico purple">🧮</div><div><b>${money(net)}</b><span>Net</span></div></div></div></div>
+ <div class="card" id="moneyChart"><div class="sectionhead"><h3>📊 Income vs Outgoing</h3><span class="pill">Green = Income · Red = Outgoing</span></div><div class="monthchart">${bars||'<div class="empty">No monthly data</div>'}</div><div id="chartTip" class="charttip">Tap a month column to display its values.</div></div>
+ <div class="card" id="moneySummary"><div class="sectionhead"><h3>📅 Monthwise Summary</h3><span class="pill">Income · Spends · Investment · Outgoing · CC Bills</span></div><div class="monthsummary"><table class="data"><tr><th>Month</th><th>Income</th><th>Spends</th><th>Investment</th><th>Total Outgoing</th><th>CC Bills</th></tr>${rows||'<tr><td colspan="6" class="empty">No monthly data</td></tr>'}</table></div></div>`;
+ applyScreenSectionOrder('money');
+}
+function showChartValue(m,I,O){let e=$('chartTip');if(e)e.innerHTML=`<b>${esc(monthName(m))}</b> · <span style="color:#15803d">Income ${money(I)}</span> · <span style="color:#dc2626">Outgoing ${money(O)}</span>`}
+function renderCC(){let rs=scopedRows('CC Bill'),cards={};rs.forEach(r=>{let k=r.accountCard||r.category||'Unspecified';cards[k]=(cards[k]||0)+Number(r.amount||0)});let names=Object.keys(cards).sort((a,b)=>cards[b]-cards[a]),grand=sum(rs),tiles=names.map((n,i)=>'<div class="cardtile tile'+(i%6+1)+'"><h4>💳 '+esc(n)+'</h4><div class="amount">'+money(cards[n])+'</div><small>'+currentLabel()+'</small></div>').join('');let months=monthKeys().slice(-9),mx=Math.max(...months.map(m=>sum(DATA.rows.filter(r=>r.type==='CC Bill'&&r.date.startsWith(m)))),1),bars=months.map(m=>{let v=sum(DATA.rows.filter(r=>r.type==='CC Bill'&&r.date.startsWith(m)));return '<div class="mcol"><div class="mval">'+money(v)+'</div><div class="mbar" style="height:'+Math.max(4,v/mx*105)+'px"></div><div class="mlab">'+monthName(m).split(' ')[0]+'</div></div>'}).join('');let cols=['#2563eb','#06b6d4','#22c55e','#f59e0b','#9333ea','#ec4899'],share=names.map((n,i)=>((cards[n]/(grand||1))*360)+'deg '+cols[i%cols.length]).join(',');let start=0,stops=names.map((n,i)=>{let e=start+(cards[n]/(grand||1))*360;let x=cols[i%cols.length]+' '+start+'deg '+e+'deg';start=e;return x}).join(',');let legend=names.map((n,i)=>'<div class="legendrow"><span><i class="dot" style="background:'+cols[i%cols.length]+'"></i>'+esc(n)+'</span><b>'+money(cards[n])+'</b></div>').join('');$('cc').innerHTML=`<div class="minihero"><div class="label" style="color:#bfdbfe">${globalView==='overall'?'Overall card position':globalView==='period'?'Period card position':'Credit-card position'}</div><div class="kpi">${money(grand)}</div><div style="font-size:10px;color:#dbeafe">${names.length} card${names.length===1?'':'s'} with bill data</div></div><div class="card" id="ccCards"><div class="sectionhead"><h3>💳 Your Cards</h3><button class="primary" onclick="openAdd('cc')">＋ Add</button></div><div class="grid2">${tiles||'<div class="empty">No credit-card bills in this view.</div>'}</div></div><div class="card" id="ccTrend"><div class="sectionhead"><h3>📈 Monthly Bill Trend</h3><span class="pill">Last 9 months</span></div><div class="monthchart">${bars}</div></div><div class="card" id="ccShare"><div class="sectionhead"><h3>🏆 Card Share</h3><span class="pill">'+names.length+' cards</span></div><div class="donutwrap"><div class="donut" style="background:conic-gradient(${stops||'#e8edf4 0deg 360deg'})"><span>${names.length}<small style="font-size:9px">cards</small></span></div><div class="legend">${legend||'<div class="empty">No card data</div>'}</div></div></div><div class="card" id="ccHistory"><div class="sectionhead"><h3>🗓️ Bill History</h3><span class="pill">Tap to edit</span></div>${txRows(rs.sort((a,b)=>b.date.localeCompare(a.date)||b.row-a.row))}</div>`}
+function renderMore(){let s=mergedSettings();$('more').innerHTML=`<div class="card" id="moreMain"><h2>••• More</h2><div class="listrow" onclick="go('income')"><div><div class="title">💰 Income</div><div class="meta">View and add income entries</div></div><b>›</b></div><div class="listrow" onclick="go('investment')"><div><div class="title">📈 Investment</div><div class="meta">View and add investment entries</div></div><b>›</b></div><div class="listrow" onclick="go('cc')"><div><div class="title">💳 Credit Cards</div><div class="meta">View card bills and card history</div></div><b>›</b></div><div class="listrow" onclick="openSettings()"><div><div class="title">⚙️ Settings</div><div class="meta">Customize tabs, sections, dropdowns and PIN</div></div><b>›</b></div><div class="listrow" onclick="refresh()"><div><div class="title">↻ Refresh Data</div><div class="meta">Reload directly from Google Sheet master</div></div><b>›</b></div></div><div class="card" id="moreMaster"><h3>Master Data</h3><div class="notice"><b>Transactions</b> is the single master ledger. Every screen reads the same rows. App settings and dropdown choices are shared across the family.</div></div>`}
+function mergedSettings(){let o=Array.isArray(SETTINGS.tabOrder)?SETTINGS.tabOrder.slice():DEFAULT_TAB_ORDER.slice();if(!o.includes('cc')){let mi=o.indexOf('more');if(mi<0)o.push('cc');else o.splice(mi,0,'cc')}return {title:SETTINGS.title||'My Expense Analyzer',tabs:{home:true,spends:true,income:true,investment:true,money:true,cc:true,more:true,...(SETTINGS.tabs||{})},tabOrder:o,sections:{secSnapshot:true,secAccount:true,secMonth:true,secCategory:true,secRecent:true,...(SETTINGS.sections||{})},sectionOrders:SETTINGS.sectionOrders||{}}}
+function sectionOrderFor(screen){let d=(SECTION_META[screen]||[]).map(x=>x[0]), saved=mergedSettings().sectionOrders[screen]||[];return [...saved.filter(x=>d.includes(x)),...d.filter(x=>!saved.includes(x))]}
+function applyHomeSections(){let s=mergedSettings();['secSnapshot','secAccount','secMonth','secCategory','secRecent'].forEach(id=>{let e=$(id);if(e)e.style.display=s.sections[id]?'block':'none'})}
+function applyScreenSectionOrder(screen){let el=$(screen);if(!el)return;let order=sectionOrderFor(screen);let nodes=order.map(id=>$(id)).filter(x=>x&&x.parentElement===el);nodes.forEach(n=>el.appendChild(n));if(screen==='home')applyHomeSections()}
+function applyAllSectionOrders(){Object.keys(SECTION_META).forEach(applyScreenSectionOrder)}
+function renderNav(){let s=mergedSettings(),order=s.tabOrder.filter(id=>TAB_META[id]);let nav=document.querySelector('.navin');if(!nav)return;let visible=order.filter(id=>s.tabs[id]!==false);if(!visible.includes('more'))visible.push('more');nav.style.gridTemplateColumns=`repeat(${Math.max(1,visible.length)},1fr)`;nav.innerHTML=visible.map(id=>{let m=TAB_META[id];return `<button data-screen="${id}" onclick="go('${id}')" class="${currentScreen===id?'on':''}"><span class="navico">${m[0]}</span>${esc(m[1])}</button>`}).join('')}
+function applySettings(){let s=mergedSettings();SETTINGS=s;$('brandTitle').textContent=s.title;renderNav();applyHomeSections();applyAllSectionOrders()}
+function syncTabVisibility(){let s=mergedSettings();document.querySelectorAll('[data-layout-tab]').forEach(x=>s.tabs[x.dataset.layoutTab]=x.checked);SETTINGS=s;return s}
+function moveTab(id,dir){let s=syncTabVisibility(),a=s.tabOrder.slice(),i=a.indexOf(id),j=i+dir;if(i<0||j<0||j>=a.length)return;[a[i],a[j]]=[a[j],a[i]];s.tabOrder=a;SETTINGS=s;renderTabSettings();renderNav();}
+function moveSection(screen,id,dir){let s=mergedSettings(),a=sectionOrderFor(screen),i=a.indexOf(id),j=i+dir;if(i<0||j<0||j>=a.length)return;[a[i],a[j]]=[a[j],a[i]];s.sectionOrders[screen]=a;SETTINGS=s;renderSectionOrderUI();applyScreenSectionOrder(screen)}
+function openQuick(){$('quickModal').classList.add('show')}function closeQuick(){$('quickModal').classList.remove('show')}
+function openAdd(mode,row=null){entryMode=mode;editRow=row;$('entryModal').classList.add('show');$('entryTitle').textContent=(row?'Edit ':'Add ')+({spend:'Spend',income:'Income',investment:'Investment / Saving',cc:'Credit Card Bill'}[mode]||'Entry');$('deleteBtn').classList.toggle('hidden',!row);resetForm();let r=row?DATA.rows.find(x=>x.row===row):null;if(r){$('fDate').value=r.date;$('fAmount').value=r.amount;$('fAccount').value=r.account;$('fType').value=r.type;$('fCategory').value=r.category;$('fSubcategory').value=r.subcategory;$('fNeed').value=r.need;$('fPayment').value=r.payment;$('fCard').value=r.accountCard;$('fBillMonth').value=r.billMonth;$('fDesc').value=r.description}else{$('fDate').value=today();$('fBillMonth').value=activeMonth||monthNow();let types={spend:'Spend',income:'Income',investment:'Investment',cc:'CC Bill'};$('fType').value=types[mode];if(mode==='income')$('fCategory').value='Income';if(mode==='investment')$('fCategory').value='Investment';if(mode==='cc'){$('fCategory').value='Credit Card Bill';$('fSubcategory').value='Monthly Bill';$('fDesc').value='Credit Card Bill'}}}
+function resetForm(){$('fDate').value=today();$('fAmount').value='';$('fDesc').value='';$('fBillMonth').value=activeMonth||monthNow();['fAccount','fType','fCategory','fSubcategory','fNeed','fPayment','fCard'].forEach(id=>$(id).value='')}
+function closeModal(){$('entryModal').classList.remove('show');editRow=null}
+function saveEntry(){let raw=String($('fAmount').value??'').trim().replace(/,/g,'');if(raw===''){toast('Enter an amount');return}let amount=Number(raw);if(!Number.isFinite(amount)){toast('Enter a valid number');return}let d={row:editRow,date:$('fDate').value,amount:amount,account:$('fAccount').value,type:$('fType').value,category:$('fCategory').value,subcategory:$('fSubcategory').value,need:$('fNeed').value,payment:$('fPayment').value,accountCard:$('fCard').value,billMonth:$('fBillMonth').value,description:$('fDesc').value};let ok=()=>{closeModal();refresh();toast('Saved ✓')};if(editRow)google.script.run.withSuccessHandler(ok).withFailureHandler(showErr).updateTransaction(d,authToken);else google.script.run.withSuccessHandler(ok).withFailureHandler(showErr).saveTransaction(d,authToken)}
+function appConfirm(title,message,okText='OK',cancelText='Cancel'){
+  return new Promise(resolve=>{
+    const old=document.getElementById('appConfirmOverlay');
+    if(old) old.remove();
+    const ov=document.createElement('div');
+    ov.id='appConfirmOverlay';
+    ov.style.cssText='position:fixed;inset:0;z-index:99999;background:rgba(15,23,42,.48);display:flex;align-items:center;justify-content:center;padding:20px;box-sizing:border-box;';
+    ov.innerHTML=`<div style="width:min(520px,100%);background:#fff;border-radius:24px;box-shadow:0 20px 60px rgba(0,0,0,.25);padding:24px;box-sizing:border-box;font-family:inherit;color:#10203A;">
+      <div style="font-size:21px;font-weight:800;margin-bottom:14px;">${title}</div>
+      <div style="font-size:16px;line-height:1.55;white-space:pre-line;color:#475569;">${message}</div>
+      <div style="display:flex;justify-content:flex-end;gap:12px;margin-top:24px;">
+        <button id="appConfirmCancel" style="border:0;border-radius:14px;padding:12px 20px;background:#EAF0F8;color:#10203A;font-size:16px;font-weight:700;">${cancelText}</button>
+        <button id="appConfirmOk" style="border:0;border-radius:14px;padding:12px 20px;background:#10203A;color:#fff;font-size:16px;font-weight:700;">${okText}</button>
+      </div>
+    </div>`;
+    document.body.appendChild(ov);
+    const finish=v=>{ov.remove();resolve(v)};
+    ov.querySelector('#appConfirmCancel').onclick=()=>finish(false);
+    ov.querySelector('#appConfirmOk').onclick=()=>finish(true);
+    ov.addEventListener('click',e=>{if(e.target===ov)finish(false)});
+  });
+}
+
+async function deleteEntry(){
+  if(!editRow){
+    toast('No transaction selected.');
+    return;
+  }
+  const r=DATA.rows.find(x=>Number(x.row)===Number(editRow));
+  const label=r ? ((r.type||'Transaction')+' • ₹'+Number(r.amount||0).toLocaleString('en-IN',{maximumFractionDigits:2})+(r.description?' • '+r.description:'')) : 'this transaction';
+
+  const first=await appConfirm('Delete transaction?',label+'\n\nThis will permanently remove the transaction from the Google Sheet.','Continue','Cancel');
+  if(!first) return;
+  const second=await appConfirm('Final confirmation','Are you sure you want to permanently DELETE this transaction?\n\nThis action cannot be undone.','Delete','Cancel');
+  if(!second) return;
+
+  const rowToDelete=Number(editRow);
+  const ok=()=>{
+    closeModal();
+    refresh();
+    toast('Transaction deleted ✓');
+  };
+  google.script.run
+    .withSuccessHandler(ok)
+    .withFailureHandler(showErr)
+    .deleteTransaction(rowToDelete,authToken);
+}
+
+function editTx(row){let r=DATA.rows.find(x=>x.row===row);if(!r)return;let mode=r.type==='CC Bill'?'cc':r.type.toLowerCase();openAdd(mode,row)}
+function refresh(){google.script.run.withSuccessHandler(d=>{DATA=d||{rows:[],options:{}};buildForms();initGlobal();renderAll();toast('Data refreshed ✓')}).withFailureHandler(showErr).getAppData(authToken)}
+const LOCKED_OPTIONS={Type:['Spend','Income','Investment','CC Bill'],Category:['Income','Investment','Credit Card Bill']}
+function managedOptionFields(){return ['Account','Type','Category','Sub-category','Need','Payment','Account/Card']}
+function renderOptionManager(){let wrap=$('optionManager');if(!wrap)return;let fields=managedOptionFields();wrap.innerHTML=fields.map(k=>{let vals=(DATA.options[k]||[]);return `<div class="card" style="padding:12px;margin-bottom:9px"><div class="sectionhead"><h3>${esc(k)}</h3><span class="pill">${vals.length} options</span></div><div class="manage-list">${vals.map((v,i)=>{let locked=(LOCKED_OPTIONS[k]||[]).includes(v);return `<div class="manage-item"><input data-opt-field="${esc(k)}" data-opt-index="${i}" value="${esc(v)}" ${locked?'disabled':''}><button class="secondary" ${locked?'disabled':''} onclick="renameManagedOption('${esc(k).replace(/'/g,"\'")}',${i})">Rename</button><button class="redbtn" ${locked?'disabled':''} onclick="deleteManagedOption('${esc(k).replace(/'/g,"\'")}',${i})">Delete</button></div>`}).join('')||'<div class="mini">No options yet.</div>'}</div><div class="manage-add"><input id="addOpt_${fields.indexOf(k)}" placeholder="Add new ${esc(k)}"><button class="primary" onclick="addManagedOption('${esc(k).replace(/'/g,"\'")}',${fields.indexOf(k)})">＋ Add</button></div></div>`}).join('')}
+function renderTabSettings(){let s=mergedSettings();$('tabSettings').innerHTML=s.tabOrder.map((id,i)=>{let m=TAB_META[id],locked=id==='more';return `<div class="layout-item"><span class="draglabel">${m[0]} ${esc(m[1])}${locked?' <span class="pill">Settings access</span>':''}</span><label class="switch"><input type="checkbox" data-layout-tab="${id}" ${s.tabs[id]!==false?'checked':''} ${locked?'disabled':''}><span class="slider"></span></label><button class="secondary" ${i===0?'disabled':''} onclick="moveTab('${id}',-1)">↑</button><button class="secondary" ${i===s.tabOrder.length-1?'disabled':''} onclick="moveTab('${id}',1)">↓</button></div>`}).join('')}
+function renderSectionOrderUI(){let s=mergedSettings(),sel=$('sectionOrderTab');if(!sel)return;let tabs=['home','spends','income','investment','money','cc','more'];sel.innerHTML=tabs.map(id=>`<option value="${id}">${id==='cc'?'CC Bills':TAB_META[id]?.[1]||id}</option>`).join('');let screen=sectionSettingsTab||sel.value||currentScreen;if(!SECTION_META[screen])screen='home';sel.value=screen;sectionSettingsTab=screen;let order=sectionOrderFor(screen);$('sectionSettings').innerHTML=order.map((id,i)=>{let meta=(SECTION_META[screen]||[]).find(x=>x[0]===id);return `<div class="layout-item"><span class="draglabel">${meta?meta[1]:id}</span><button class="secondary" ${i===0?'disabled':''} onclick="moveSection('${screen}','${id}',-1)">↑</button><button class="secondary" ${i===order.length-1?'disabled':''} onclick="moveSection('${screen}','${id}',1)">↓</button></div>`}).join('')||'<div class="mini">No reorderable sections in this tab.</div>'}
+function openSettings(){let s=mergedSettings();$('setTitle').value=s.title;renderTabSettings();renderSectionOrderUI();renderOptionManager();$('settingsModal').classList.add('show')}
+function closeSettings(){$('settingsModal').classList.remove('show')}
+function saveSettingsUI(){let s=mergedSettings();s.title=$('setTitle').value.trim()||'My Expense Analyzer';document.querySelectorAll('[data-layout-tab]').forEach(x=>s.tabs[x.dataset.layoutTab]=x.checked);google.script.run.withSuccessHandler(v=>{SETTINGS=v||s;applySettings();closeSettings();toast('Settings saved ✓')}).withFailureHandler(showErr).saveSettings(s,authToken)}
+function persistManagedOptions(field,values,done){google.script.run.withSuccessHandler(d=>{DATA.options[field]=d.options[field]||values;buildForms();renderOptionManager();if(done)done();toast('Options saved ✓')}).withFailureHandler(showErr).saveOptionList(field,values,authToken)}
+function addManagedOption(field,idx){let e=$('addOpt_'+idx),v=(e&&e.value||'').trim();if(!v){toast('Enter a value first');return}let vals=[...(DATA.options[field]||[])];if(vals.some(x=>x.toLowerCase()===v.toLowerCase())){toast('Already exists');return}vals.push(v);persistManagedOptions(field,vals,()=>{if(e)e.value=''})}
+function renameManagedOption(field,idx){let inputs=document.querySelectorAll('[data-opt-field="'+CSS.escape(field)+'"]');let input=inputs[idx],nv=(input&&input.value||'').trim(),vals=[...(DATA.options[field]||[])];if(!input||!nv||!vals[idx])return;if(nv===vals[idx]){toast('No change');return}if(vals.some((x,i)=>i!==idx&&x.toLowerCase()===nv.toLowerCase())){toast('Already exists');return}let old=vals[idx];vals[idx]=nv;google.script.run.withSuccessHandler(d=>{DATA.options[field]=d.options[field]||vals;buildForms();renderOptionManager();refresh();toast(old+' → '+nv)}).withFailureHandler(showErr).renameOption(field,old,nv,authToken)}
+function deleteManagedOption(field,idx){let vals=[...(DATA.options[field]||[])],old=vals[idx];if(!old)return;if(!confirm('Remove "'+old+'" from future dropdown choices? Existing transactions are kept.'))return;vals.splice(idx,1);persistManagedOptions(field,vals)}
+function changePinUI(){let old=$('oldPinChange').value.trim(),nw=$('newPinChange').value.trim(),cf=$('confirmPinChange').value.trim();if(!/^\d{4,6}$/.test(old)||!/^[0-9]{4,6}$/.test(nw)){toast('PIN must be 4–6 digits');return}if(nw!==cf){toast('New PINs do not match');return}google.script.run.withSuccessHandler(()=>{['oldPinChange','newPinChange','confirmPinChange'].forEach(id=>$(id).value='');toast('PIN changed ✓')}).withFailureHandler(showErr).changeAppPin(old,nw,authToken)}
+function resetSettings(){let d={title:'My Expense Analyzer',tabs:{home:true,spends:true,income:true,investment:true,money:true,cc:true,more:true},tabOrder:DEFAULT_TAB_ORDER.slice(),sectionOrders:{},sections:{secSnapshot:true,secAccount:true,secMonth:true,secCategory:true,secRecent:true}};google.script.run.withSuccessHandler(v=>{SETTINGS=v||d;applySettings();openSettings();toast('Reset ✓')}).withFailureHandler(showErr).saveSettings(d,authToken)}
+function showErr(e){alert(e&&e.message?e.message:String(e))}function toast(t){$('toast').textContent=t;$('toast').style.display='block';setTimeout(()=>$('toast').style.display='none',1800)}
+window.onload=function(){renderPinDots();};
+</script>
+</body>
+</html>
+
+<style id="mobile-text-fit-fix-v26">
+/* MOBILE TEXT FIT: keep stat contents readable inside the now-correct grids. */
+@media(max-width:520px){
+  .phone-device .grid2,
+  .phone-device .grid4{
+    grid-template-columns:minmax(0,1fr) minmax(0,1fr);
+  }
+
+  .phone-device .stat.iconstat{
+    display:grid;
+    grid-template-columns:42px minmax(0,1fr);
+    align-items:center;
+    gap:8px;
+    min-width:0;
+    overflow:hidden;
+  }
+
+  .phone-device .stat.iconstat .ico{
+    width:42px;
+    min-width:42px;
+    height:42px;
+    font-size:21px;
+  }
+
+  .phone-device .stat.iconstat > div:last-child{
+    min-width:0;
+    width:auto;
+    max-width:none;
+    overflow:visible;
+  }
+
+  .phone-device .stat.iconstat b{
+    display:block;
+    font-size:clamp(14px,4.25vw,19px);
+    line-height:1.12;
+    white-space:normal;
+    overflow:visible;
+    text-overflow:clip;
+    overflow-wrap:normal;
+    word-break:normal;
+    letter-spacing:-.35px;
+  }
+
+  .phone-device .stat.iconstat span{
+    display:block;
+    font-size:10px;
+    line-height:1.2;
+    white-space:normal;
+    overflow:visible;
+    overflow-wrap:anywhere;
+  }
+
+  /* Hero stat amounts: never replace a real value with an ellipsis. */
+  .phone-device .hero .stat b{
+    font-size:clamp(14px,4.1vw,22px);
+    line-height:1.08;
+    white-space:normal;
+    overflow:visible;
+    text-overflow:clip;
+    overflow-wrap:normal;
+    word-break:normal;
+    letter-spacing:-.45px;
+  }
+
+  .phone-device .hero .stat span{
+    white-space:normal;
+    line-height:1.2;
+  }
+
+  /* Investment opening-balance and other icon-stat cards get a little more usable width. */
+  .phone-device .grid2 > .stat.iconstat,
+  .phone-device .grid4 > .stat.iconstat{
+    padding:14px 12px;
+  }
+}
+
+@media(max-width:390px){
+  .phone-device .stat.iconstat{
+    grid-template-columns:38px minmax(0,1fr);
+    gap:6px;
+    padding:11px 9px;
+  }
+  .phone-device .stat.iconstat .ico{
+    width:38px;
+    min-width:38px;
+    height:38px;
+    font-size:19px;
+  }
+  .phone-device .stat.iconstat b{font-size:14px;}
+  .phone-device .stat.iconstat span{font-size:9px;}
+  .phone-device .hero .stat b{font-size:14px;}
+}
+</style>
