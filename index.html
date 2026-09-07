@@ -1,3 +1,4 @@
+
 <!doctype html>
 <html>
 <head>
@@ -228,7 +229,11 @@ const google = {
             if (cProp in cTarget) return cTarget[cProp];
             return function(...args) {
               fetch(SCRIPT_API_URL, {
+                redirect: "follow",
                 method: "POST",
+                headers: {
+                  "Content-Type": "text/plain;charset=utf-8"
+                },
                 body: JSON.stringify({ action: cProp, args: args })
               })
               .then(res => res.json())
