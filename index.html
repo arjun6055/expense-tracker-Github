@@ -215,37 +215,36 @@ const SCRIPT_API_URL = "https://script.google.com/macros/s/AKfycbwnBVOVjMfGkd9bB
 
 const google = {
   script: {
-    run: new Proxy({}, {
-      get(target, prop) {
-        let onSuccess = () => {};
-        let onFailure = (err) => console.error(err);
-        const chain = {
-          withSuccessHandler(fn) { onSuccess = fn; return chain; },
-          withFailureHandler(fn) { onFailure = fn; return chain; }
-        };
-        return new Proxy(chain, {
-          get(cTarget, cProp) {
-            if (cProp in cTarget) return cTarget[cProp];
-            return function(...args) {
-              fetch(SCRIPT_API_URL, {
-                redirect: "follow",
-                method: "POST",
-                headers: {
-                  "Content-Type": "text/plain;charset=utf-8"
-                },
-                body: JSON.stringify({ action: cProp, args: args })
-              })
-              .then(res => res.json())
-              .then(data => {
+    get run() {
+      let onSuccess = () => {};
+      let onFailure = console.error;
+      const runner = new Proxy({}, {
+        get(target, prop) {
+          if (prop === 'withSuccessHandler') return (fn) => { onSuccess = fn; return runner; };
+          if (prop === 'withFailureHandler') return (fn) => { onFailure = fn; return runner; };
+          return (...args) => {
+            fetch(SCRIPT_API_URL, {
+              redirect: "follow",
+              method: "POST",
+              headers: { "Content-Type": "text/plain;charset=utf-8" },
+              body: JSON.stringify({ action: prop, args: args })
+            })
+            .then(res => res.text())
+            .then(text => {
+              try {
+                const data = JSON.parse(text);
                 if (data.error) onFailure(new Error(data.error));
                 else onSuccess(data.result);
-              })
-              .catch(err => onFailure(err));
-            };
-          }
-        });
-      }
-    })
+              } catch(e) {
+                onFailure(new Error("API Link Error. Ensure New Version was deployed."));
+              }
+            })
+            .catch(err => onFailure(err));
+          };
+        }
+      });
+      return runner;
+    }
   }
 };
 // --- END BRIDGE ---
