@@ -8,7 +8,7 @@
 <meta name="theme-color" content="#101a2c">
 
 <style>
-/* V3.1 DYNAMIC CSS VARIABLE ENGINE */
+/* V3.3 DYNAMIC CSS VARIABLE ENGINE */
 :root {
   --bg: #f4f7fb; --card: #ffffff; --ink: #152238; --muted: #718096; --line: #e7ecf3; --dark: #101a2c;
   --blue: #2563eb; --cyan: #06b6d4; --green: #16a34a; --orange: #f59e0b; --pink: #ec4899; --purple: #7c3aed; --red: #dc2626;
@@ -22,16 +22,17 @@ body.dark-mode {
   --input-bg: #1f2937; --btn-sec-bg: #334155; --pill-bg: #1e293b; --pill-txt: #818cf8; --glass: rgba(17,24,39,.97);
 }
 
-*{box-sizing:border-box}html{scroll-behavior:smooth}
-body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;-webkit-tap-highlight-color:transparent;overflow-x:hidden}
-button,input,select,textarea{font:inherit}button{cursor:pointer;border:0}
-button:focus,input:focus,select:focus,textarea:focus{outline:3px solid #2563eb25;outline-offset:1px}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;overflow-x:hidden}
+button,input,select,textarea{font:inherit}button{cursor:pointer;border:0;outline:none!important}
+input:focus,select:focus,textarea:focus{outline:3px solid #2563eb25;outline-offset:1px}
+
 .app{max-width:1050px;margin:auto;padding-bottom:125px;min-height:100svh}
 .top{color:#fff;padding:28px 28px 24px;border-radius:0 0 38px 38px;background:radial-gradient(circle at 92% 10%,#38bdf8 0,#2563eb 23%,transparent 45%),radial-gradient(circle at 60% 120%,#1d4ed8 0,#101827 58%);position:relative;overflow:hidden}
 .top:after{content:"";position:absolute;width:220px;height:220px;border:1px solid #ffffff20;border-radius:50%;right:-90px;bottom:-125px;box-shadow:0 0 0 32px #ffffff08,0 0 0 64px #ffffff05}
 .brand{position:relative;z-index:1}.brand h1{font-size:32px;margin:0;font-weight:900;letter-spacing:-1px}.brand p{margin:6px 0 0;color:#dbeafe;font-size:13px}
-.content{padding:16px 22px 24px;min-height:70vh}.screen{display:none}.screen.active{display:block;animation:fadein .2s cubic-bezier(0.2,0.8,0.2,1)}
-@keyframes fadein{from{opacity:0;transform:scale(0.98)}to{opacity:1;transform:scale(1)}}
+.content{padding:16px 22px 24px;min-height:70vh}.screen{display:none}.screen.active{display:block;animation:fadein .15s cubic-bezier(0,0,.2,1)}
+@keyframes fadein{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 
 .card{background:var(--card);border:1px solid var(--line);border-radius:30px;padding:22px;margin-bottom:16px;box-shadow:var(--shadow);color:var(--ink)}
 .card h2{font-size:25px;margin:0 0 16px;letter-spacing:-.45px}.card h3{font-size:20px;margin:0 0 14px;letter-spacing:-.25px}
@@ -43,7 +44,22 @@ button:focus,input:focus,select:focus,textarea:focus{outline:3px solid #2563eb25
 .grid2{grid-template-columns:repeat(2,minmax(0,1fr))}.grid3{grid-template-columns:repeat(3,minmax(0,1fr))}.grid4{grid-template-columns:repeat(2,minmax(0,1fr))}
 .stat{background:var(--stat-bg);border:1px solid var(--stat-border);border-radius:21px;padding:15px;min-width:0;overflow:hidden}
 .hero .stat{background:#ffffff14;border-color:#ffffff22}
-.stat b{display:block;font-size:clamp(15px,4.5vw,21px);font-weight:900;line-height:1.2;letter-spacing:-.4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* Strictly Enforced Single Row Numbers */
+.stat b, .cardtile .amount, .focusstat b {
+    display: block !important;
+    font-size: clamp(15px, 4.5vw, 21px) !important;
+    font-weight: 900 !important;
+    line-height: 1.2 !important;
+    letter-spacing: -0.4px !important;
+    white-space: nowrap !important;
+    word-break: keep-all !important;
+    overflow-wrap: normal !important;
+    text-overflow: ellipsis !important;
+    overflow: hidden !important;
+    width: 100% !important;
+}
+
 .stat span{display:block;color:var(--muted);font-size:11px;margin-top:4px;line-height:1.35;white-space:normal}.hero .stat span{color:#dbeafe}
 .iconstat{display:flex;gap:10px;align-items:center;min-width:0;padding:14px 12px}
 .iconstat > div:last-child{min-width:0;flex:1}
@@ -76,7 +92,7 @@ textarea{min-height:90px;resize:vertical}.row{display:grid;grid-template-columns
 
 .cardtile{border-radius:20px;padding:16px;color:#fff;min-height:135px;position:relative;overflow:hidden;box-shadow:0 10px 28px rgba(0,0,0,.15)}
 .cardtile:after{content:"";position:absolute;width:110px;height:110px;border:17px solid #ffffff12;border-radius:50%;right:-42px;bottom:-52px}
-.cardtile h4{margin:0;font-size:15px;position:relative;z-index:1}.cardtile .amount{font-size:24px;font-weight:950;margin-top:22px;position:relative;z-index:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cardtile h4{margin:0;font-size:15px;position:relative;z-index:1}
 .tile1{background:linear-gradient(135deg,#172554,#2563eb)}.tile2{background:linear-gradient(135deg,#3b0764,#9333ea)}.tile3{background:linear-gradient(135deg,#064e3b,#059669)}.tile4{background:linear-gradient(135deg,#7c2d12,#ea580c)}.tile5{background:linear-gradient(135deg,#164e63,#0891b2)}.tile6{background:linear-gradient(135deg,#4c1d95,#7c3aed)}
 
 .monthchart{display:grid;grid-template-columns:repeat(9,minmax(28px,1fr));gap:6px;align-items:end;height:150px;padding:10px 2px 23px;border-bottom:1px solid var(--line);overflow:auto}
@@ -97,12 +113,14 @@ textarea{min-height:90px;resize:vertical}.row{display:grid;grid-template-columns
 .monthbar select{padding:12px;height:52px;border-radius:16px}.periodbar{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
 .viewhint{text-align:center;font-size:11px;color:var(--muted);padding-top:10px;font-weight:750}
 
+/* V3.3 NAV DESIGN UPGRADE */
 .nav{position:fixed;bottom:0;left:0;right:0;background:var(--nav-bg);border-top:1px solid var(--line);z-index:30;box-shadow:0 -12px 35px rgba(0,0,0,.06);padding-bottom:calc(25px + env(safe-area-inset-bottom));overflow-x:auto;scrollbar-width:none}
 .nav::-webkit-scrollbar{display:none}
-.navin{width:100%;max-width:none;margin:auto;display:grid;grid-template-columns:repeat(7,minmax(60px,1fr));padding:8px 6px}
-.nav button{background:transparent;color:var(--muted);padding:6px 2px;font-size:11px;font-weight:850;white-space:nowrap;min-height:58px}
+.navin{width:100%;max-width:none;margin:auto;display:grid;grid-template-columns:repeat(7,minmax(62px,1fr));gap:4px;padding:8px 6px}
+.nav button{background:transparent;color:var(--muted);padding:8px 2px;font-size:11px;font-weight:850;white-space:nowrap;min-height:58px;border-radius:16px;transition:background 0.2s, color 0.2s}
 .nav button .navico{display:block;font-size:25px;line-height:25px;margin-bottom:4px}
-.nav button.on{color:var(--blue)}.dark-mode .nav button.on{color:#60a5fa}
+.nav button.on{background:#eef2ff;color:var(--blue)}
+.dark-mode .nav button.on{background:rgba(37,99,235,0.15);color:#60a5fa}
 
 .fab{position:fixed;right:20px;bottom:115px;width:66px;height:66px;border-radius:50%;background:var(--blue);color:#fff;font-size:32px;box-shadow:0 14px 34px rgba(37,99,235,.4);z-index:31}
 .modal{position:fixed;inset:0;background:#0009;display:none;align-items:flex-end;z-index:60}.modal.show{display:flex}
@@ -127,7 +145,35 @@ textarea{min-height:90px;resize:vertical}.row{display:grid;grid-template-columns
 .swipe-fg{position:relative;z-index:1;background:var(--card);border-bottom:none;transition:transform .2s cubic-bezier(.2,.8,.2,1);will-change:transform}
 
 @media(max-width:390px){
- .content{padding:12px 10px 18px}.viewbox{margin:0 10px 12px;padding:10px}.grid2,.grid3,.grid4{gap:8px}.card{padding:16px;border-radius:22px}.stat{padding:12px}.ico{width:40px;min-width:40px;height:40px;font-size:19px}.stat b{font-size:15px}.nav button{font-size:9px}.caticon{width:44px;min-width:44px;height:44px;font-size:22px}
+ .content{padding:12px 10px 18px}.viewbox{margin:0 10px 12px;padding:10px}.grid2,.grid3,.grid4{gap:8px}.card{padding:16px;border-radius:22px}.stat{padding:12px}.ico{width:40px;min-width:40px;height:40px;font-size:19px}.nav button{font-size:9px}.caticon{width:44px;min-width:44px;height:44px;font-size:22px}
+}
+
+@media(max-width:520px){
+    .phone-device .grid4 .stat.iconstat {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        padding: 14px !important;
+        gap: 8px !important;
+    }
+    .phone-device .grid4 .stat.iconstat .ico {
+        width: 36px !important; min-width: 36px !important; height: 36px !important; font-size: 18px !important; margin-bottom: 2px !important;
+    }
+    .phone-device .grid4 .stat.iconstat b {
+        font-size: clamp(16px, 5vw, 20px) !important; letter-spacing: -0.5px !important; width: 100% !important;
+    }
+
+    .phone-device .focusstat {
+        flex-direction: column !important; align-items: flex-start !important; text-align: left !important; padding: 16px !important; gap: 8px !important;
+    }
+    .phone-device .focusstat .ico {
+        width: 44px !important; min-width: 44px !important; height: 44px !important; font-size: 22px !important;
+    }
+    .phone-device .focusstat > div:last-child {
+        align-items: flex-start !important; text-align: left !important; width: 100% !important; overflow: hidden !important;
+    }
+    .phone-device .focusstat b {
+        font-size: 22px !important; letter-spacing: -0.5px !important; width: 100% !important; text-align: left !important;
+    }
 }
 
 /* PIN Screen */
@@ -142,21 +188,6 @@ textarea{min-height:90px;resize:vertical}.row{display:grid;grid-template-columns
 body.pin-locked{overflow:hidden}
 
 .layout-list{display:grid;gap:9px}.layout-item{display:grid;grid-template-columns:1fr auto auto;gap:9px;align-items:center;padding:12px 14px;background:var(--stat-bg);border:1px solid var(--stat-border);border-radius:16px}.layout-item .draglabel{font-weight:800;font-size:14px}.layout-item button{min-width:44px;padding:10px 12px}.layout-note{font-size:12px;color:var(--muted);line-height:1.45;margin:6px 0 12px}.section-order-box{background:var(--stat-bg);border:1px solid var(--stat-border);border-radius:20px;padding:14px;margin-top:12px}.chartbar{cursor:pointer;transition:transform .12s,opacity .12s}.chartbar:active{transform:scaleY(.96);transform-origin:bottom}.charttip{font-size:11px;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 12px;margin-top:10px;min-height:20px}.monthsummary{overflow:auto}.monthsummary table{min-width:650px}.monthsummary th,.monthsummary td{white-space:nowrap;padding:8px;font-size:13px}.manage-note{font-size:12px;color:var(--muted);line-height:1.5;margin:6px 0 12px}.manage-list{display:grid;gap:9px}.manage-item{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:9px;align-items:center}.manage-item input{min-width:0}.manage-add{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:9px;margin-top:10px}.pin-change-box{background:var(--stat-bg);border:1px solid var(--stat-border);border-radius:20px;padding:16px;margin-top:14px}.pin-change-box .row{margin-top:8px}
-
-/* Enforce Single Row Truncation for Grid Numbers */
-.phone-device .stat b, .phone-device .cardtile .amount, .phone-device .focusstat b {
-    white-space: nowrap !important;
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
-    line-height: 1.2 !important;
-}
-.phone-device .focusstat {
-    display:flex !important; flex-direction:column !important; justify-content:center !important; align-items:center !important; gap:8px !important; width:100% !important; min-width:0 !important; padding:16px 10px !important; overflow:hidden !important; text-align:center !important;
-}
-.phone-device .focusstat .ico { width:46px !important; min-width:46px !important; height:46px !important; flex:none !important; font-size:23px !important; }
-.phone-device .focusstat > div:last-child { display:flex !important; flex-direction:column !important; align-items:center !important; justify-content:center !important; width:100% !important; min-width:0 !important; max-width:100% !important; overflow:hidden !important; }
-.phone-device .focusstat b { font-size:18px !important; letter-spacing:-.35px !important; width:100% !important; text-align:center !important; }
-.phone-device .focusstat span { display:block !important; width:100% !important; margin-top:2px !important; font-size:10px !important; line-height:1.3 !important; white-space:nowrap !important; overflow:hidden !important; text-overflow:ellipsis !important; }
 </style>
 <script>
 // --- GITHUB TO GOOGLE SCRIPT BRIDGE ---
@@ -311,19 +342,10 @@ async function setupBiometrics() {
     const challenge = new Uint8Array(32); window.crypto.getRandomValues(challenge);
     const userId = new Uint8Array(16); window.crypto.getRandomValues(userId);
     await navigator.credentials.create({
-      publicKey: {
-        challenge: challenge,
-        rp: { name: "Expense Analyzer" },
-        user: { id: userId, name: "Family", displayName: "Family Member" },
-        pubKeyCredParams: [{ type: "public-key", alg: -7 }, { type: "public-key", alg: -257 }],
-        authenticatorSelection: { authenticatorAttachment: "platform", userVerification: "required" },
-        timeout: 60000
-      }
+      publicKey: { challenge: challenge, rp: { name: "Expense Analyzer" }, user: { id: userId, name: "Family", displayName: "Family Member" }, pubKeyCredParams: [{ type: "public-key", alg: -7 }, { type: "public-key", alg: -257 }], authenticatorSelection: { authenticatorAttachment: "platform", userVerification: "required" }, timeout: 60000 }
     });
-    localStorage.setItem('bio_enabled', 'true');
-    localStorage.setItem('saved_pin', btoa(p));
-    $('bioBtn').style.display = 'block';
-    toast("Fingerprint linked ✓");
+    localStorage.setItem('bio_enabled', 'true'); localStorage.setItem('saved_pin', btoa(p));
+    $('bioSetupBtn').classList.add('hidden'); $('bioRemoveBtn').classList.remove('hidden'); $('bioBtn').style.display = 'block'; toast("Fingerprint linked ✓");
   } catch(e) { console.error(e); toast("Setup cancelled or failed."); }
 }
 
@@ -365,7 +387,7 @@ function triggerConfetti() {
   }
 }
 
-// GESTURE ENGINE
+// V3.3 FAST GESTURE ENGINE
 let touchStartX = null, touchStartY = null;
 document.addEventListener('touchstart', e => {
   if (e.touches.length > 1) return;
@@ -375,10 +397,11 @@ document.addEventListener('touchstart', e => {
 document.addEventListener('touchend', e => {
   if (!touchStartX || SETTINGS.swipeTabs === false) return;
   if (e.target.closest('.swipe-wrap') || e.target.closest('.monthchart') || e.target.closest('.monthchips') || e.target.closest('.subtabs') || e.target.closest('.donutwrap') || e.target.closest('.sheet') || e.target.closest('.filtergrid')) return;
+  
   let dX = e.changedTouches[0].clientX - touchStartX;
   let dY = e.changedTouches[0].clientY - touchStartY;
   
-  if (Math.abs(dX) > 60 && Math.abs(dX) > Math.abs(dY)*1.2) {
+  if (Math.abs(dX) > 35 && Math.abs(dX) > Math.abs(dY)*1.1) {
     let s = mergedSettings();
     let order = s.tabOrder.filter(id => s.tabs[id] !== false);
     if (!order.includes('more')) order.push('more');
@@ -437,14 +460,9 @@ function go(id){
   document.querySelectorAll('.screen').forEach(x=>x.classList.remove('active')); 
   $(id).classList.add('active');
   
-  document.querySelectorAll('.nav button').forEach(b => {
-    if(b.dataset.screen === id) {
-      b.classList.add('on');
-      try { b.scrollIntoView({behavior: 'smooth', block: 'nearest', inline: 'center'}); } catch(e) {}
-    } else {
-      b.classList.remove('on');
-    }
-  });
+  renderNav();
+  let activeBtn = document.querySelector(`.nav button[data-screen="${id}"]`);
+  if(activeBtn) { try { activeBtn.scrollIntoView({behavior: 'smooth', block: 'nearest', inline: 'center'}); } catch(e) {} }
 
   if(id==='income')renderIncome(); 
   if(id==='investment')renderInvestment(); 
@@ -506,7 +524,7 @@ function renderHome(){
    </div>`;
  }
  $('home').innerHTML=`
- <div class="card hero"><div class="label">${globalView==='overall'?'Overall position':globalView==='period'?'Period position':'Monthly position'}</div><div class="big">${money(out)}</div><div class="minihero" style="margin:0;background:#ffffff10;border:1px solid #ffffff1c"><div class="label">Total outgoing</div><div style="font-size:12px;margin-top:3px;color:#dbeafe;font-weight:750">Spends + Investment</div></div><div class="grid2" style="margin-top:14px"><div class="stat"><b>${money(sp)}</b><span>Spends</span></div><div class="stat"><b>${money(inv)}</b><span>Investment</span></div><div class="stat"><b>${money(inc)}</b><span>Money In</span></div><div class="stat"><b>${money(inc-out)}</b><span>Net position</span></div><div class="stat" style="grid-column:1/-1;text-align:center"><b>${money(savingsBalance())}</b><span>Total savings / investment</span></div></div></div>
+ <div class="card hero"><div class="label">${globalView==='overall'?'Overall position':globalView==='period'?'Period position':'Monthly position'}</div><div class="big">${money(out)}</div><div class="minihero" style="margin:0;background:#ffffff10;border:1px solid #ffffff1c"><div class="label">Total outgoing</div><div style="font-size:12px;margin-top:3px;color:#dbeafe;font-weight:750">Spends + Investment</div></div><div class="grid2" style="margin-top:14px"><div class="stat"><b>${money(sp)}</b><span>Spends</span></div><div class="stat"><b>${money(inv)}</b><span>Investment</span></div><div class="stat"><b>${money(inc)}</b><span>Money In</span></div><div class="stat"><b>${money(inc-out)}</b><span>Net position</span></div><div class="stat focusstat" style="grid-column:1/-1;text-align:center"><b>${money(savingsBalance())}</b><span>Total savings / investment</span></div></div></div>
  ${budgetHtml}
  <div class="card" id="secSnapshot"><div class="sectionhead"><h3>🎯 Financial Snapshot</h3><span class="pill">${currentLabel()}</span></div><div class="grid4"><div class="stat iconstat"><div class="ico blue">💰</div><div><b>${money(inc)}</b><span>Income</span></div></div><div class="stat iconstat"><div class="ico orange">🧾</div><div><b>${money(sp)}</b><span>Spends</span></div></div><div class="stat iconstat"><div class="ico green">📈</div><div><b>${money(inv)}</b><span>Investment</span></div></div><div class="stat iconstat"><div class="ico purple">💳</div><div><b>${money(cc)}</b><span>CC Bills</span></div></div></div></div>
  <div class="card" id="secAccount"><div class="sectionhead"><h3>👨‍👩‍👦 Account-wise</h3><span class="pill">Spends</span></div>${summary(all.filter(r=>r.type==='Spend'),'account')}</div>
@@ -617,7 +635,7 @@ function mergedSettings(){let o=Array.isArray(SETTINGS.tabOrder)?SETTINGS.tabOrd
 function sectionOrderFor(screen){let d=(SECTION_META[screen]||[]).map(x=>x[0]), saved=mergedSettings().sectionOrders[screen]||[];return [...saved.filter(x=>d.includes(x)),...d.filter(x=>!saved.includes(x))]}
 function applyScreenSectionOrder(screen){let el=$(screen);if(!el)return;let order=sectionOrderFor(screen);let nodes=order.map(id=>$(id)).filter(x=>x&&x.parentElement===el);nodes.forEach(n=>el.appendChild(n));if(screen==='home')applyHomeSections()}
 function applyAllSectionOrders(){Object.keys(SECTION_META).forEach(applyScreenSectionOrder)}
-function renderNav(){let s=mergedSettings(),order=s.tabOrder.filter(id=>TAB_META[id]);let nav=document.querySelector('.navin');if(!nav)return;let visible=order.filter(id=>s.tabs[id]!==false);if(!visible.includes('more'))visible.push('more');nav.style.gridTemplateColumns=`repeat(${visible.length},minmax(0,1fr))`;nav.innerHTML=visible.map(id=>{let m=TAB_META[id];return `<button data-screen="${id}" onclick="go('${id}')" class="${currentScreen===id?'on':''}"><span class="navico">${m[0]}</span>${esc(m[1])}</button>`}).join('')}
+function renderNav(){let s=mergedSettings(),order=s.tabOrder.filter(id=>TAB_META[id]);let nav=document.querySelector('.navin');if(!nav)return;let visible=order.filter(id=>s.tabs[id]!==false);if(!visible.includes('more'))visible.push('more');nav.style.gridTemplateColumns=`repeat(${visible.length},minmax(62px,1fr))`;nav.innerHTML=visible.map(id=>{let m=TAB_META[id];return `<button data-screen="${id}" onclick="go('${id}')" class="${currentScreen===id?'on':''}"><span class="navico">${m[0]}</span>${esc(m[1])}</button>`}).join('')}
 function applySettings(){let s=mergedSettings();SETTINGS=s;$('brandTitle').textContent=s.title;renderNav();applyHomeSections();applyAllSectionOrders();}
 function syncTabVisibility(){let s=mergedSettings();document.querySelectorAll('[data-layout-tab]').forEach(x=>s.tabs[x.dataset.layoutTab]=x.checked);SETTINGS=s;return s}
 function moveTab(id,dir){let s=syncTabVisibility(),a=s.tabOrder.slice(),i=a.indexOf(id),j=i+dir;if(i<0||j<0||j>=a.length)return;[a[i],a[j]]=[a[j],a[i]];s.tabOrder=a;SETTINGS=s;renderTabSettings();renderNav();go(currentScreen);}
