@@ -209,6 +209,9 @@ textarea{min-height:90px}.field label{font-size:11px;margin-bottom:6px;}
  .phone-device .nav button[data-screen="investment"] .navico{font-size:27px}
 }
 
+.pin-bio{width:100%;margin-top:8px;height:52px;border-radius:17px;background:#e2e8f0;color:#0f172a;font-size:16px;font-weight:800;border:1px solid #cbd5e1;cursor:pointer;}
+.pin-bio:active{background:#cbd5e1}
+
 </style>
 <script>
 // --- GITHUB TO GOOGLE SCRIPT BRIDGE ---
@@ -456,7 +459,7 @@ body.pin-locked{overflow:hidden}
 </style>
 </head>
 <body class="pin-locked">
-<div id="pinGate"><div class="pinbox"><div class="pinlogo">💰</div><h1>My Expense Analyzer</h1><p>Private family expense tracker</p><div class="pin-dots" id="pinDots"></div><div class="pinpad"><button onclick="pinKey('1')">1</button><button onclick="pinKey('2')">2</button><button onclick="pinKey('3')">3</button><button onclick="pinKey('4')">4</button><button onclick="pinKey('5')">5</button><button onclick="pinKey('6')">6</button><button onclick="pinKey('7')">7</button><button onclick="pinKey('8')">8</button><button onclick="pinKey('9')">9</button><button class="pin-del" onclick="pinClear()">⌫</button><button onclick="pinKey('0')">0</button><button class="pin-del" onclick="pinBack()">←</button></div><button class="pin-unlock" onclick="unlockApp()">Unlock</button><div class="pin-msg" id="pinMsg"></div><p class="pin-foot">Enter your 4–6 digit family PIN</p></div></div>
+<div id="pinGate"><div class="pinbox"><div class="pinlogo">💰</div><h1>My Expense Analyzer</h1><p>Private family expense tracker</p><div class="pin-dots" id="pinDots"></div><div class="pinpad"><button onclick="pinKey('1')">1</button><button onclick="pinKey('2')">2</button><button onclick="pinKey('3')">3</button><button onclick="pinKey('4')">4</button><button onclick="pinKey('5')">5</button><button onclick="pinKey('6')">6</button><button onclick="pinKey('7')">7</button><button onclick="pinKey('8')">8</button><button onclick="pinKey('9')">9</button><button class="pin-del" onclick="pinClear()">⌫</button><button onclick="pinKey('0')">0</button><button class="pin-del" onclick="pinBack()">←</button></div><button class="pin-unlock" onclick="unlockApp()">Unlock</button><button class="pin-bio hidden" id="bioUnlockBtn" onclick="unlockWithBiometrics()">👆 Unlock with Fingerprint</button><div class="pin-msg" id="pinMsg"></div><p class="pin-foot">Enter your 4–6 digit family PIN</p></div></div>
 <div class="app">
 <header class="top"><div class="brand"><h1 id="brandTitle">My Expense Analyzer</h1><p>Google Sheet master • Mobile Expense Tracker</p></div></header>
 
@@ -509,7 +512,9 @@ body.pin-locked{overflow:hidden}
  <div class="actionline"><button class="redbtn hidden" id="deleteBtn" onclick="deleteEntry()">Delete</button><button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveEntry()">Save</button></div>
  </div></div>
 
-<div class="modal" id="settingsModal"><div class="sheet"><button class="secondary close" onclick="closeSettings()">Close</button><h2>⚙️ Settings</h2><p class="mini">Customize the app without editing the Google Sheet. Changes are shared across the family app.</p><div class="field"><label>App title</label><input id="setTitle"></div><h3>Bottom navigation order</h3><p class="layout-note">Use ↑ / ↓ to move tabs. The order is saved for everyone using this family app.</p><div id="tabSettings" class="layout-list"></div><h3 style="margin-top:15px">Section order by tab</h3><p class="layout-note">Choose a tab, then move its sections up or down. This applies to the sections/cards inside that tab.</p><div class="field"><label>Tab</label><select id="sectionOrderTab" onchange="sectionSettingsTab=this.value;renderSectionOrderUI()"></select></div><div id="sectionSettings" class="layout-list"></div><h3 style="margin-top:18px">🧩 Dropdown / Master Options</h3><p class="manage-note">Add, rename or remove options used in the entry form. Renaming an existing value also updates matching transactions in the master sheet.</p><div id="optionManager"></div><div class="pin-change-box"><h3>🔐 Change App PIN</h3><p class="manage-note">Use a new 4–6 digit PIN. This changes the PIN for everyone using this family app.</p><div class="row"><div class="field"><label>Current PIN</label><input id="oldPinChange" type="password" inputmode="numeric" maxlength="6"></div><div class="field"><label>New PIN</label><input id="newPinChange" type="password" inputmode="numeric" maxlength="6"></div></div><div class="field"><label>Confirm New PIN</label><input id="confirmPinChange" type="password" inputmode="numeric" maxlength="6"></div><button class="primary" onclick="changePinUI()">Change PIN</button></div><div class="actionline"><button class="secondary" onclick="resetSettings()">Reset View Settings</button><button class="primary" onclick="saveSettingsUI()">Save Settings</button></div></div></div>
+<div class="modal" id="settingsModal"><div class="sheet"><button class="secondary close" onclick="closeSettings()">Close</button><h2>⚙️ Settings</h2><p class="mini">Customize the app without editing the Google Sheet. Changes are shared across the family app.</p><div class="field"><label>App title</label><input id="setTitle"></div><h3>Bottom navigation order</h3><p class="layout-note">Use ↑ / ↓ to move tabs. The order is saved for everyone using this family app.</p><div id="tabSettings" class="layout-list"></div><h3 style="margin-top:15px">Section order by tab</h3><p class="layout-note">Choose a tab, then move its sections up or down. This applies to the sections/cards inside that tab.</p><div class="field"><label>Tab</label><select id="sectionOrderTab" onchange="sectionSettingsTab=this.value;renderSectionOrderUI()"></select></div><div id="sectionSettings" class="layout-list"></div><h3 style="margin-top:18px">🧩 Dropdown / Master Options</h3><p class="manage-note">Add, rename or remove options used in the entry form. Renaming an existing value also updates matching transactions in the master sheet.</p><div id="optionManager"></div>
+ <div class="pin-change-box"><h3>👆 Setup Fingerprint</h3><p class="manage-note">Unlock the app instantly. Enter your current PIN below, then tap Register to link your fingerprint/screen lock.</p><div class="row"><div class="field"><label>Current PIN</label><input id="bioSetupPin" type="password" inputmode="numeric" maxlength="6"></div></div><button class="primary" style="margin-top:8px" onclick="registerBiometrics()">Register Fingerprint</button></div>
+ <div class="pin-change-box"><h3>🔐 Change App PIN</h3><p class="manage-note">Use a new 4–6 digit PIN. This changes the PIN for everyone using this family app.</p><div class="row"><div class="field"><label>Current PIN</label><input id="oldPinChange" type="password" inputmode="numeric" maxlength="6"></div><div class="field"><label>New PIN</label><input id="newPinChange" type="password" inputmode="numeric" maxlength="6"></div></div><div class="field"><label>Confirm New PIN</label><input id="confirmPinChange" type="password" inputmode="numeric" maxlength="6"></div><button class="primary" onclick="changePinUI()">Change PIN</button></div><div class="actionline"><button class="secondary" onclick="resetSettings()">Reset View Settings</button><button class="primary" onclick="saveSettingsUI()">Save Settings</button></div></div></div>
 <div class="toast" id="toast"></div>
 
 <script>
@@ -668,7 +673,172 @@ function deleteManagedOption(field,idx){let vals=[...(DATA.options[field]||[])],
 function changePinUI(){let old=$('oldPinChange').value.trim(),nw=$('newPinChange').value.trim(),cf=$('confirmPinChange').value.trim();if(!/^\d{4,6}$/.test(old)||!/^[0-9]{4,6}$/.test(nw)){toast('PIN must be 4–6 digits');return}if(nw!==cf){toast('New PINs do not match');return}google.script.run.withSuccessHandler(()=>{['oldPinChange','newPinChange','confirmPinChange'].forEach(id=>$(id).value='');toast('PIN changed ✓')}).withFailureHandler(showErr).changeAppPin(old,nw,authToken)}
 function resetSettings(){let d={title:'My Expense Analyzer',tabs:{home:true,spends:true,income:true,investment:true,money:true,cc:true,more:true},tabOrder:DEFAULT_TAB_ORDER.slice(),sectionOrders:{},sections:{secSnapshot:true,secAccount:true,secMonth:true,secCategory:true,secRecent:true}};google.script.run.withSuccessHandler(v=>{SETTINGS=v||d;applySettings();openSettings();toast('Reset ✓')}).withFailureHandler(showErr).saveSettings(d,authToken)}
 function showErr(e){alert(e&&e.message?e.message:String(e))}function toast(t){$('toast').textContent=t;$('toast').style.display='block';setTimeout(()=>$('toast').style.display='none',1800)}
-window.onload=function(){renderPinDots();};
+
+// --- BIOMETRICS / PASSKEY LOGIC ---
+function bufferToBase64url(buffer) {
+  const bytes = new Uint8Array(buffer);
+  let str = '';
+  for (let i = 0; i < bytes.length; i++) { str += String.fromCharCode(bytes[i]); }
+  return btoa(str).replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
+}
+function base64urlToBuffer(base64url) {
+  const base64 = base64url.replace(/-/g, '+').replace(/_/g, '/');
+  const binStr = window.atob(base64);
+  const bin = new Uint8Array(binStr.length);
+  for (let i = 0; i < binStr.length; i++) { bin[i] = binStr.charCodeAt(i); }
+  return bin.buffer;
+}
+function checkBioStatus() {
+  if (localStorage.getItem('bioCredId')) { $('bioUnlockBtn').classList.remove('hidden'); }
+}
+async function registerBiometrics() {
+  const pin = $('bioSetupPin').value.trim();
+  if(!/^\d{4,6}$/.test(pin)) { toast('Enter your 4-6 digit PIN first'); return; }
+  $('toast').textContent = "Verifying PIN..."; $('toast').style.display='block';
+  google.script.run.withSuccessHandler(async r => {
+     $('toast').style.display='none';
+     if (!window.PublicKeyCredential) { toast("Fingerprints not supported in this app wrapper."); return; }
+     try {
+        const publicKeyCredentialCreationOptions = {
+          challenge: window.crypto.getRandomValues(new Uint8Array(32)),
+          rp: { name: "Expense Analyzer" },
+          user: {
+            id: window.crypto.getRandomValues(new Uint8Array(16)),
+            name: "user",
+            displayName: "Family User"
+          },
+          pubKeyCredParams: [{alg: -7, type: "public-key"}, {alg: -257, type: "public-key"}],
+          authenticatorSelection: { userVerification: "required" },
+          timeout: 60000,
+          attestation: "none"
+        };
+        const credential = await navigator.credentials.create({ publicKey: publicKeyCredentialCreationOptions });
+        localStorage.setItem('bioCredId', bufferToBase64url(credential.rawId));
+        localStorage.setItem('savedPin', btoa(pin));
+        $('bioSetupPin').value = '';
+        toast("Fingerprint registered ✓");
+        checkBioStatus();
+     } catch(e) { toast("Fingerprint setup canceled/failed."); }
+  }).withFailureHandler(e => { toast("Incorrect PIN entered."); }).authenticatePin(pin);
+}
+async function unlockWithBiometrics() {
+  const credIdStr = localStorage.getItem('bioCredId');
+  const savedPinStr = localStorage.getItem('savedPin');
+  if (!credIdStr || !savedPinStr) return;
+  try {
+    const publicKeyCredentialRequestOptions = {
+      challenge: window.crypto.getRandomValues(new Uint8Array(32)),
+      allowCredentials: [{ id: base64urlToBuffer(credIdStr), type: 'public-key' }],
+      timeout: 60000,
+      userVerification: 'required'
+    };
+    await navigator.credentials.get({ publicKey: publicKeyCredentialRequestOptions });
+    const pin = atob(savedPinStr);
+    $('pinMsg').textContent = 'Authenticating...';
+    google.script.run.withSuccessHandler(r => {
+       authToken=r.token; 
+       $('pinGate').classList.add('hidden');
+       document.body.classList.remove('pin-locked');
+       pinValue=''; renderPinDots(); init();
+    }).withFailureHandler(e => { $('pinMsg').textContent='Stored PIN invalid.'; }).authenticatePin(pin);
+  } catch(e) { $('pinMsg').textContent = 'Fingerprint failed or canceled.'; }
+}
+
+window.onload=function(){renderPinDots(); checkBioStatus();};
 </script>
 </body>
 </html>
+
+<style id="mobile-text-fit-fix-v26">
+/* MOBILE TEXT FIT: keep stat contents readable inside the now-correct grids. */
+@media(max-width:520px){
+  .phone-device .grid2,
+  .phone-device .grid4{
+    grid-template-columns:minmax(0,1fr) minmax(0,1fr);
+  }
+
+  .phone-device .stat.iconstat{
+    display:grid;
+    grid-template-columns:42px minmax(0,1fr);
+    align-items:center;
+    gap:8px;
+    min-width:0;
+    overflow:hidden;
+  }
+
+  .phone-device .stat.iconstat .ico{
+    width:42px;
+    min-width:42px;
+    height:42px;
+    font-size:21px;
+  }
+
+  .phone-device .stat.iconstat > div:last-child{
+    min-width:0;
+    width:auto;
+    max-width:none;
+    overflow:visible;
+  }
+
+  .phone-device .stat.iconstat b{
+    display:block;
+    font-size:clamp(14px,4.25vw,19px);
+    line-height:1.12;
+    white-space:normal;
+    overflow:visible;
+    text-overflow:clip;
+    overflow-wrap:normal;
+    word-break:normal;
+    letter-spacing:-.35px;
+  }
+
+  .phone-device .stat.iconstat span{
+    display:block;
+    font-size:10px;
+    line-height:1.2;
+    white-space:normal;
+    overflow:visible;
+    overflow-wrap:anywhere;
+  }
+
+  /* Hero stat amounts: never replace a real value with an ellipsis. */
+  .phone-device .hero .stat b{
+    font-size:clamp(14px,4.1vw,22px);
+    line-height:1.08;
+    white-space:normal;
+    overflow:visible;
+    text-overflow:clip;
+    overflow-wrap:normal;
+    word-break:normal;
+    letter-spacing:-.45px;
+  }
+
+  .phone-device .hero .stat span{
+    white-space:normal;
+    line-height:1.2;
+  }
+
+  /* Investment opening-balance and other icon-stat cards get a little more usable width. */
+  .phone-device .grid2 > .stat.iconstat,
+  .phone-device .grid4 > .stat.iconstat{
+    padding:14px 12px;
+  }
+}
+
+@media(max-width:390px){
+  .phone-device .stat.iconstat{
+    grid-template-columns:38px minmax(0,1fr);
+    gap:6px;
+    padding:11px 9px;
+  }
+  .phone-device .stat.iconstat .ico{
+    width:38px;
+    min-width:38px;
+    height:38px;
+    font-size:19px;
+  }
+  .phone-device .stat.iconstat b{font-size:14px;}
+  .phone-device .stat.iconstat span{font-size:9px;}
+  .phone-device .hero .stat b{font-size:14px;}
+}
+</style>
