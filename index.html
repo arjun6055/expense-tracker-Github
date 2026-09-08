@@ -499,7 +499,7 @@ body.pin-locked{overflow:hidden}
 
 <script>
 let DATA={rows:[],options:{}},SETTINGS={};
-let globalView='monthly',activeMonth='',periodStart='',periodEnd='',currentScreen='home',editRow=null,entryMode='spend',sectionSettingsTab='home';
+let globalView='monthly',activeMonth='',periodStart='',periodEnd='',currentScreen='home',editRow=null,entryMode='spend',sectionSettingsTab='home',tfType='',tfVal='';
 const DEFAULT_TAB_ORDER=['home','spends','income','investment','money','cc','transfers','more'];
 const TAB_META={home:['⌂','Home'],spends:['🧾','Spends'],income:['💰','Income'],investment:['📈','Investment'],money:['₹','Money'],cc:['💳','CC Bills'],transfers:['↔️','Transfers'],more:['•••','More']};
 const SECTION_META={
@@ -588,7 +588,21 @@ function setPeriodDates(){periodStart=$('periodStart').value||'';periodEnd=$('pe
 function inScope(r){if(globalView==='overall')return true;if(globalView==='monthly')return String(r.date||'').startsWith(activeMonth);let d=String(r.date||'');return (!periodStart||d>=periodStart)&&(!periodEnd||d<=periodEnd)}
 function scopedRows(type){return DATA.rows.filter(r=>(!type||r.type===type)&&inScope(r))}
 function renderAll(){renderHome();renderSpends();renderIncome();renderInvestment();renderMoney();renderCC();renderTransfers();renderMore();applyAllSectionOrders();}
-function go(id){currentScreen=id;document.querySelectorAll('.screen').forEach(x=>x.classList.remove('active'));$(id).classList.add('active');document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('on',b.dataset.screen===id));if(id==='income')renderIncome();if(id==='investment')renderInvestment();if(id==='spends')renderSpends();if(id==='money')renderMoney();if(id==='cc')renderCC();if(id==='transfers')renderTransfers();if(id==='more')renderMore();applyScreenSectionOrder(id);window.scrollTo({top:0,behavior:'smooth'})}
+function go(id){
+  currentScreen=id;
+  document.querySelectorAll('.screen').forEach(x=>x.classList.remove('active'));
+  $(id).classList.add('active');
+  document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('on',b.dataset.screen===id));
+  if(id==='income')renderIncome();
+  if(id==='investment')renderInvestment();
+  if(id==='spends')renderSpends();
+  if(id==='money')renderMoney();
+  if(id==='cc')renderCC();
+  if(id==='transfers'){ tfType=''; tfVal=''; renderTransfers(); }
+  if(id==='more')renderMore();
+  applyScreenSectionOrder(id);
+  window.scrollTo({top:0,behavior:'smooth'})
+}
 function currentLabel(){return globalView==='overall'?'Overall':globalView==='period'?'Selected Period':monthName(activeMonth)}
 function renderHome(){let all=scopedRows(),inc=sum(all.filter(r=>r.type==='Income')),sp=sum(all.filter(r=>r.type==='Spend')),inv=sum(all.filter(r=>r.type==='Investment')),cc=sum(all.filter(r=>r.type==='CC Bill')),out=sp+inv,ess=sum(all.filter(r=>r.type==='Spend'&&r.need==='Essential')),non=sum(all.filter(r=>r.type==='Spend'&&r.need==='Non-Essential'));$('home').innerHTML=`
  <div class="card hero"><div class="label">${globalView==='overall'?'Overall position':globalView==='period'?'Period position':'Monthly position'}</div><div class="big">${money(out)}</div><div class="minihero" style="margin:0;background:#ffffff10;border:1px solid #ffffff1c"><div class="label">Total outgoing</div><div style="font-size:10px;color:#dbeafe">Spends + Investment</div></div><div class="grid2" style="margin-top:9px"><div class="stat"><b>${money(sp)}</b><span>Spends</span></div><div class="stat"><b>${money(inv)}</b><span>Investment</span></div><div class="stat"><b>${money(inc)}</b><span>Money In</span></div><div class="stat"><b>${money(inc-out)}</b><span>Net position</span></div><div class="stat"><b>${money(savingsBalance())}</b><span>Total savings / investment</span></div></div></div>
@@ -599,7 +613,9 @@ function renderHome(){let all=scopedRows(),inc=sum(all.filter(r=>r.type==='Incom
  <div class="card" id="secRecent"><div class="sectionhead"><h3>🧾 Recent Spends</h3><button class="secondary" onclick="go('spends')">View all</button></div>${txRows(all.filter(r=>r.type==='Spend').sort((a,b)=>b.date.localeCompare(a.date)||b.row-a.row).slice(0,7))}</div>`;applyHomeSections()}
 function applyHomeSections(){let s=mergedSettings();['secSnapshot','secAccount','secMonth','secCategory','secRecent'].forEach(id=>{let e=$(id);if(e)e.style.display=s.sections[id]?'block':'none'})}
 function routeToSpends(filterType, filterValue) {if($('spAccount')) $('spAccount').value = '';if($('spCategory')) $('spCategory').value = '';if($('spNeed')) $('spNeed').value = '';if($('spSearch')) $('spSearch').value = '';go('spends');let targetDropdown = filterType === 'category' ? $('spCategory') : $('spAccount');if(targetDropdown) targetDropdown.value = filterValue;renderSpends();}
-function summary(rs,key){let a={};rs.forEach(r=>{let k=r[key]||'Unspecified';a[k]=(a[k]||0)+Number(r.amount||0)});let ar=Object.entries(a).sort((x,y)=>y[1]-x[1]),mx=ar[0]?.[1]||1;if(!ar.length)return '<div class="empty">No data</div>';return ar.slice(0,8).map(x=>{let c=x[0];return '<div class="listrow txclick" onclick="routeToSpends(\''+key+'\', \''+esc(c).replace(/'/g,"\\'")+'\')"><div class="catrow"><div class="caticon '+catBg(c)+'">'+catIcon(c)+'</div><div class="catname"><div class="title">'+esc(c)+'</div><div class="bar"><i style="width:'+Math.max(2,x[1]/mx*100)+'%"></i></div></div></div><div class="amt">'+money(x[1])+'</div></div>'}).join('')}
+function filterTransfers(type, val) {tfType=type; tfVal=val; renderTransfers(); let tx=document.getElementById('transferTx'); if(tx)tx.scrollIntoView({behavior:'smooth'});}
+function clearTransferFilter() {tfType=''; tfVal=''; renderTransfers();}
+function summary(rs,key,routeFn){if(!routeFn)routeFn='routeToSpends';let a={};rs.forEach(r=>{let k=r[key]||'Unspecified';a[k]=(a[k]||0)+Number(r.amount||0)});let ar=Object.entries(a).sort((x,y)=>y[1]-x[1]),mx=ar[0]?.[1]||1;if(!ar.length)return '<div class="empty">No data</div>';return ar.slice(0,8).map(x=>{let c=x[0];return '<div class="listrow txclick" onclick="'+routeFn+'(\''+key+'\', \''+esc(c).replace(/'/g,"\\'")+'\')"><div class="catrow"><div class="caticon '+catBg(c)+'">'+catIcon(c)+'</div><div class="catname"><div class="title">'+esc(c)+'</div><div class="bar"><i style="width:'+Math.max(2,x[1]/mx*100)+'%"></i></div></div></div><div class="amt">'+money(x[1])+'</div></div>'}).join('')}
 function txRows(rs){return rs.length?rs.map(txHtml).join(''):'<div class="empty">No matching entries</div>'}
 function txHtml(r){let c=r.category||r.type||'Transaction';return '<div class="listrow txclick" onclick="editTx('+r.row+')"><div class="catrow"><div class="caticon '+catBg(c)+'">'+catIcon(c)+'</div><div class="catname"><div class="title">'+esc(r.description||c)+'</div><div class="meta">'+esc(r.date)+' · '+esc(r.type)+' · '+esc(c)+(r.account?' · '+esc(r.account):'')+(r.accountCard?' · '+esc(r.accountCard):'')+'</div></div></div><div class="amt">'+money(r.amount)+'</div></div>'}
 function spendFilteredRows(qOverride){let rs=scopedRows('Spend'),q=(qOverride!==undefined?qOverride:($('spSearch')?.value||'')).toLowerCase(),a=$('spAccount')?.value||'',c=$('spCategory')?.value||'',n=$('spNeed')?.value||'',sort=$('spSort')?.value||'new';rs=rs.filter(r=>(!a||r.account===a)&&(!c||r.category===c)&&(!n||r.need===n)&&(!q||[r.description,r.category,r.subcategory,r.accountCard,r.payment,r.account].join(' ').toLowerCase().includes(q)));if(sort==='amount')rs.sort((a,b)=>b.amount-a.amount);else if(sort==='old')rs.sort((a,b)=>a.date.localeCompare(b.date)||a.row-b.row);else rs.sort((a,b)=>b.date.localeCompare(a.date)||b.row-a.row);return rs}
@@ -626,6 +642,14 @@ function renderTransfers(){
   let rs = all.filter(r => r.type === 'ATM' || r.type === 'Personal Transfer').sort((a,b)=>b.date.localeCompare(a.date)||b.row-a.row);
   let atmTotal = sum(rs.filter(r => r.type === 'ATM'));
   let ptTotal = sum(rs.filter(r => r.type === 'Personal Transfer'));
+
+  let filteredRs = rs;
+  if(tfType && tfVal) {
+    filteredRs = rs.filter(r => r[tfType] === tfVal);
+  }
+
+  let filterBadge = (tfType && tfVal) ? '<span class="pill" onclick="clearTransferFilter()" style="cursor:pointer;background:#fee2e2;color:#991b1b">✖ Clear Filter</span>' : '<span class="pill">Tap overview to filter</span>';
+
   $('transfers').innerHTML=`
   <div class="minihero" style="background:linear-gradient(135deg,#4c1d95,#7c3aed)">
     <div class="label" style="color:#e9d5ff">${currentLabel()} Transfers</div>
@@ -636,15 +660,21 @@ function renderTransfers(){
     </div>
   </div>
   <div class="card" id="transferStats">
-    <div class="sectionhead"><h3>📊 Overview</h3></div>
+    <div class="sectionhead"><h3>📊 Overview</h3><span class="pill">Tap to filter below</span></div>
     <h4 style="margin:5px 0;font-size:12px;color:var(--muted)">From Account</h4>
-    ${summary(rs, 'account')}
+    ${summary(rs, 'account', 'filterTransfers')}
     <h4 style="margin:15px 0 5px;font-size:12px;color:var(--muted)">To Person / Category</h4>
-    ${summary(rs, 'category')}
+    ${summary(rs, 'category', 'filterTransfers')}
   </div>
   <div class="card" id="transferTx">
-    <div class="sectionhead"><h3>↔️ Transactions</h3><button class="primary" onclick="openAdd('transfer')">＋ Add</button></div>
-    ${txRows(rs)}
+    <div class="sectionhead" style="align-items:center">
+      <h3>↔️ Transactions</h3>
+      <div style="display:flex;gap:8px;align-items:center">
+        ${filterBadge}
+        <button class="primary" onclick="openAdd('transfer')">＋ Add</button>
+      </div>
+    </div>
+    ${txRows(filteredRs)}
   </div>`;
 }
 function renderMore(){let s=mergedSettings();$('more').innerHTML=`<div class="card" id="moreMain"><h2>••• More</h2><div class="listrow" onclick="go('income')"><div><div class="title">💰 Income</div><div class="meta">View and add income entries</div></div><b>›</b></div><div class="listrow" onclick="go('investment')"><div><div class="title">📈 Investment</div><div class="meta">View and add investment entries</div></div><b>›</b></div><div class="listrow" onclick="go('cc')"><div><div class="title">💳 Credit Cards</div><div class="meta">View card bills and card history</div></div><b>›</b></div><div class="listrow" onclick="go('transfers')"><div><div class="title">↔️ Transfers</div><div class="meta">View ATM and personal transfers</div></div><b>›</b></div><div class="listrow" onclick="openSettings()"><div><div class="title">⚙️ Settings</div><div class="meta">Customize tabs, sections, dropdowns and PIN</div></div><b>›</b></div><div class="listrow" onclick="refresh()"><div><div class="title">↻ Refresh Data</div><div class="meta">Reload directly from Google Sheet master</div></div><b>›</b></div></div><div class="card" id="moreMaster"><h3>Master Data</h3><div class="notice"><b>Transactions</b> is the single master ledger. Every screen reads the same rows. App settings and dropdown choices are shared across the family.</div></div>`}
