@@ -8,7 +8,7 @@
 <meta name="theme-color" content="#101a2c">
 
 <style>
-/* V3.5 DYNAMIC CSS VARIABLE ENGINE */
+/* V3.6 DYNAMIC CSS VARIABLE ENGINE */
 :root {
   --bg: #f4f7fb; --card: #ffffff; --ink: #152238; --muted: #718096; --line: #e7ecf3; --dark: #101a2c;
   --blue: #2563eb; --cyan: #06b6d4; --green: #16a34a; --orange: #f59e0b; --pink: #ec4899; --purple: #7c3aed; --red: #dc2626;
@@ -45,7 +45,7 @@ input:focus,select:focus,textarea:focus{outline:3px solid #2563eb25;outline-offs
 .stat{background:var(--stat-bg);border:1px solid var(--stat-border);border-radius:21px;padding:15px;min-width:0;overflow:visible}
 .hero .stat{background:#ffffff14;border-color:#ffffff22}
 
-/* Strictly Enforced Single Row Numbers */
+/* Strictly Enforced Single Row Numbers - Removed Ellipsis */
 .stat b, .cardtile .amount, .focusstat b {
     display: block !important;
     font-size: clamp(14px, 4.5vw, 21px) !important;
@@ -112,11 +112,12 @@ textarea{min-height:90px;resize:vertical}.row{display:grid;grid-template-columns
 .monthbar select{padding:12px;height:52px;border-radius:16px}.periodbar{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
 .viewhint{text-align:center;font-size:11px;color:var(--muted);padding-top:10px;font-weight:750}
 
-/* V3.5 FLUID NON-SCROLLING NAV DESIGN */
-.nav{position:fixed;bottom:0;left:0;right:0;background:var(--nav-bg);border-top:1px solid var(--line);z-index:30;box-shadow:0 -12px 35px rgba(0,0,0,.06);padding-bottom:calc(25px + env(safe-area-inset-bottom));}
-.navin{width:100%;max-width:none;margin:auto;display:grid;gap:2px;padding:6px 4px}
-.nav button{background:transparent;color:var(--muted);padding:6px 1px;font-size:10px;font-weight:850;white-space:nowrap;min-height:54px;border-radius:14px;transition:background 0.2s, color 0.2s}
-.nav button .navico{display:block;font-size:22px;line-height:22px;margin-bottom:3px}
+/* V3.6 RESTORED SCROLLABLE BOTTOM NAV */
+.nav{position:fixed;bottom:0;left:0;right:0;background:var(--nav-bg);border-top:1px solid var(--line);z-index:30;box-shadow:0 -12px 35px rgba(0,0,0,.06);padding-bottom:calc(25px + env(safe-area-inset-bottom));overflow-x:auto;overflow-y:hidden;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.nav::-webkit-scrollbar{display:none}
+.navin{min-width:100%;width:max-content;margin:0 auto;display:grid;gap:4px;padding:8px 6px}
+.nav button{background:transparent;color:var(--muted);padding:8px 2px;font-size:11px;font-weight:850;white-space:nowrap;min-height:58px;border-radius:16px;transition:background 0.2s, color 0.2s}
+.nav button .navico{display:block;font-size:25px;line-height:25px;margin-bottom:4px}
 .nav button.on{background:#eef2ff;color:var(--blue)}
 .dark-mode .nav button.on{background:rgba(37,99,235,0.15);color:#60a5fa}
 
@@ -390,7 +391,7 @@ function triggerConfetti() {
   }
 }
 
-// V3.3 FAST GESTURE ENGINE
+// V3.6 ISOLATED GESTURE ENGINE
 let touchStartX = null, touchStartY = null;
 document.addEventListener('touchstart', e => {
   if (e.touches.length > 1) return;
@@ -399,7 +400,8 @@ document.addEventListener('touchstart', e => {
 
 document.addEventListener('touchend', e => {
   if (!touchStartX || SETTINGS.swipeTabs === false) return;
-  if (e.target.closest('.swipe-wrap') || e.target.closest('.monthchart') || e.target.closest('.monthchips') || e.target.closest('.subtabs') || e.target.closest('.donutwrap') || e.target.closest('.sheet') || e.target.closest('.filtergrid')) return;
+  // Completely ignore swipes that start or end on the navigation bar
+  if (e.target.closest('.swipe-wrap') || e.target.closest('.monthchart') || e.target.closest('.monthchips') || e.target.closest('.subtabs') || e.target.closest('.donutwrap') || e.target.closest('.sheet') || e.target.closest('.filtergrid') || e.target.closest('.nav')) return;
   
   let dX = e.changedTouches[0].clientX - touchStartX;
   let dY = e.changedTouches[0].clientY - touchStartY;
@@ -458,13 +460,18 @@ function scopedRows(type){return DATA.rows.filter(r=>(!type||r.type===type)&&inS
 
 function renderAll(){renderHome();renderSpends();renderIncome();renderInvestment();renderMoney();renderCC();renderTransfers();renderMore();applyAllSectionOrders();}
 
-// V3.5 Final Nav Rendering Fix without auto-scroll jumps
+// V3.6 Scrollable Nav Centering
 function go(id){
   currentScreen=id; 
   document.querySelectorAll('.screen').forEach(x=>x.classList.remove('active')); 
   $(id).classList.add('active');
-  renderNav();
   
+  renderNav();
+  let activeBtn = document.querySelector(`.nav button[data-screen="${id}"]`);
+  if(activeBtn) { 
+    try { activeBtn.scrollIntoView({behavior: 'smooth', block: 'nearest', inline: 'center'}); } catch(e) {} 
+  }
+
   if(id==='income')renderIncome(); 
   if(id==='investment')renderInvestment(); 
   if(id==='spends')renderSpends();
@@ -642,7 +649,7 @@ function renderNav(){
   let nav=document.querySelector('.navin'); if(!nav) return;
   let visible=order.filter(id=>s.tabs[id]!==false);
   if(!visible.includes('more')) visible.push('more');
-  nav.style.gridTemplateColumns=`repeat(${visible.length},minmax(0,1fr))`;
+  nav.style.gridTemplateColumns=`repeat(${visible.length},minmax(64px,1fr))`;
   nav.innerHTML=visible.map(id=>{
     let m=TAB_META[id];
     return `<button data-screen="${id}" onclick="go('${id}')" class="${currentScreen===id?'on':''}"><span class="navico">${m[0]}</span>${esc(m[1])}</button>`;
