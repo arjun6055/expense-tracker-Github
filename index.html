@@ -8,7 +8,7 @@
 <meta name="theme-color" content="#101a2c">
 
 <style>
-/* V3.3 DYNAMIC CSS VARIABLE ENGINE */
+/* V3.4 DYNAMIC CSS VARIABLE ENGINE */
 :root {
   --bg: #f4f7fb; --card: #ffffff; --ink: #152238; --muted: #718096; --line: #e7ecf3; --dark: #101a2c;
   --blue: #2563eb; --cyan: #06b6d4; --green: #16a34a; --orange: #f59e0b; --pink: #ec4899; --purple: #7c3aed; --red: #dc2626;
@@ -42,22 +42,21 @@ input:focus,select:focus,textarea:focus{outline:3px solid #2563eb25;outline-offs
 .label{font-size:11px;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);font-weight:850}
 .grid2,.grid3,.grid4{display:grid;gap:12px;width:100%}
 .grid2{grid-template-columns:repeat(2,minmax(0,1fr))}.grid3{grid-template-columns:repeat(3,minmax(0,1fr))}.grid4{grid-template-columns:repeat(2,minmax(0,1fr))}
-.stat{background:var(--stat-bg);border:1px solid var(--stat-border);border-radius:21px;padding:15px;min-width:0;overflow:hidden}
+.stat{background:var(--stat-bg);border:1px solid var(--stat-border);border-radius:21px;padding:15px;min-width:0;overflow:visible}
 .hero .stat{background:#ffffff14;border-color:#ffffff22}
 
-/* Strictly Enforced Single Row Numbers */
+/* Strictly Enforced Single Row Numbers - Removed Ellipsis */
 .stat b, .cardtile .amount, .focusstat b {
     display: block !important;
-    font-size: clamp(15px, 4.5vw, 21px) !important;
+    font-size: clamp(14px, 4.5vw, 21px) !important;
     font-weight: 900 !important;
     line-height: 1.2 !important;
-    letter-spacing: -0.4px !important;
+    letter-spacing: -0.6px !important;
     white-space: nowrap !important;
     word-break: keep-all !important;
     overflow-wrap: normal !important;
-    text-overflow: ellipsis !important;
-    overflow: hidden !important;
-    width: 100% !important;
+    text-overflow: clip !important;
+    overflow: visible !important;
 }
 
 .stat span{display:block;color:var(--muted);font-size:11px;margin-top:4px;line-height:1.35;white-space:normal}.hero .stat span{color:#dbeafe}
@@ -113,7 +112,6 @@ textarea{min-height:90px;resize:vertical}.row{display:grid;grid-template-columns
 .monthbar select{padding:12px;height:52px;border-radius:16px}.periodbar{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
 .viewhint{text-align:center;font-size:11px;color:var(--muted);padding-top:10px;font-weight:750}
 
-/* V3.3 NAV DESIGN UPGRADE */
 .nav{position:fixed;bottom:0;left:0;right:0;background:var(--nav-bg);border-top:1px solid var(--line);z-index:30;box-shadow:0 -12px 35px rgba(0,0,0,.06);padding-bottom:calc(25px + env(safe-area-inset-bottom));overflow-x:auto;scrollbar-width:none}
 .nav::-webkit-scrollbar{display:none}
 .navin{width:100%;max-width:none;margin:auto;display:grid;grid-template-columns:repeat(7,minmax(62px,1fr));gap:4px;padding:8px 6px}
@@ -149,30 +147,35 @@ textarea{min-height:90px;resize:vertical}.row{display:grid;grid-template-columns
 }
 
 @media(max-width:520px){
-    .phone-device .grid4 .stat.iconstat {
+    /* Uniform Stacked Layout for all Grid Items on Phones */
+    .phone-device .iconstat {
         flex-direction: column !important;
         align-items: flex-start !important;
-        padding: 14px !important;
-        gap: 8px !important;
+        padding: 14px 12px !important;
+        gap: 6px !important;
     }
-    .phone-device .grid4 .stat.iconstat .ico {
+    .phone-device .iconstat .ico {
         width: 36px !important; min-width: 36px !important; height: 36px !important; font-size: 18px !important; margin-bottom: 2px !important;
     }
-    .phone-device .grid4 .stat.iconstat b {
-        font-size: clamp(16px, 5vw, 20px) !important; letter-spacing: -0.5px !important; width: 100% !important;
+    .phone-device .iconstat b {
+        font-size: clamp(14px, 4.8vw, 19px) !important;
+        letter-spacing: -0.6px !important; 
+        width: 100% !important;
+        overflow: visible !important;
     }
 
     .phone-device .focusstat {
-        flex-direction: column !important; align-items: flex-start !important; text-align: left !important; padding: 16px !important; gap: 8px !important;
+        flex-direction: column !important; align-items: flex-start !important; text-align: left !important; padding: 16px 12px !important; gap: 8px !important;
     }
     .phone-device .focusstat .ico {
         width: 44px !important; min-width: 44px !important; height: 44px !important; font-size: 22px !important;
     }
     .phone-device .focusstat > div:last-child {
-        align-items: flex-start !important; text-align: left !important; width: 100% !important; overflow: hidden !important;
+        align-items: flex-start !important; text-align: left !important; width: 100% !important; overflow: visible !important;
     }
     .phone-device .focusstat b {
-        font-size: 22px !important; letter-spacing: -0.5px !important; width: 100% !important; text-align: left !important;
+        font-size: clamp(16px, 5.5vw, 22px) !important; 
+        letter-spacing: -0.6px !important; width: 100% !important; text-align: left !important; overflow: visible !important;
     }
 }
 
@@ -455,14 +458,18 @@ function scopedRows(type){return DATA.rows.filter(r=>(!type||r.type===type)&&inS
 
 function renderAll(){renderHome();renderSpends();renderIncome();renderInvestment();renderMoney();renderCC();renderTransfers();renderMore();applyAllSectionOrders();}
 
+// V3.3 Forced Bottom Nav Rendering Update
 function go(id){
   currentScreen=id; 
   document.querySelectorAll('.screen').forEach(x=>x.classList.remove('active')); 
   $(id).classList.add('active');
   
+  // Force total redraw of nav to ensure highlighting stays in sync perfectly when swiping
   renderNav();
   let activeBtn = document.querySelector(`.nav button[data-screen="${id}"]`);
-  if(activeBtn) { try { activeBtn.scrollIntoView({behavior: 'smooth', block: 'nearest', inline: 'center'}); } catch(e) {} }
+  if(activeBtn) { 
+    try { activeBtn.scrollIntoView({behavior: 'smooth', block: 'nearest', inline: 'center'}); } catch(e) {} 
+  }
 
   if(id==='income')renderIncome(); 
   if(id==='investment')renderInvestment(); 
