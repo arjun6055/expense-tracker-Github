@@ -8,7 +8,7 @@
 <meta name="theme-color" content="#101a2c">
 
 <style>
-/* V5.0 DYNAMIC CSS VARIABLE ENGINE & OFFLINE QUEUE */
+/* V4.7 DYNAMIC CSS VARIABLE ENGINE & EXTERNAL MIC UI */
 :root {
   --bg: #f4f7fb; --card: #ffffff; --ink: #152238; --muted: #718096; --line: #e7ecf3; --dark: #101a2c;
   --blue: #2563eb; --cyan: #06b6d4; --green: #16a34a; --orange: #f59e0b; --pink: #ec4899; --purple: #7c3aed; --red: #dc2626;
@@ -113,7 +113,10 @@ textarea{min-height:90px;resize:vertical}.row{display:grid;grid-template-columns
 .nav button.on{background:#eef2ff;color:var(--blue)}
 .dark-mode .nav button.on{background:rgba(37,99,235,0.15);color:#60a5fa}
 
+/* FAB BUTTONS */
 .fab{position:fixed;right:20px;bottom:115px;width:66px;height:66px;border-radius:50%;background:var(--blue);color:#fff;font-size:32px;box-shadow:0 14px 34px rgba(37,99,235,.4);z-index:31;display:flex;align-items:center;justify-content:center}
+.fab-mic{position:fixed;right:26px;bottom:196px;width:54px;height:54px;border-radius:50%;background:var(--card);color:var(--ink);font-size:24px;box-shadow:0 10px 25px rgba(0,0,0,.15);z-index:31;display:flex;align-items:center;justify-content:center;border:1px solid var(--line)}
+
 .modal{position:fixed;inset:0;background:#0009;display:none;align-items:flex-end;z-index:60}.modal.show{display:flex}
 .sheet{width:100%;max-width:none;max-height:94svh;overflow:auto;background:var(--card);margin:auto;padding:24px 20px;border-radius:32px 32px 0 0;box-shadow:0 -20px 70px rgba(0,0,0,.6)}
 .close{float:right}.checklist{display:grid;grid-template-columns:1fr 1fr;gap:10px}
@@ -135,9 +138,7 @@ textarea{min-height:90px;resize:vertical}.row{display:grid;grid-template-columns
 .swipe-bg > div{width:85px;display:grid;place-items:center;font-weight:850;color:#fff;font-size:14px}
 .swipe-fg{position:relative;z-index:1;background:var(--card);border-bottom:none;transition:transform .2s cubic-bezier(.2,.8,.2,1);will-change:transform}
 
-/* Voice & Camera Buttons */
-.mic-btn { width:100%; padding:14px; border-radius:16px; background:#eef2ff; color:#4f46e5; font-size:16px; font-weight:800; display:flex; align-items:center; justify-content:center; gap:8px; margin-top:8px; border:1px solid #c7d2fe; transition:0.2s }
-.mic-btn:active { background:#c7d2fe; transform:scale(0.98) }
+/* Receipt Button */
 .cam-btn { padding:14px; border-radius:16px; background:var(--btn-sec-bg); color:var(--ink); font-size:14px; font-weight:800; display:flex; align-items:center; justify-content:center; gap:8px; width:100%; margin-bottom:12px; border:1px solid var(--line); transition:0.2s }
 
 /* Offline Mode Indicator */
@@ -145,6 +146,8 @@ textarea{min-height:90px;resize:vertical}.row{display:grid;grid-template-columns
 
 @media(max-width:390px){
  .content{padding:12px 10px 18px}.viewbox{margin:0 10px 12px;padding:10px}.grid2,.grid3,.grid4{gap:8px}.card{padding:16px;border-radius:22px}.stat{padding:12px}.ico{width:40px;min-width:40px;height:40px;font-size:19px}.nav button{font-size:9px}.nav button .navico{font-size:19px;line-height:19px}.caticon{width:44px;min-width:44px;height:44px;font-size:22px}
+ .fab{width:60px;height:60px;bottom:105px;right:15px;font-size:28px}
+ .fab-mic{width:46px;height:46px;bottom:180px;right:22px;font-size:20px}
 }
 
 @media(max-width:520px){
@@ -225,9 +228,9 @@ const google = {
 
 <nav class="nav"><div class="navin"></div></nav>
 <button class="fab" onclick="openQuick()">＋</button>
+<button class="fab-mic" onclick="startVoiceEntry()">🎙️</button>
 
 <div class="modal" id="quickModal"><div class="sheet"><button class="secondary close" onclick="closeQuick()">Close</button><h2>＋ Add Entry</h2><div class="notice">All entries are written to the same Google Sheet <b>Transactions</b> master.</div>
- <button class="mic-btn" onclick="startVoiceEntry()">🎙️ Tap to Voice Add (e.g., "Spent 500 on Food")</button>
  <div class="grid2" style="margin-top:16px">
  <button class="card" style="margin-bottom:0" onclick="closeQuick();openAdd('spend')"><h3>💸 Spend</h3><div class="meta">Daily expense · category</div></button>
  <button class="card" style="margin-bottom:0" onclick="closeQuick();openAdd('investment')"><h3>📈 Investment</h3><div class="meta">FD/RD · MF · stocks</div></button>
@@ -393,28 +396,38 @@ function startVoiceEntry() {
   
   let rec = new SpeechRecognition();
   rec.lang = 'en-IN';
-  rec.onstart = () => { toast("Listening... Speak now"); };
+  rec.continuous = false;
+  rec.interimResults = false;
+
+  rec.onstart = () => { toast("🎙️ Listening... Speak now"); };
+  rec.onerror = (e) => { 
+    console.error(e); 
+    toast("Mic Error: " + e.error + " (Check browser permissions)"); 
+  };
   rec.onresult = (e) => {
     let txt = e.results[0][0].transcript.toLowerCase();
     toast("Processing: " + txt);
     closeQuick();
     openAdd('spend');
     
-    // Parse Amount
     let amtMatch = txt.match(/\d+/);
     if(amtMatch) $('fAmount').value = amtMatch[0];
     
-    // Parse Description
-    $('fDesc').value = txt;
+    $('fDesc').value = txt.charAt(0).toUpperCase() + txt.slice(1);
     
-    // Guess Category
-    if(txt.includes('food')||txt.includes('eat')||txt.includes('restaurant')) $('fCategory').value = 'Food';
-    else if(txt.includes('grocery')||txt.includes('supermarket')) $('fCategory').value = 'Grocery';
-    else if(txt.includes('travel')||txt.includes('uber')||txt.includes('cab')) $('fCategory').value = 'Travel';
-    else if(txt.includes('shopping')||txt.includes('clothes')) $('fCategory').value = 'Shopping';
-    else if(txt.includes('medical')||txt.includes('pharmacy')||txt.includes('doctor')) $('fCategory').value = 'Medical';
+    if(txt.includes('food')||txt.includes('eat')||txt.includes('restaurant')||txt.includes('zomato')||txt.includes('swiggy')) $('fCategory').value = 'Food';
+    else if(txt.includes('grocery')||txt.includes('supermarket')||txt.includes('mart')||txt.includes('milk')) $('fCategory').value = 'Grocery';
+    else if(txt.includes('travel')||txt.includes('uber')||txt.includes('cab')||txt.includes('ola')||txt.includes('auto')||txt.includes('petrol')) $('fCategory').value = 'Transport';
+    else if(txt.includes('shopping')||txt.includes('clothes')||txt.includes('myntra')||txt.includes('amazon')) $('fCategory').value = 'Shopping';
+    else if(txt.includes('medical')||txt.includes('pharmacy')||txt.includes('doctor')||txt.includes('medicine')) $('fCategory').value = 'Medical';
+    else if(txt.includes('bill')||txt.includes('recharge')||txt.includes('electricity')||txt.includes('wifi')||txt.includes('broadband')) $('fCategory').value = 'Utility';
   };
-  rec.start();
+  
+  try {
+    rec.start();
+  } catch(e) {
+    toast("Mic is already in use or blocked.");
+  }
 }
 
 // V5.0 RECEIPT SNAPSHOT ENGINE
@@ -426,14 +439,14 @@ function handleReceiptUpload(input) {
     let img = new Image();
     img.onload = function() {
        let canvas = document.createElement('canvas');
-       let max_size = 800; // Compress image to 800px max
+       let max_size = 800; // Compress image
        let w = img.width, h = img.height;
        if(w > h && w > max_size) { h *= max_size/w; w = max_size; }
        else if(h > max_size) { w *= max_size/h; h = max_size; }
        canvas.width = w; canvas.height = h;
        let ctx = canvas.getContext('2d');
        ctx.drawImage(img, 0, 0, w, h);
-       receiptBase64 = canvas.toDataURL('image/jpeg', 0.6); // 60% quality JPEG
+       receiptBase64 = canvas.toDataURL('image/jpeg', 0.6); 
        
        let btn = $('receiptBtn');
        btn.textContent = '📸 Receipt Attached ✓';
@@ -460,12 +473,12 @@ function updateOfflineUI() {
 function processOfflineQueue() {
   if(offlineQueue.length === 0 || !navigator.onLine) { updateOfflineUI(); return; }
   updateOfflineUI();
-  let d = offlineQueue[0]; // Take first
+  let d = offlineQueue[0]; 
   
   google.script.run.withSuccessHandler(()=>{
-     offlineQueue.shift(); // Remove from queue on success
+     offlineQueue.shift(); 
      localStorage.setItem('expenseOfflineQueue', JSON.stringify(offlineQueue));
-     processOfflineQueue(); // Loop until empty
+     processOfflineQueue(); 
      if(offlineQueue.length === 0) refresh();
   }).withFailureHandler(()=>{
      console.error("Failed to sync offline item");
@@ -970,7 +983,7 @@ function saveEntry(){
   let typeVal = $('fType').value;
   let d={row:editRow,date:$('fDate').value,amount:amount,account:$('fAccount').value,type:typeVal,category:$('fCategory').value,subcategory:$('fSubcategory').value,need:$('fNeed').value,payment:$('fPayment').value,accountCard:$('fCard').value,billMonth:$('fBillMonth').value,description:$('fDesc').value};
   
-  if(receiptBase64) d.receipt = receiptBase64; // Attach photo payload
+  if(receiptBase64) d.receipt = receiptBase64;
 
   if(!navigator.onLine) {
      offlineQueue.push(d);
