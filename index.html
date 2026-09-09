@@ -112,7 +112,6 @@ textarea{min-height:90px;resize:vertical}.row{display:grid;grid-template-columns
 .nav button.on{background:#eef2ff;color:var(--blue)}
 .dark-mode .nav button.on{background:rgba(37,99,235,0.15);color:#60a5fa}
 
-/* FAB BUTTONS */
 .fab{position:fixed;right:20px;bottom:115px;width:66px;height:66px;border-radius:50%;background:var(--blue);color:#fff;font-size:32px;box-shadow:0 14px 34px rgba(37,99,235,.4);z-index:31;display:flex;align-items:center;justify-content:center}
 .fab-mic{position:fixed;right:26px;bottom:196px;width:54px;height:54px;border-radius:50%;background:var(--card);color:var(--ink);font-size:24px;box-shadow:0 10px 25px rgba(0,0,0,.15);z-index:31;display:flex;align-items:center;justify-content:center;border:1px solid var(--line)}
 
@@ -465,6 +464,10 @@ function startVoiceEntry() {
     }
   };
   try { rec.start(); } catch(e) { toast("Mic is already running."); }
+}
+
+function handleMicClick() {
+    startVoiceEntry();
 }
 
 function handleReceiptUpload(input) {
@@ -976,7 +979,7 @@ function exportCSV() {
   toast("Export downloaded ✓");
 }
 
-function renderMore(){let s=mergedSettings();$('more').innerHTML=`<div class="card" id="moreMain"><h2>••• More</h2><div class="listrow" onclick="go('income')"><div><div class="title">💰 Income</div><div class="meta">View and add income entries</div></div><b>›</b></div><div class="listrow" onclick="go('investment')"><div><div class="title">📈 Investment</div><div class="meta">View and add investment entries</div></div><b>›</b></div><div class="listrow" onclick="go('cc')"><div><div class="title">💳 Credit Cards</div><div class="meta">View card bills and card history</div></div><b>›</b></div><div class="listrow" onclick="go('transfers')"><div><div class="title">↔️ Transfers</div><div class="meta">View ATM and personal transfers</div></div><b>›</b></div><div class="listrow" onclick="go('insights')"><div><div class="title">✨ Smart Insights</div><div class="meta">Algorithmic spending analysis</div></div><b>›</b></div><div class="listrow" onclick="exportCSV()"><div><div class="title">📥 Export to CSV</div><div class="meta">Download full transaction sheet to device</div></div><b>›</b></div><div class="listrow" onclick="openSettings()"><div><div class="title">⚙️ Settings</div><div class="meta">Customize tabs, sections, dropdowns and PIN</div></div><b>›</b></div><div class="listrow" onclick="refresh(true)"><div><div class="title">↻ Refresh Data</div><div class="meta">Reload directly from Google Sheet master</div></div><b>›</b></div></div><div class="card" id="moreMaster"><h3>Master Data</h3><div class="notice"><b>Transactions</b> is the single master ledger. Every screen reads the same rows. App settings and dropdown choices are shared across the family.</div></div>`}
+function renderMore(){let s=mergedSettings();$('more').innerHTML=`<div class="card" id="moreMain"><h2>••• More</h2><div class="listrow" onclick="go('income')"><div><div class="title">💰 Income</div><div class="meta">View and add income entries</div></div><b>›</b></div><div class="listrow" onclick="go('investment')"><div><div class="title">📈 Investment</div><div class="meta">View and add investment entries</div></div><b>›</b></div><div class="listrow" onclick="go('cc')"><div><div class="title">💳 Credit Cards</div><div class="meta">View card bills and card history</div></div><b>›</b></div><div class="listrow" onclick="go('transfers')"><div><div class="title">↔️ Transfers</div><div class="meta">View ATM and personal transfers</div></div><b>›</b></div><div class="listrow" onclick="go('insights')"><div><div class="title">✨ Smart Insights</div><div class="meta">Algorithmic spending analysis</div></div><b>›</b></div><div class="listrow" onclick="exportCSV()"><div><div class="title">📥 Export to CSV</div><div class="meta">Download full transaction sheet to device</div></div><b>›</b></div><div class="listrow" onclick="openSettings()"><div><div class="title">⚙️ Settings</div><div class="meta">Customize tabs, sections, dropdowns and PIN</div></div><b>›</b></div><div class="listrow" onclick="refresh()"><div><div class="title">↻ Refresh Data</div><div class="meta">Reload directly from Google Sheet master</div></div><b>›</b></div></div><div class="card" id="moreMaster"><h3>Master Data</h3><div class="notice"><b>Transactions</b> is the single master ledger. Every screen reads the same rows. App settings and dropdown choices are shared across the family.</div></div>`}
 function mergedSettings(){let o=Array.isArray(SETTINGS.tabOrder)?SETTINGS.tabOrder.slice():DEFAULT_TAB_ORDER.slice();if(!o.includes('cc')){let mi=o.indexOf('more');if(mi<0)o.push('cc');else o.splice(mi,0,'cc')}if(!o.includes('transfers')){let mi=o.indexOf('more');if(mi<0)o.push('transfers');else o.splice(mi,0,'transfers')}if(!o.includes('insights')){let mi=o.indexOf('more');if(mi<0)o.push('insights');else o.splice(mi,0,'insights')}return {title:SETTINGS.title||'My Expense Analyzer',budget:SETTINGS.budget||'',goalName:SETTINGS.goalName||'',goalAmount:SETTINGS.goalAmount||'',recurring:SETTINGS.recurring||[],recState:SETTINGS.recState||{},swipeTabs:SETTINGS.swipeTabs!==false,swipeRows:SETTINGS.swipeRows!==false,tabs:{home:true,spends:true,income:true,investment:true,money:true,cc:true,transfers:true,insights:true,more:true,...(SETTINGS.tabs||{})},tabOrder:o,sections:{secBudget:true,secSnapshot:true,secAccount:true,secMonth:true,secCategory:true,secRecent:true,...(SETTINGS.sections||{})},sectionOrders:SETTINGS.sectionOrders||{}}}
 function sectionOrderFor(screen){let d=(SECTION_META[screen]||[]).map(x=>x[0]), saved=mergedSettings().sectionOrders[screen]||[];return [...saved.filter(x=>d.includes(x)),...d.filter(x=>!saved.includes(x))]}
 function applyScreenSectionOrder(screen){let el=$(screen);if(!el)return;let order=sectionOrderFor(screen);let nodes=order.map(id=>$(id)).filter(x=>x&&x.parentElement===el);nodes.forEach(n=>el.appendChild(n));if(screen==='home')applyHomeSections()}
@@ -1104,15 +1107,17 @@ function appConfirm(title,message,okText='OK',cancelText='Cancel'){
   });
 }
 
-function deleteEntryFromModal() { if(editRow) quickDelete(editRow, true); }
 async function quickDelete(rowId, fromModal=false){
   const r=DATA.rows.find(x=>Number(x.row)===Number(rowId));
   const label=r ? ((r.type||'Transaction')+' • '+money(r.amount)+(r.description?' • '+r.description:'')) : 'this transaction';
   const first=await appConfirm('Delete transaction?',label+'\n\nThis will permanently remove it from the master sheet.','Delete','Cancel');
   if(!first) return;
+  const second=await appConfirm('Are you absolutely sure?','You are about to permanently delete this transaction. This cannot be undone.','Yes, Delete','Cancel');
+  if(!second) return;
   const ok=()=>{ if(fromModal) closeModal(); refresh(false); toast('Transaction deleted ✓'); };
   google.script.run.withSuccessHandler(ok).withFailureHandler(showErr).deleteTransaction(Number(rowId),authToken);
 }
+function deleteEntryFromModal() { if(editRow) quickDelete(editRow, true); }
 
 function editTx(row){let r=DATA.rows.find(x=>x.row===row);if(!r)return;let mode=r.type==='CC Bill'?'cc':(r.type==='ATM'||r.type==='Personal Transfer')?'transfer':r.type.toLowerCase();openAdd(mode,row)}
 
