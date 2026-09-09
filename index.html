@@ -9,7 +9,6 @@
 <meta name="theme-color" content="#101a2c">
 
 <style>
-/* V5.3 DYNAMIC CSS VARIABLE ENGINE & RECEIPT CLEANUP UI */
 :root {
   --bg: #f4f7fb; --card: #ffffff; --ink: #152238; --muted: #718096; --line: #e7ecf3; --dark: #101a2c;
   --blue: #2563eb; --cyan: #06b6d4; --green: #16a34a; --orange: #f59e0b; --pink: #ec4899; --purple: #7c3aed; --red: #dc2626;
@@ -113,6 +112,7 @@ textarea{min-height:90px;resize:vertical}.row{display:grid;grid-template-columns
 .nav button.on{background:#eef2ff;color:var(--blue)}
 .dark-mode .nav button.on{background:rgba(37,99,235,0.15);color:#60a5fa}
 
+/* FAB BUTTONS */
 .fab{position:fixed;right:20px;bottom:115px;width:66px;height:66px;border-radius:50%;background:var(--blue);color:#fff;font-size:32px;box-shadow:0 14px 34px rgba(37,99,235,.4);z-index:31;display:flex;align-items:center;justify-content:center}
 .fab-mic{position:fixed;right:26px;bottom:196px;width:54px;height:54px;border-radius:50%;background:var(--card);color:var(--ink);font-size:24px;box-shadow:0 10px 25px rgba(0,0,0,.15);z-index:31;display:flex;align-items:center;justify-content:center;border:1px solid var(--line)}
 
@@ -194,6 +194,13 @@ const google = {
 <div id="offlineBanner">📶 Offline Mode - Changes saved locally</div>
 <div id="pinGate"><div class="pinbox"><div class="pinlogo">💰</div><h1>My Expense Analyzer</h1><p>Private family expense tracker</p><div class="pin-dots" id="pinDots"></div><div class="pinpad"><button onclick="pinKey('1')">1</button><button onclick="pinKey('2')">2</button><button onclick="pinKey('3')">3</button><button onclick="pinKey('4')">4</button><button onclick="pinKey('5')">5</button><button onclick="pinKey('6')">6</button><button onclick="pinKey('7')">7</button><button onclick="pinKey('8')">8</button><button onclick="pinKey('9')">9</button><button class="pin-del" onclick="pinClear()">⌫</button><button onclick="pinKey('0')">0</button><button class="pin-del" onclick="pinBack()">←</button></div><button class="pin-unlock" onclick="unlockApp()">Unlock</button><button id="bioBtn" class="pin-unlock" style="background:#2563eb;margin-top:12px;display:none;" onclick="unlockWithBiometrics()">🔓 Unlock with Fingerprint</button><div class="pin-msg" id="pinMsg"></div><p class="pin-foot">Enter your 4–6 digit family PIN</p></div></div>
 
+<div class="modal" id="receiptViewerModal" style="background:rgba(0,0,0,0.9); z-index:99999; display:none; align-items:center; justify-content:center;">
+   <div style="position:relative; width:100%; height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:20px;">
+       <button class="secondary" style="position:absolute; top:20px; right:20px; background:#1f2937; color:#fff; border-radius:99px; font-size:14px; padding:10px 16px;" onclick="document.getElementById('receiptViewerModal').style.display='none'">✖ Close</button>
+       <img id="rvImg" src="" style="max-width:100%; max-height:85vh; border-radius:16px; box-shadow:0 20px 50px rgba(0,0,0,0.5);">
+   </div>
+</div>
+
 <div class="app">
 <header class="top"><div class="brand"><h1 id="brandTitle">My Expense Analyzer</h1><p>Google Sheet master • Mobile Expense Tracker</p></div></header>
 
@@ -224,10 +231,10 @@ const google = {
 <nav class="nav"><div class="navin"></div></nav>
 
 <button class="fab" onclick="openQuick()">＋</button>
-<button class="fab-mic" onclick="handleMicClick()">🎙️</button>
+<button class="fab-mic" onclick="startVoiceEntry()">🎙️</button>
 
 <div class="modal" id="quickModal"><div class="sheet"><button class="secondary close" onclick="closeQuick()">Close</button><h2>＋ Add Entry</h2><div class="notice">All entries are written to the same Google Sheet <b>Transactions</b> master.</div>
- <button class="mic-btn" onclick="handleMicClick()">🎙️ Tap to Voice Add (e.g., "Spent 500 on Food")</button>
+ <button class="mic-btn" onclick="startVoiceEntry()">🎙️ Tap to Voice Add (e.g., "Spent 500 on Food")</button>
  <div class="grid2" style="margin-top:16px">
  <button class="card" style="margin-bottom:0" onclick="closeQuick();openAdd('spend')"><h3>💸 Spend</h3><div class="meta">Daily expense · category</div></button>
  <button class="card" style="margin-bottom:0" onclick="closeQuick();openAdd('investment')"><h3>📈 Investment</h3><div class="meta">FD/RD · MF · stocks</div></button>
@@ -335,7 +342,19 @@ function renderPinDots(){let d=$('pinDots');if(!d)return;d.innerHTML=[0,1,2,3,4,
 function pinKey(n){if(pinValue.length>=6)return;pinValue+=n;renderPinDots();if(pinValue.length===6) setTimeout(unlockApp,80);}
 function pinBack(){pinValue=pinValue.slice(0,-1);renderPinDots();}
 function pinClear(){pinValue='';renderPinDots();$('pinMsg').textContent='';}
-function unlockApp(){if(!/^\d{4,6}$/.test(pinValue)){ $('pinMsg').textContent='Enter a 4 to 6 digit PIN.'; return; } $('pinMsg').textContent='Checking…';google.script.run.withSuccessHandler(r=>{authToken=r.token; $('pinGate').classList.add('hidden');document.body.classList.remove('pin-locked');pinValue='';renderPinDots();init();}).withFailureHandler(e=>{$('pinMsg').textContent=(e&&e.message)||'Incorrect PIN.';pinValue='';renderPinDots();}).authenticatePin(pinValue);}
+function unlockApp(){
+  if(!/^\d{4,6}$/.test(pinValue)){ $('pinMsg').textContent='Enter a 4 to 6 digit PIN.'; return; } 
+  $('pinMsg').textContent='Checking…';
+  google.script.run.withSuccessHandler(r=>{
+     authToken=r.token; 
+     $('pinGate').classList.add('hidden');
+     document.body.classList.remove('pin-locked');
+     pinValue='';renderPinDots();init();
+  }).withFailureHandler(e=>{
+     $('pinMsg').textContent=(e&&e.message)||'Incorrect PIN.';
+     pinValue='';renderPinDots();
+  }).authenticatePin(pinValue);
+}
 
 async function setupBiometrics() {
   if (!window.PublicKeyCredential) { toast("Fingerprint not supported here."); return; }
@@ -390,39 +409,25 @@ function triggerConfetti() {
   }
 }
 
-function handleMicClick() {
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (!SpeechRecognition) {
-        toast("Opening secure voice bridge...");
-        
-        let baseUrl = window.location.href.split('?')[0].split('#')[0];
-        let cleanUrl = baseUrl.replace('https://', '').replace('http://', '');
-        let intentUrl = 'intent://' + cleanUrl + '?voice=1&t=' + authToken + '#Intent;scheme=https;package=com.android.chrome;end;';
-        
-        window.location.href = intentUrl;
-        
-        setTimeout(() => {
-            let a = document.createElement('a');
-            a.href = baseUrl + '?voice=1&t=' + authToken;
-            a.target = '_blank';
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-        }, 800);
-    } else {
-        startVoiceEntry();
-    }
-}
-
 function startVoiceEntry() {
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SpeechRecognition) {
+     alert("Voice input is not supported. Please use the 'Add to Home Screen' Chrome app."); return;
+  }
   let rec = new SpeechRecognition();
   rec.lang = 'en-IN';
   rec.continuous = false;
   rec.interimResults = false;
 
   rec.onstart = () => { toast("🎙️ Listening... Speak now"); };
-  rec.onerror = (e) => { console.error(e); toast("Mic Error: " + e.error); };
+  
+  rec.onerror = (e) => { 
+    if(e.error === 'not-allowed') {
+       alert("Microphone Blocked.\n\nTap the Lock/Settings icon in your browser address bar -> Permissions -> Allow Microphone.");
+    } else {
+       toast("Mic Error: " + e.error); 
+    }
+  };
   
   rec.onresult = (e) => {
     let txt = e.results[0][0].transcript;
@@ -459,7 +464,7 @@ function startVoiceEntry() {
         }
     }
   };
-  try { rec.start(); } catch(e) { toast("Mic is already in use."); }
+  try { rec.start(); } catch(e) { toast("Mic is already running."); }
 }
 
 function handleReceiptUpload(input) {
@@ -470,14 +475,14 @@ function handleReceiptUpload(input) {
     let img = new Image();
     img.onload = function() {
        let canvas = document.createElement('canvas');
-       let max_size = 600; 
+       let max_size = 1600; 
        let w = img.width, h = img.height;
        if(w > h && w > max_size) { h *= max_size/w; w = max_size; }
        else if(h > max_size) { w *= max_size/h; h = max_size; }
        canvas.width = w; canvas.height = h;
        let ctx = canvas.getContext('2d');
        ctx.drawImage(img, 0, 0, w, h);
-       receiptBase64 = canvas.toDataURL('image/jpeg', 0.4); 
+       receiptBase64 = canvas.toDataURL('image/jpeg', 0.85); 
        
        let btn = $('receiptBtn');
        btn.textContent = '📸 Receipt Attached ✓';
@@ -536,45 +541,32 @@ function processOfflineQueue() {
 window.addEventListener('online', processOfflineQueue);
 window.addEventListener('offline', updateOfflineUI);
 
-document.addEventListener('visibilitychange', () => {
-   if (document.visibilityState === 'visible' && authToken) {
-       google.script.run.withSuccessHandler(d => {
-           if(d && d.rows) {
-               DATA.rows = d.rows;
-               if(currentScreen === 'spends') renderSpends();
-               if(currentScreen === 'home') renderHome();
-               if(currentScreen === 'money') renderMoney();
-               if(currentScreen === 'insights') renderInsights();
-           }
-       }).getAppData(authToken);
-   }
-});
-
 function init() {
   activeMonth = monthNow();
   updateOfflineUI();
   
-  let pData = new Promise((resolve, reject) => {
-    google.script.run.withSuccessHandler(resolve).withFailureHandler(reject).getAppData(authToken);
-  });
-  let pSettings = new Promise((resolve, reject) => {
-    google.script.run.withSuccessHandler(resolve).withFailureHandler(reject).getSettings(authToken);
-  });
-
-  Promise.all([pData, pSettings]).then(results => {
-    DATA = results[0] || {rows:[], options:{}};
-    SETTINGS = results[1] || {};
+  // CACHE FIRST LOADING
+  let cachedData = localStorage.getItem('expense_data_cache');
+  let cachedSettings = localStorage.getItem('expense_settings_cache');
+  
+  if (cachedData) { DATA = JSON.parse(cachedData); }
+  if (cachedSettings) { SETTINGS = JSON.parse(cachedSettings); }
+  
+  if (cachedData) {
+     applySettings(); buildForms(); initGlobal(); renderAll();
+  } else {
+     toast("Syncing with cloud...");
+  }
+  
+  // BACKGROUND SYNC
+  google.script.run.withSuccessHandler(res => {
+    DATA = res.appData || {rows:[], options:{}};
+    SETTINGS = res.settings || {};
+    localStorage.setItem('expense_data_cache', JSON.stringify(DATA));
+    localStorage.setItem('expense_settings_cache', JSON.stringify(SETTINGS));
     applySettings(); buildForms(); initGlobal(); renderAll();
     processOfflineQueue();
-    
-    const urlParams = new URLSearchParams(window.location.search);
-    if(urlParams.get('voice') === '1') {
-       setTimeout(() => {
-           openAdd('spend');
-           setTimeout(startVoiceEntry, 600);
-       }, 300);
-    }
-  }).catch(showErr);
+  }).withFailureHandler(showErr).getAppPayload(authToken);
 }
 
 function buildForms(){const mp={fAccount:'Account',fType:'Type',fCategory:'Category',fSubcategory:'Sub-category',fNeed:'Need',fPayment:'Payment',fCard:'Account/Card'};Object.entries(mp).forEach(([id,key])=>fillSelect($(id),DATA.options[key]||[],'Select...'));if(entryMode==='income')$('fCategory').value='Income';if(entryMode==='investment')$('fCategory').value='Investment';if(entryMode==='cc'){$('fCategory').value='Credit Card Bill';$('fSubcategory').value='Monthly Bill'}}
@@ -694,7 +686,7 @@ function txRows(rs) {
 
 function txHtml(r){
   let c = r.category || r.type || 'Transaction';
-  let recIcon = r.receipt ? `<span style="font-size:16px; margin-left:6px; cursor:pointer;" onclick="event.stopPropagation(); window.open('${r.receipt}', '_blank');" title="View Receipt">📎</span>` : '';
+  let recIcon = r.receipt ? `<span style="font-size:16px; margin-left:6px; cursor:pointer;" onclick="event.stopPropagation(); document.getElementById('rvImg').src='${r.receipt}'; document.getElementById('receiptViewerModal').style.display='flex';" title="View Receipt">📎</span>` : '';
   return `<div class="swipe-wrap">
     <div class="swipe-bg"><div style="background:var(--blue)">Copy</div><div style="background:var(--red)">Delete</div></div>
     <div class="swipe-fg listrow txclick" ontouchstart="txTouchStart(event, this)" ontouchmove="txTouchMove(event, this)" ontouchend="txTouchEnd(event, this, ${r.row})" onclick="editTx(${r.row})">
@@ -822,6 +814,7 @@ function toggleRec(idx) {
    else delete s.recState[key];
    
    SETTINGS.recState = s.recState; renderMoney();
+   localStorage.setItem('expense_settings_cache', JSON.stringify(SETTINGS));
    google.script.run.saveSettings(s, authToken);
 }
 
@@ -983,7 +976,7 @@ function exportCSV() {
   toast("Export downloaded ✓");
 }
 
-function renderMore(){let s=mergedSettings();$('more').innerHTML=`<div class="card" id="moreMain"><h2>••• More</h2><div class="listrow" onclick="go('income')"><div><div class="title">💰 Income</div><div class="meta">View and add income entries</div></div><b>›</b></div><div class="listrow" onclick="go('investment')"><div><div class="title">📈 Investment</div><div class="meta">View and add investment entries</div></div><b>›</b></div><div class="listrow" onclick="go('cc')"><div><div class="title">💳 Credit Cards</div><div class="meta">View card bills and card history</div></div><b>›</b></div><div class="listrow" onclick="go('transfers')"><div><div class="title">↔️ Transfers</div><div class="meta">View ATM and personal transfers</div></div><b>›</b></div><div class="listrow" onclick="go('insights')"><div><div class="title">✨ Smart Insights</div><div class="meta">Algorithmic spending analysis</div></div><b>›</b></div><div class="listrow" onclick="exportCSV()"><div><div class="title">📥 Export to CSV</div><div class="meta">Download full transaction sheet to device</div></div><b>›</b></div><div class="listrow" onclick="openSettings()"><div><div class="title">⚙️ Settings</div><div class="meta">Customize tabs, sections, dropdowns and PIN</div></div><b>›</b></div><div class="listrow" onclick="refresh()"><div><div class="title">↻ Refresh Data</div><div class="meta">Reload directly from Google Sheet master</div></div><b>›</b></div></div><div class="card" id="moreMaster"><h3>Master Data</h3><div class="notice"><b>Transactions</b> is the single master ledger. Every screen reads the same rows. App settings and dropdown choices are shared across the family.</div></div>`}
+function renderMore(){let s=mergedSettings();$('more').innerHTML=`<div class="card" id="moreMain"><h2>••• More</h2><div class="listrow" onclick="go('income')"><div><div class="title">💰 Income</div><div class="meta">View and add income entries</div></div><b>›</b></div><div class="listrow" onclick="go('investment')"><div><div class="title">📈 Investment</div><div class="meta">View and add investment entries</div></div><b>›</b></div><div class="listrow" onclick="go('cc')"><div><div class="title">💳 Credit Cards</div><div class="meta">View card bills and card history</div></div><b>›</b></div><div class="listrow" onclick="go('transfers')"><div><div class="title">↔️ Transfers</div><div class="meta">View ATM and personal transfers</div></div><b>›</b></div><div class="listrow" onclick="go('insights')"><div><div class="title">✨ Smart Insights</div><div class="meta">Algorithmic spending analysis</div></div><b>›</b></div><div class="listrow" onclick="exportCSV()"><div><div class="title">📥 Export to CSV</div><div class="meta">Download full transaction sheet to device</div></div><b>›</b></div><div class="listrow" onclick="openSettings()"><div><div class="title">⚙️ Settings</div><div class="meta">Customize tabs, sections, dropdowns and PIN</div></div><b>›</b></div><div class="listrow" onclick="refresh(true)"><div><div class="title">↻ Refresh Data</div><div class="meta">Reload directly from Google Sheet master</div></div><b>›</b></div></div><div class="card" id="moreMaster"><h3>Master Data</h3><div class="notice"><b>Transactions</b> is the single master ledger. Every screen reads the same rows. App settings and dropdown choices are shared across the family.</div></div>`}
 function mergedSettings(){let o=Array.isArray(SETTINGS.tabOrder)?SETTINGS.tabOrder.slice():DEFAULT_TAB_ORDER.slice();if(!o.includes('cc')){let mi=o.indexOf('more');if(mi<0)o.push('cc');else o.splice(mi,0,'cc')}if(!o.includes('transfers')){let mi=o.indexOf('more');if(mi<0)o.push('transfers');else o.splice(mi,0,'transfers')}if(!o.includes('insights')){let mi=o.indexOf('more');if(mi<0)o.push('insights');else o.splice(mi,0,'insights')}return {title:SETTINGS.title||'My Expense Analyzer',budget:SETTINGS.budget||'',goalName:SETTINGS.goalName||'',goalAmount:SETTINGS.goalAmount||'',recurring:SETTINGS.recurring||[],recState:SETTINGS.recState||{},swipeTabs:SETTINGS.swipeTabs!==false,swipeRows:SETTINGS.swipeRows!==false,tabs:{home:true,spends:true,income:true,investment:true,money:true,cc:true,transfers:true,insights:true,more:true,...(SETTINGS.tabs||{})},tabOrder:o,sections:{secBudget:true,secSnapshot:true,secAccount:true,secMonth:true,secCategory:true,secRecent:true,...(SETTINGS.sections||{})},sectionOrders:SETTINGS.sectionOrders||{}}}
 function sectionOrderFor(screen){let d=(SECTION_META[screen]||[]).map(x=>x[0]), saved=mergedSettings().sectionOrders[screen]||[];return [...saved.filter(x=>d.includes(x)),...d.filter(x=>!saved.includes(x))]}
 function applyScreenSectionOrder(screen){let el=$(screen);if(!el)return;let order=sectionOrderFor(screen);let nodes=order.map(id=>$(id)).filter(x=>x&&x.parentElement===el);nodes.forEach(n=>el.appendChild(n));if(screen==='home')applyHomeSections()}
@@ -1038,7 +1031,10 @@ function openAdd(mode,row=null){
          btn.textContent = '📄 View Attached Receipt';
          btn.style.background = 'var(--blue)';
          btn.style.color = '#fff';
-         btn.onclick = () => window.open(r.receipt, '_blank');
+         btn.onclick = () => {
+             document.getElementById('rvImg').src = r.receipt;
+             document.getElementById('receiptViewerModal').style.display = 'flex';
+         };
          $('delReceiptBtn').classList.remove('hidden');
       }
   }
@@ -1081,17 +1077,8 @@ function saveEntry(){
   }
 
   let ok=()=>{
-      closeModal();refresh();toast('Saved ✓'); 
+      closeModal();refresh(false);toast('Saved ✓'); 
       if(!editRow && (typeVal === 'Investment' || typeVal === 'CC Bill' || typeVal === 'Income')) triggerConfetti(); 
-      
-      const urlParams = new URLSearchParams(window.location.search);
-      if(urlParams.get('voice') === '1') {
-          setTimeout(() => {
-              appConfirm('Saved Successfully', 'Your voice entry was saved to the cloud.\n\nYou can now close this browser tab and return to the App.', 'Got it', '').then(() => {
-                  try { window.close(); } catch(e) {}
-              });
-          }, 800);
-      }
   };
   
   if(editRow)google.script.run.withSuccessHandler(ok).withFailureHandler(showErr).updateTransaction(d,authToken);
@@ -1123,12 +1110,22 @@ async function quickDelete(rowId, fromModal=false){
   const label=r ? ((r.type||'Transaction')+' • '+money(r.amount)+(r.description?' • '+r.description:'')) : 'this transaction';
   const first=await appConfirm('Delete transaction?',label+'\n\nThis will permanently remove it from the master sheet.','Delete','Cancel');
   if(!first) return;
-  const ok=()=>{ if(fromModal) closeModal(); refresh(); toast('Transaction deleted ✓'); };
+  const ok=()=>{ if(fromModal) closeModal(); refresh(false); toast('Transaction deleted ✓'); };
   google.script.run.withSuccessHandler(ok).withFailureHandler(showErr).deleteTransaction(Number(rowId),authToken);
 }
 
 function editTx(row){let r=DATA.rows.find(x=>x.row===row);if(!r)return;let mode=r.type==='CC Bill'?'cc':(r.type==='ATM'||r.type==='Personal Transfer')?'transfer':r.type.toLowerCase();openAdd(mode,row)}
-function refresh(){google.script.run.withSuccessHandler(d=>{DATA=d||{rows:[],options:{}};buildForms();initGlobal();renderAll();toast('Data refreshed ✓')}).withFailureHandler(showErr).getAppData(authToken)}
+
+function refresh(showToast = true){
+  google.script.run.withSuccessHandler(d=>{
+    DATA=d.appData||{rows:[],options:{}};
+    SETTINGS=d.settings||{};
+    localStorage.setItem('expense_data_cache', JSON.stringify(DATA));
+    localStorage.setItem('expense_settings_cache', JSON.stringify(SETTINGS));
+    buildForms();initGlobal();renderAll();
+    if(showToast) toast('Data refreshed ✓');
+  }).withFailureHandler(showErr).getAppPayload(authToken)
+}
 
 /* RECURRING MANAGER */
 function addRecurring() {
