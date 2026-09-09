@@ -8,7 +8,7 @@
 <meta name="theme-color" content="#101a2c">
 
 <style>
-/* V4.9 DYNAMIC CSS VARIABLE ENGINE */
+/* V4.9 DYNAMIC CSS VARIABLE ENGINE & SMART VOICE MATCHING */
 :root {
   --bg: #f4f7fb; --card: #ffffff; --ink: #152238; --muted: #718096; --line: #e7ecf3; --dark: #101a2c;
   --blue: #2563eb; --cyan: #06b6d4; --green: #16a34a; --orange: #f59e0b; --pink: #ec4899; --purple: #7c3aed; --red: #dc2626;
@@ -234,7 +234,6 @@ const google = {
 <button class="fab-mic" onclick="startVoiceEntry()">🎙️</button>
 
 <div class="modal" id="quickModal"><div class="sheet"><button class="secondary close" onclick="closeQuick()">Close</button><h2>＋ Add Entry</h2><div class="notice">All entries are written to the same Google Sheet <b>Transactions</b> master.</div>
- <button class="mic-btn" onclick="startVoiceEntry()">🎙️ Tap to Voice Add (e.g., "Spent 500 on Food")</button>
  <div class="grid2" style="margin-top:16px">
  <button class="card" style="margin-bottom:0" onclick="closeQuick();openAdd('spend')"><h3>💸 Spend</h3><div class="meta">Daily expense · category</div></button>
  <button class="card" style="margin-bottom:0" onclick="closeQuick();openAdd('investment')"><h3>📈 Investment</h3><div class="meta">FD/RD · MF · stocks</div></button>
@@ -393,10 +392,10 @@ function triggerConfetti() {
   }
 }
 
-// V5.0 VOICE-TO-EXPENSE ENGINE
+// V5.1 ROBUST VOICE-TO-EXPENSE ENGINE
 function startVoiceEntry() {
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if (!SpeechRecognition) { toast("Voice input is not supported on this browser."); return; }
+  if (!SpeechRecognition) { toast("Voice input is not supported on this browser/app."); return; }
   
   let rec = new SpeechRecognition();
   rec.lang = 'en-IN';
@@ -406,7 +405,7 @@ function startVoiceEntry() {
   rec.onstart = () => { toast("🎙️ Listening... Speak now"); };
   rec.onerror = (e) => { 
     console.error(e); 
-    toast("Mic Error: " + e.error + " (Check browser permissions)"); 
+    toast("Mic Error: " + e.error); 
   };
   
   rec.onresult = (e) => {
@@ -427,38 +426,29 @@ function startVoiceEntry() {
     let catSelect = $('fCategory');
     let matched = false;
 
-    // 1. Try to match exact custom category names first
-    for(let i=0; i<catSelect.options.length; i++) {
-      let optVal = catSelect.options[i].value.toLowerCase();
-      if(optVal && txtLower.includes(optVal)) {
-         catSelect.value = catSelect.options[i].value;
-         matched = true; break;
-      }
+    const syn = {
+        'Food': ['food', 'eat', 'restaurant', 'zomato', 'swiggy', 'dine', 'lunch', 'dinner', 'breakfast'],
+        'Grocery': ['grocery', 'supermarket', 'mart', 'milk', 'vegetable', 'fruit'],
+        'Transport': ['travel', 'uber', 'cab', 'ola', 'auto', 'petrol', 'fuel', 'train', 'bus'],
+        'Shopping': ['shopping', 'clothes', 'myntra', 'amazon', 'flipkart'],
+        'Medical': ['medical', 'pharmacy', 'doctor', 'medicine', 'hospital', 'health'],
+        'Utility': ['utility', 'bill', 'recharge', 'electricity', 'wifi', 'broadband']
+    };
+
+    let targetConcept = '';
+    for (const [catName, keywords] of Object.entries(syn)) {
+        if (keywords.some(k => txtLower.includes(k))) {
+            targetConcept = catName.toLowerCase();
+            break;
+        }
     }
 
-    // 2. If no exact match, fallback to Synonyms
-    if(!matched) {
-      const syn = {
-        'Food': ['eat', 'restaurant', 'zomato', 'swiggy', 'dine'],
-        'Grocery': ['supermarket', 'mart', 'milk', 'vegetable'],
-        'Transport': ['uber', 'cab', 'ola', 'auto', 'petrol', 'fuel', 'travel'],
-        'Shopping': ['clothes', 'myntra', 'amazon', 'flipkart'],
-        'Medical': ['pharmacy', 'doctor', 'medicine', 'hospital'],
-        'Utility': ['bill', 'recharge', 'electricity', 'wifi', 'broadband']
-      };
-      
-      for (const [catName, keywords] of Object.entries(syn)) {
-        if (keywords.some(k => txtLower.includes(k))) {
-          // Find actual case-sensitive option in dropdown
-          for(let i=0; i<catSelect.options.length; i++) {
-             if(catSelect.options[i].value.toLowerCase() === catName.toLowerCase()) {
-                catSelect.value = catSelect.options[i].value;
-                matched = true; break;
-             }
-          }
+    for(let i=0; i<catSelect.options.length; i++) {
+        let optVal = catSelect.options[i].value.toLowerCase();
+        if ((targetConcept && optVal.includes(targetConcept)) || (optVal && txtLower.includes(optVal))) {
+            catSelect.value = catSelect.options[i].value;
+            matched = true; break;
         }
-        if(matched) break;
-      }
     }
   };
   
@@ -660,11 +650,11 @@ function txRows(rs) {
 
 function txHtml(r){
   let c = r.category || r.type || 'Transaction';
-  let recIcon = r.receipt ? ` <span style="font-size:14px" title="Receipt Attached">📎</span>` : '';
+  let recIcon = r.receipt ? `<span style="font-size:16px; margin-left:6px; cursor:pointer;" onclick="event.stopPropagation(); window.open('${r.receipt}', '_blank');" title="View Receipt">📎</span>` : '';
   return `<div class="swipe-wrap">
     <div class="swipe-bg"><div style="background:var(--blue)">Copy</div><div style="background:var(--red)">Delete</div></div>
     <div class="swipe-fg listrow txclick" ontouchstart="txTouchStart(event, this)" ontouchmove="txTouchMove(event, this)" ontouchend="txTouchEnd(event, this, ${r.row})" onclick="editTx(${r.row})">
-      <div class="catrow"><div class="caticon ${catBg(c)}">${catIcon(c)}</div><div class="catname"><div class="title">${esc(r.description||c)}${recIcon}</div><div class="meta">${esc(r.type)} · ${esc(c)}${r.account?' · '+esc(r.account):''}${r.accountCard?' · '+esc(r.accountCard):''}</div></div></div>
+      <div class="catrow"><div class="caticon ${catBg(c)}">${catIcon(c)}</div><div class="catname"><div class="title" style="display:flex;align-items:center;">${esc(r.description||c)}${recIcon}</div><div class="meta">${esc(r.type)} · ${esc(c)}${r.account?' · '+esc(r.account):''}${r.accountCard?' · '+esc(r.accountCard):''}</div></div></div>
       <div class="amt">${money(r.amount)}</div>
     </div></div>`;
 }
@@ -1128,7 +1118,7 @@ function addManagedOption(field,idx){let e=$('addOpt_'+idx),v=(e&&e.value||'').t
 function renameManagedOption(field,idx){let inputs=document.querySelectorAll('[data-opt-field="'+CSS.escape(field)+'"]');let input=inputs[idx],nv=(input&&input.value||'').trim(),vals=[...(DATA.options[field]||[])];if(!input||!nv||!vals[idx])return;if(nv===vals[idx]){toast('No change');return}if(vals.some((x,i)=>i!==idx&&x.toLowerCase()===nv.toLowerCase())){toast('Already exists');return}let old=vals[idx];vals[idx]=nv;google.script.run.withSuccessHandler(d=>{DATA.options[field]=d.options[field]||vals;buildForms();renderOptionManager();refresh();toast(old+' → '+nv)}).withFailureHandler(showErr).renameOption(field,old,nv,authToken)}
 function deleteManagedOption(field,idx){let vals=[...(DATA.options[field]||[])],old=vals[idx];if(!old)return;if(!confirm('Remove "'+old+'" from future dropdown choices? Existing transactions are kept.'))return;vals.splice(idx,1);persistManagedOptions(field,vals)}
 function changePinUI(){let old=$('oldPinChange').value.trim(),nw=$('newPinChange').value.trim(),cf=$('confirmPinChange').value.trim();if(!/^\d{4,6}$/.test(old)||!/^[0-9]{4,6}$/.test(nw)){toast('PIN must be 4–6 digits');return}if(nw!==cf){toast('New PINs do not match');return}google.script.run.withSuccessHandler(()=>{['oldPinChange','newPinChange','confirmPinChange'].forEach(id=>$(id).value='');toast('PIN changed ✓')}).withFailureHandler(showErr).changeAppPin(old,nw,authToken)}
-function resetSettings(){let d={title:'My Expense Analyzer',budget:'',goalName:'',goalAmount:'',recurring:[],recState:{},swipeTabs:true,swipeRows:true,tabs:{home:true,spends:true,income:true,investment:true,money:true,cc:true,transfers:true,insights:true,more:true},tabOrder:DEFAULT_TAB_ORDER.slice(),sectionOrders:{},sections:{secBudget:true,secSnapshot:true,secAccount:true,secMonth:true,secCategory:true,secRecent:true}};google.script.run.withSuccessHandler(v=>{SETTINGS=v||d;applySettings();openSettings();toast('Reset ✓')}).withFailureHandler(showErr).saveSettings(d,authToken)}
+function resetSettings(){let d={title:'My Expense Analyzer',budget:'',goalName:'',goalAmount:'',recurring:[],recState:{},swipeTabs:true,swipeRows:true,tabs:{home:true,spends:true,income:true,investment:true,money:true,cc:true,transfers:true,insights:true,more:true},tabOrder:DEFAULT_TAB_ORDER.slice(),sectionOrders:{},sections:{secBudget:true,secSnapshot:true,secAccount:true,secMonth:true,secCategory:true,secRecent:true,...(SETTINGS.sections||{})}};google.script.run.withSuccessHandler(v=>{SETTINGS=v||d;applySettings();openSettings();toast('Reset ✓')}).withFailureHandler(showErr).saveSettings(d,authToken)}
 function showErr(e){alert(e&&e.message?e.message:String(e))}function toast(t){$('toast').textContent=t;$('toast').style.display='block';setTimeout(()=>$('toast').style.display='none',2000)}
 window.onload=function(){
   if(localStorage.getItem('theme') === 'dark') document.body.classList.add('dark-mode');
