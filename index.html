@@ -8,7 +8,7 @@
 <meta name="theme-color" content="#101a2c">
 
 <style>
-/* V4.4 DYNAMIC CSS VARIABLE ENGINE & SMART RECURRING MATCHING */
+/* V4.5 DYNAMIC CSS VARIABLE ENGINE & HYBRID RECURRING TOGGLES */
 :root {
   --bg: #f4f7fb; --card: #ffffff; --ink: #152238; --muted: #718096; --line: #e7ecf3; --dark: #101a2c;
   --blue: #2563eb; --cyan: #06b6d4; --green: #16a34a; --orange: #f59e0b; --pink: #ec4899; --purple: #7c3aed; --red: #dc2626;
@@ -104,6 +104,7 @@ textarea{min-height:90px;resize:vertical}.row{display:grid;grid-template-columns
 .monthbar select{padding:12px;height:52px;border-radius:16px}.periodbar{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
 .viewhint{text-align:center;font-size:11px;color:var(--muted);padding-top:10px;font-weight:750}
 
+/* NAV */
 .nav{position:fixed;bottom:0;left:0;right:0;background:var(--nav-bg);border-top:1px solid var(--line);z-index:30;box-shadow:0 -12px 35px rgba(0,0,0,.06);padding-bottom:calc(25px + env(safe-area-inset-bottom));overflow-x:auto;overflow-y:hidden;scrollbar-width:none;-webkit-overflow-scrolling:touch}
 .nav::-webkit-scrollbar{display:none}
 .navin{min-width:100%;width:max-content;margin:0 auto;display:grid;gap:4px;padding:8px 6px}
@@ -289,7 +290,7 @@ const TAB_META={home:['⌂','Home'],spends:['🧾','Spends'],income:['💰','Inc
 const SECTION_META={
   home:[['secBudget','🛡️ Safe to Spend'],['secSnapshot','🎯 Financial Snapshot'],['secAccount','👨‍👩‍👦 Account-wise Expenses'],['secMonth','📅 Explore by Month'],['secCategory','🌈 Where did it go?'],['secRecent','🧾 Recent Spends']],
   spends:[['spendFilters','🔎 Spend Filters'],['spendTx','🧾 Transactions']],
-  income:[['incomeTx','💰 Income']],
+  income:[['incomeTrend','📈 Income Trend'],['incomeTx','💰 Income']],
   investment:[['investmentTx','📈 Investment / Saving']],
   money:[['moneyPosition','💼 Financial Position'],['moneyRec','🔁 Recurring Charges'],['moneyChart','📊 Income vs Outgoing'],['moneySummary','📅 Monthwise Summary']],
   cc:[['ccCards','💳 Your Cards'],['ccTrend','📈 Monthly Bill Trend'],['ccShare','🏆 Card Share'],['ccHistory','🗓️ Bill History']],
@@ -369,7 +370,7 @@ function triggerConfetti() {
   }
 }
 
-// V4.3 GESTURE ENGINE (With Duplicate action on Swipe Right)
+// V4.5 GESTURE ENGINE
 let touchStartX = null, touchStartY = null;
 document.addEventListener('touchstart', e => {
   if (e.touches.length > 1) return;
@@ -567,7 +568,23 @@ function renderSpends(){
 }
 
 function liveSpendSearch(input){let rs=spendFilteredRows(input.value),summary=$('spSummary'),list=$('spTxList');if(summary)summary.textContent=currentLabel()+' · '+rs.length+' tx · '+money(sum(rs));if(list)list.innerHTML=txRows(rs);if(document.activeElement!==input){input.focus()} }
-function renderIncome(){let rs=scopedRows('Income').sort((a,b)=>b.date.localeCompare(a.date)||b.row-a.row),total=sum(rs);$('income').innerHTML=`<div class="minihero"><div class="label" style="color:#bfdbfe">${globalView==='overall'?'Overall income':globalView==='period'?'Period income':'Monthly income'}</div><div class="kpi">${money(total)}</div><div style="font-size:12px;color:#dbeafe;font-weight:750">${rs.length} income entr${rs.length===1?'y':'ies'}</div></div><div class="card" id="incomeTx"><div class="sectionhead"><h3>💰 Income</h3><button class="primary" onclick="openAdd('income')">＋ Add</button></div>${txRows(rs)}</div>`}
+
+function renderIncome(){
+  let rs=scopedRows('Income').sort((a,b)=>b.date.localeCompare(a.date)||b.row-a.row), total=sum(rs);
+  
+  let months=monthKeys().slice(-9);
+  let mx=Math.max(...months.map(m=>sum(DATA.rows.filter(r=>r.type==='Income'&&r.date.startsWith(m)))),1);
+  let bars=months.map(m=>{
+    let v=sum(DATA.rows.filter(r=>r.type==='Income'&&r.date.startsWith(m)));
+    return `<div class="mcol" onclick="showIncomeChartValue('${m}',${v})"><div style="width:100%;display:flex;gap:4px;align-items:end;justify-content:center;height:120px"><div class="mbar chartbar" style="height:${Math.max(5,v/mx*110)}px;background:linear-gradient(180deg,#38bdf8,#2563eb)"></div></div><div class="mlab">${monthName(m).split(' ')[0]}</div></div>`;
+  }).join('');
+
+  $('income').innerHTML=`
+  <div class="minihero"><div class="label" style="color:#bfdbfe">${globalView==='overall'?'Overall income':globalView==='period'?'Period income':'Monthly income'}</div><div class="kpi">${money(total)}</div><div style="font-size:12px;color:#dbeafe;font-weight:750">${rs.length} income entr${rs.length===1?'y':'ies'}</div></div>
+  <div class="card" id="incomeTrend"><div class="sectionhead"><h3>📈 Monthly Trend</h3><span class="pill">Last 9 months</span></div><div class="monthchart">${bars||`<div class="empty" style="grid-column:1/-1">${emptySVG()}<div style="margin-top:8px">No data</div></div>`}</div><div id="incChartTip" class="charttip">Tap a month column to display its values.</div></div>
+  <div class="card" id="incomeTx"><div class="sectionhead"><h3>💰 Income</h3><button class="primary" onclick="openAdd('income')">＋ Add</button></div>${txRows(rs)}</div>`;
+}
+function showIncomeChartValue(m,v){let e=$('incChartTip');if(e)e.innerHTML=`<b style="font-size:13px">${esc(monthName(m))}</b> · <span style="color:var(--blue);font-weight:800">Income ${money(v)}</span>`}
 
 function renderInvestment(){
   let rs=scopedRows('Investment').sort((a,b)=>b.date.localeCompare(a.date)||b.row-a.row), added=investmentAdded(), balance=OPENING_SAVINGS+added, monthlyInv=sum(rs);
@@ -589,6 +606,18 @@ function renderInvestment(){
   <div class="card" id="investmentTx"><div class="sectionhead"><h3>📈 Investment / Saving</h3><button class="primary" onclick="openAdd('investment')">＋ Add</button></div><div class="data-note" style="font-size:13px;font-weight:800;color:var(--ink)">Current savings/investment balance: <b>${money(balance)}</b></div><div style="height:12px"></div>${txRows(rs)}</div>`;
 }
 
+function toggleRec(idx) {
+   let s=mergedSettings(); if(!s.recState) s.recState={};
+   let key = idx + '_' + activeMonth;
+   let cur = s.recState[key];
+   if(cur === undefined) s.recState[key] = true;
+   else if (cur === true) s.recState[key] = false;
+   else delete s.recState[key];
+   
+   SETTINGS.recState = s.recState; renderMoney();
+   google.script.run.saveSettings(s, authToken);
+}
+
 function renderMoney(){
  let all=scopedRows(),inc=sum(all.filter(r=>r.type==='Income')),sp=sum(all.filter(r=>r.type==='Spend')),inv=sum(all.filter(r=>r.type==='Investment')),net=inc-sp-inv;
  let months=monthKeys().slice(-12);
@@ -596,26 +625,29 @@ function renderMoney(){
  let rows=months.slice().reverse().map(m=>{let I=sum(DATA.rows.filter(r=>r.type==='Income'&&r.date.startsWith(m))),S=sum(DATA.rows.filter(r=>r.type==='Spend'&&r.date.startsWith(m))),V=sum(DATA.rows.filter(r=>r.type==='Investment'&&r.date.startsWith(m))),O=S+V,C=sum(DATA.rows.filter(r=>r.type==='CC Bill'&&r.date.startsWith(m)));return `<tr><td>${esc(monthName(m))}</td><td>${money(I)}</td><td>${money(S)}</td><td>${money(V)}</td><td>${money(O)}</td><td>${money(C)}</td></tr>`}).join('');
  
  let recs = mergedSettings().recurring || [];
+ let recState = mergedSettings().recState || {};
  let recHtml = '';
  if(recs.length && globalView==='monthly') {
-    let curMonthTx = scopedRows('Spend');
+    let curMonthTx = all.filter(r => r.type === 'Spend' || r.type === 'Investment' || r.type === 'CC Bill');
     let totalRec = 0, totalPaid = 0;
-    let rRows = recs.map(rc => {
+    let rRows = recs.map((rc, i) => {
        totalRec += Number(rc.amt);
+       let isPaid = false;
+       let manualState = recState[i + '_' + activeMonth];
        
-       // V4.4 SMART RECURRING MATCHING: Match by partial text OR EXACT amount
-       let isPaid = curMonthTx.some(tx => {
-           let tTitle = String(rc.title).toLowerCase();
-           let matchText = (tx.description||'').toLowerCase().includes(tTitle) || (tx.category||'').toLowerCase().includes(tTitle) || (tx.subcategory||'').toLowerCase().includes(tTitle);
-           let matchAmt = (Number(tx.amount) === Number(rc.amt));
-           return matchText || matchAmt;
-       });
+       if(manualState === true) { isPaid = true; }
+       else if (manualState === false) { isPaid = false; }
+       else {
+           let tTitle = String(rc.title).toLowerCase().trim();
+           isPaid = curMonthTx.some(tx => (tx.description||'').toLowerCase().includes(tTitle) || (tx.category||'').toLowerCase().includes(tTitle));
+       }
        
        if(isPaid) totalPaid += Number(rc.amt);
-       let stat = isPaid ? '<span style="color:var(--green);font-weight:900;font-size:12px;margin-left:8px">Paid ✓</span>' : '<span style="color:var(--orange);font-weight:900;font-size:12px;margin-left:8px">Pending</span>';
-       return `<div class="listrow"><div class="title">${esc(rc.title)}</div><div><b style="font-size:16px">${money(rc.amt)}</b>${stat}</div></div>`;
+       let stat = isPaid ? `<span onclick="toggleRec(${i})" class="pill" style="cursor:pointer;background:#dcfce7;color:#166534;margin-left:8px">Paid ✓</span>` : `<span onclick="toggleRec(${i})" class="pill" style="cursor:pointer;background:#fef3c7;color:#92400e;margin-left:8px">Pending</span>`;
+       return `<div class="listrow"><div class="title">${esc(rc.title)}</div><div style="display:flex;align-items:center"><b style="font-size:16px">${money(rc.amt)}</b>${stat}</div></div>`;
     }).join('');
-    recHtml = `<div class="card" id="moneyRec"><div class="sectionhead"><h3>🔁 Recurring Charges</h3><span class="pill">${money(totalPaid)} / ${money(totalRec)} Paid</span></div>${rRows}</div>`;
+    recHtml = `<div class="card" id="moneyRec"><div class="sectionhead"><h3>🔁 Recurring Charges</h3><span class="pill">${money(totalPaid)} / ${money(totalRec)} Paid</span></div>
+    <div style="font-size:11px;color:var(--muted);margin-bottom:12px;font-weight:700">Tap a badge to manually override its status.</div>${rRows}</div>`;
  }
 
  $('money').innerHTML=`<div class="minihero"><div class="label" style="color:#bfdbfe">${currentLabel()} financial position</div><div class="kpi ${net<0?'negative':''}">${money(net)}</div><div style="font-size:12px;color:#dbeafe;font-weight:750">Money In − Total Outgoing (Spends + Investment)</div></div>
@@ -654,7 +686,7 @@ function renderTransfers(){
   </div>`;
 }
 
-// V4.4 ALGORITHMIC INSIGHTS (Fixed Month Logic)
+// V4.4 ALGORITHMIC INSIGHTS
 function renderInsights() {
   let rs = scopedRows('Spend'); 
   let bud = Number(SETTINGS.budget) || 0;
@@ -746,7 +778,7 @@ function exportCSV() {
 }
 
 function renderMore(){let s=mergedSettings();$('more').innerHTML=`<div class="card" id="moreMain"><h2>••• More</h2><div class="listrow" onclick="go('income')"><div><div class="title">💰 Income</div><div class="meta">View and add income entries</div></div><b>›</b></div><div class="listrow" onclick="go('investment')"><div><div class="title">📈 Investment</div><div class="meta">View and add investment entries</div></div><b>›</b></div><div class="listrow" onclick="go('cc')"><div><div class="title">💳 Credit Cards</div><div class="meta">View card bills and card history</div></div><b>›</b></div><div class="listrow" onclick="go('transfers')"><div><div class="title">↔️ Transfers</div><div class="meta">View ATM and personal transfers</div></div><b>›</b></div><div class="listrow" onclick="go('insights')"><div><div class="title">✨ Smart Insights</div><div class="meta">Algorithmic spending analysis</div></div><b>›</b></div><div class="listrow" onclick="exportCSV()"><div><div class="title">📥 Export to CSV</div><div class="meta">Download full transaction sheet to device</div></div><b>›</b></div><div class="listrow" onclick="openSettings()"><div><div class="title">⚙️ Settings</div><div class="meta">Customize tabs, sections, dropdowns and PIN</div></div><b>›</b></div><div class="listrow" onclick="refresh()"><div><div class="title">↻ Refresh Data</div><div class="meta">Reload directly from Google Sheet master</div></div><b>›</b></div></div><div class="card" id="moreMaster"><h3>Master Data</h3><div class="notice"><b>Transactions</b> is the single master ledger. Every screen reads the same rows. App settings and dropdown choices are shared across the family.</div></div>`}
-function mergedSettings(){let o=Array.isArray(SETTINGS.tabOrder)?SETTINGS.tabOrder.slice():DEFAULT_TAB_ORDER.slice();if(!o.includes('cc')){let mi=o.indexOf('more');if(mi<0)o.push('cc');else o.splice(mi,0,'cc')}if(!o.includes('transfers')){let mi=o.indexOf('more');if(mi<0)o.push('transfers');else o.splice(mi,0,'transfers')}if(!o.includes('insights')){let mi=o.indexOf('more');if(mi<0)o.push('insights');else o.splice(mi,0,'insights')}return {title:SETTINGS.title||'My Expense Analyzer',budget:SETTINGS.budget||'',goalName:SETTINGS.goalName||'',goalAmount:SETTINGS.goalAmount||'',recurring:SETTINGS.recurring||[],swipeTabs:SETTINGS.swipeTabs!==false,swipeRows:SETTINGS.swipeRows!==false,tabs:{home:true,spends:true,income:true,investment:true,money:true,cc:true,transfers:true,insights:true,more:true,...(SETTINGS.tabs||{})},tabOrder:o,sections:{secBudget:true,secSnapshot:true,secAccount:true,secMonth:true,secCategory:true,secRecent:true,...(SETTINGS.sections||{})},sectionOrders:SETTINGS.sectionOrders||{}}}
+function mergedSettings(){let o=Array.isArray(SETTINGS.tabOrder)?SETTINGS.tabOrder.slice():DEFAULT_TAB_ORDER.slice();if(!o.includes('cc')){let mi=o.indexOf('more');if(mi<0)o.push('cc');else o.splice(mi,0,'cc')}if(!o.includes('transfers')){let mi=o.indexOf('more');if(mi<0)o.push('transfers');else o.splice(mi,0,'transfers')}if(!o.includes('insights')){let mi=o.indexOf('more');if(mi<0)o.push('insights');else o.splice(mi,0,'insights')}return {title:SETTINGS.title||'My Expense Analyzer',budget:SETTINGS.budget||'',goalName:SETTINGS.goalName||'',goalAmount:SETTINGS.goalAmount||'',recurring:SETTINGS.recurring||[],recState:SETTINGS.recState||{},swipeTabs:SETTINGS.swipeTabs!==false,swipeRows:SETTINGS.swipeRows!==false,tabs:{home:true,spends:true,income:true,investment:true,money:true,cc:true,transfers:true,insights:true,more:true,...(SETTINGS.tabs||{})},tabOrder:o,sections:{secBudget:true,secSnapshot:true,secAccount:true,secMonth:true,secCategory:true,secRecent:true,...(SETTINGS.sections||{})},sectionOrders:SETTINGS.sectionOrders||{}}}
 function sectionOrderFor(screen){let d=(SECTION_META[screen]||[]).map(x=>x[0]), saved=mergedSettings().sectionOrders[screen]||[];return [...saved.filter(x=>d.includes(x)),...d.filter(x=>!saved.includes(x))]}
 function applyScreenSectionOrder(screen){let el=$(screen);if(!el)return;let order=sectionOrderFor(screen);let nodes=order.map(id=>$(id)).filter(x=>x&&x.parentElement===el);nodes.forEach(n=>el.appendChild(n));if(screen==='home')applyHomeSections()}
 function applyAllSectionOrders(){Object.keys(SECTION_META).forEach(applyScreenSectionOrder)}
@@ -883,7 +915,7 @@ function addManagedOption(field,idx){let e=$('addOpt_'+idx),v=(e&&e.value||'').t
 function renameManagedOption(field,idx){let inputs=document.querySelectorAll('[data-opt-field="'+CSS.escape(field)+'"]');let input=inputs[idx],nv=(input&&input.value||'').trim(),vals=[...(DATA.options[field]||[])];if(!input||!nv||!vals[idx])return;if(nv===vals[idx]){toast('No change');return}if(vals.some((x,i)=>i!==idx&&x.toLowerCase()===nv.toLowerCase())){toast('Already exists');return}let old=vals[idx];vals[idx]=nv;google.script.run.withSuccessHandler(d=>{DATA.options[field]=d.options[field]||vals;buildForms();renderOptionManager();refresh();toast(old+' → '+nv)}).withFailureHandler(showErr).renameOption(field,old,nv,authToken)}
 function deleteManagedOption(field,idx){let vals=[...(DATA.options[field]||[])],old=vals[idx];if(!old)return;if(!confirm('Remove "'+old+'" from future dropdown choices? Existing transactions are kept.'))return;vals.splice(idx,1);persistManagedOptions(field,vals)}
 function changePinUI(){let old=$('oldPinChange').value.trim(),nw=$('newPinChange').value.trim(),cf=$('confirmPinChange').value.trim();if(!/^\d{4,6}$/.test(old)||!/^[0-9]{4,6}$/.test(nw)){toast('PIN must be 4–6 digits');return}if(nw!==cf){toast('New PINs do not match');return}google.script.run.withSuccessHandler(()=>{['oldPinChange','newPinChange','confirmPinChange'].forEach(id=>$(id).value='');toast('PIN changed ✓')}).withFailureHandler(showErr).changeAppPin(old,nw,authToken)}
-function resetSettings(){let d={title:'My Expense Analyzer',budget:'',goalName:'',goalAmount:'',recurring:[],swipeTabs:true,swipeRows:true,tabs:{home:true,spends:true,income:true,investment:true,money:true,cc:true,transfers:true,insights:true,more:true},tabOrder:DEFAULT_TAB_ORDER.slice(),sectionOrders:{},sections:{secBudget:true,secSnapshot:true,secAccount:true,secMonth:true,secCategory:true,secRecent:true}};google.script.run.withSuccessHandler(v=>{SETTINGS=v||d;applySettings();openSettings();toast('Reset ✓')}).withFailureHandler(showErr).saveSettings(d,authToken)}
+function resetSettings(){let d={title:'My Expense Analyzer',budget:'',goalName:'',goalAmount:'',recurring:[],recState:{},swipeTabs:true,swipeRows:true,tabs:{home:true,spends:true,income:true,investment:true,money:true,cc:true,transfers:true,insights:true,more:true},tabOrder:DEFAULT_TAB_ORDER.slice(),sectionOrders:{},sections:{secBudget:true,secSnapshot:true,secAccount:true,secMonth:true,secCategory:true,secRecent:true}};google.script.run.withSuccessHandler(v=>{SETTINGS=v||d;applySettings();openSettings();toast('Reset ✓')}).withFailureHandler(showErr).saveSettings(d,authToken)}
 function showErr(e){alert(e&&e.message?e.message:String(e))}function toast(t){$('toast').textContent=t;$('toast').style.display='block';setTimeout(()=>$('toast').style.display='none',2000)}
 window.onload=function(){
   if(localStorage.getItem('theme') === 'dark') document.body.classList.add('dark-mode');
