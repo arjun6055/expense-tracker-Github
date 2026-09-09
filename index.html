@@ -8,7 +8,7 @@
 <meta name="theme-color" content="#101a2c">
 
 <style>
-/* V4.8 DYNAMIC CSS VARIABLE ENGINE & SMART VOICE MATCHING */
+/* V4.9 DYNAMIC CSS VARIABLE ENGINE */
 :root {
   --bg: #f4f7fb; --card: #ffffff; --ink: #152238; --muted: #718096; --line: #e7ecf3; --dark: #101a2c;
   --blue: #2563eb; --cyan: #06b6d4; --green: #16a34a; --orange: #f59e0b; --pink: #ec4899; --purple: #7c3aed; --red: #dc2626;
@@ -87,7 +87,7 @@ textarea{min-height:90px;resize:vertical}.row{display:grid;grid-template-columns
 .tile1{background:linear-gradient(135deg,#172554,#2563eb)}.tile2{background:linear-gradient(135deg,#3b0764,#9333ea)}.tile3{background:linear-gradient(135deg,#064e3b,#059669)}.tile4{background:linear-gradient(135deg,#7c2d12,#ea580c)}.tile5{background:linear-gradient(135deg,#164e63,#0891b2)}.tile6{background:linear-gradient(135deg,#4c1d95,#7c3aed)}
 
 .monthchart{display:grid;grid-template-columns:repeat(9,minmax(28px,1fr));gap:6px;align-items:end;height:150px;padding:10px 2px 23px;border-bottom:1px solid var(--line);overflow:auto}
-.mcol{height:100%;display:flex;flex-direction:column;justify-content:end;align-items:center;gap:5px;min-width:0}
+.mcol{height:100%;display:flex;flex-direction:column;justify-content:end;align-items:center;gap:5px;min-width:0;cursor:pointer}
 .mbar{width:100%;max-width:32px;border-radius:9px 9px 4px 4px;background:linear-gradient(180deg,#38bdf8,#2563eb);min-height:5px}
 .mval{font-size:9px;color:var(--muted);white-space:nowrap}.mlab{font-size:9px;color:var(--muted);white-space:nowrap}
 .filtergrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.filtergrid .search{grid-column:1/-1}
@@ -138,7 +138,9 @@ textarea{min-height:90px;resize:vertical}.row{display:grid;grid-template-columns
 .swipe-bg > div{width:85px;display:grid;place-items:center;font-weight:850;color:#fff;font-size:14px}
 .swipe-fg{position:relative;z-index:1;background:var(--card);border-bottom:none;transition:transform .2s cubic-bezier(.2,.8,.2,1);will-change:transform}
 
-/* Receipt Button */
+/* Voice/Camera Buttons */
+.mic-btn { width:100%; padding:14px; border-radius:16px; background:#eef2ff; color:#4f46e5; font-size:16px; font-weight:800; display:flex; align-items:center; justify-content:center; gap:8px; margin-top:8px; border:1px solid #c7d2fe; transition:0.2s }
+.mic-btn:active { background:#c7d2fe; transform:scale(0.98) }
 .cam-btn { padding:14px; border-radius:16px; background:var(--btn-sec-bg); color:var(--ink); font-size:14px; font-weight:800; display:flex; align-items:center; justify-content:center; gap:8px; width:100%; margin-bottom:12px; border:1px solid var(--line); transition:0.2s }
 
 /* Offline Mode Indicator */
@@ -227,10 +229,12 @@ const google = {
 </div>
 
 <nav class="nav"><div class="navin"></div></nav>
+
 <button class="fab" onclick="openQuick()">＋</button>
 <button class="fab-mic" onclick="startVoiceEntry()">🎙️</button>
 
 <div class="modal" id="quickModal"><div class="sheet"><button class="secondary close" onclick="closeQuick()">Close</button><h2>＋ Add Entry</h2><div class="notice">All entries are written to the same Google Sheet <b>Transactions</b> master.</div>
+ <button class="mic-btn" onclick="startVoiceEntry()">🎙️ Tap to Voice Add (e.g., "Spent 500 on Food")</button>
  <div class="grid2" style="margin-top:16px">
  <button class="card" style="margin-bottom:0" onclick="closeQuick();openAdd('spend')"><h3>💸 Spend</h3><div class="meta">Daily expense · category</div></button>
  <button class="card" style="margin-bottom:0" onclick="closeQuick();openAdd('investment')"><h3>📈 Investment</h3><div class="meta">FD/RD · MF · stocks</div></button>
@@ -389,7 +393,7 @@ function triggerConfetti() {
   }
 }
 
-// V4.8 ROBUST VOICE-TO-EXPENSE ENGINE
+// V5.0 VOICE-TO-EXPENSE ENGINE
 function startVoiceEntry() {
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
   if (!SpeechRecognition) { toast("Voice input is not supported on this browser."); return; }
@@ -706,7 +710,7 @@ function renderSpends(){
   let rs=spendFilteredRows();
   let q=($('spSearch')?.value||'').toLowerCase(),a=$('spAccount')?.value||'',c=$('spCategory')?.value||'',n=$('spNeed')?.value||'',sort=$('spSort')?.value||'new';
   let isFiltered = (q || a || c || n || sort !== 'new');
-  let clearBtnHtml = isFiltered ? `<button onclick="clearFilters()" style="background:#fee2e2; color:#991b1b; padding:10px 14px; border-radius:99px; font-size:13px; font-weight:850">✖ Clear</button>` : '';
+  let clearBtnHtml = isFiltered ? `<button onclick="clearFilters()" style="background:#fee2e2; color:#991b1b; padding:10px 14px; border-radius:99px; font-size:13px; font-weight:850; border:none;">✖ Clear</button>` : '';
 
   let swipeInfo = SETTINGS.swipeRows === false ? 'Tap to edit' : 'Swipe ➡️ Copy | ⬅️ Delete';
 
@@ -827,7 +831,7 @@ function renderMoney(){
  applyScreenSectionOrder('money');
 }
 function showChartValue(m,I,O){let e=$('chartTip');if(e)e.innerHTML=`<b style="font-size:13px">${esc(monthName(m))}</b> · <span style="color:var(--green);font-weight:800">In ${money(I)}</span> · <span style="color:var(--red);font-weight:800">Out ${money(O)}</span>`}
-function renderCC(){let rs=scopedRows('CC Bill'),cards={};rs.forEach(r=>{let k=r.accountCard||r.category||'Unspecified';cards[k]=(cards[k]||0)+Number(r.amount||0)});let names=Object.keys(cards).sort((a,b)=>cards[b]-cards[a]),grand=sum(rs),tiles=names.map((n,i)=>'<div class="cardtile tile'+(i%6+1)+'"><h4>💳 '+esc(n)+'</h4><div class="amount">'+money(cards[n])+'</div><small>'+currentLabel()+'</small></div>').join('');let months=monthKeys().slice(-9),mx=Math.max(...months.map(m=>sum(DATA.rows.filter(r=>r.type==='CC Bill'&&r.date.startsWith(m)))),1),bars=months.map(m=>{let v=sum(DATA.rows.filter(r=>r.type==='CC Bill'&&r.date.startsWith(m)));return '<div class="mcol"><div class="mval">'+money(v)+'</div><div class="mbar" style="height:'+Math.max(5,v/mx*110)+'px"></div><div class="mlab">'+monthName(m).split(' ')[0]+'</div></div>'}).join('');let cols=['#2563eb','#06b6d4','#22c55e','#f59e0b','#9333ea','#ec4899'],share=names.map((n,i)=>((cards[n]/(grand||1))*360)+'deg '+cols[i%cols.length]).join(',');let start=0,stops=names.map((n,i)=>{let e=start+(cards[n]/(grand||1))*360;let x=cols[i%cols.length]+' '+start+'deg '+e+'deg';start=e;return x}).join(',');let legend=names.map((n,i)=>'<div class="legendrow"><span><i class="dot" style="background:'+cols[i%cols.length]+'"></i>'+esc(n)+'</span><b>'+money(cards[n])+'</b></div>').join('');$('cc').innerHTML=`<div class="minihero"><div class="label" style="color:#bfdbfe">${globalView==overall'?'Overall card position':globalView==='period'?'Period card position':'Credit-card position'}</div><div class="kpi">${money(grand)}</div><div style="font-size:12px;color:#dbeafe;font-weight:750">${names.length} card${names.length===1?'':'s'} with bill data</div></div><div class="card" id="ccCards"><div class="sectionhead"><h3>💳 Your Cards</h3><button class="primary" onclick="openAdd('cc')">＋ Add</button></div><div class="grid2">${tiles||`<div class="empty" style="grid-column:1/-1">${emptySVG()}<div style="margin-top:8px">No credit-card bills in this view.</div></div>`}</div></div><div class="card" id="ccTrend"><div class="sectionhead"><h3>📈 Monthly Bill Trend</h3><span class="pill">Last 9 months</span></div><div class="monthchart">${bars}</div></div><div class="card" id="ccShare"><div class="sectionhead"><h3>🏆 Card Share</h3><span class="pill">'+names.length+' cards</span></div><div class="donutwrap"><div class="donut" style="background:conic-gradient(${stops||'var(--stat-border) 0deg 360deg'})"><span>${names.length}<small style="font-size:10px;display:block">cards</small></span></div><div class="legend">${legend||`<div class="empty">No data</div>`}</div></div></div><div class="card" id="ccHistory"><div class="sectionhead"><h3>🗓️ Bill History</h3><span class="pill">Swipe left to delete</span></div>${txRows(rs.sort((a,b)=>b.date.localeCompare(a.date)||b.row-a.row))}</div>`}
+function renderCC(){let rs=scopedRows('CC Bill'),cards={};rs.forEach(r=>{let k=r.accountCard||r.category||'Unspecified';cards[k]=(cards[k]||0)+Number(r.amount||0)});let names=Object.keys(cards).sort((a,b)=>cards[b]-cards[a]),grand=sum(rs),tiles=names.map((n,i)=>'<div class="cardtile tile'+(i%6+1)+'"><h4>💳 '+esc(n)+'</h4><div class="amount">'+money(cards[n])+'</div><small>'+currentLabel()+'</small></div>').join('');let months=monthKeys().slice(-9),mx=Math.max(...months.map(m=>sum(DATA.rows.filter(r=>r.type==='CC Bill'&&r.date.startsWith(m)))),1),bars=months.map(m=>{let v=sum(DATA.rows.filter(r=>r.type==='CC Bill'&&r.date.startsWith(m)));return '<div class="mcol"><div class="mval">'+money(v)+'</div><div class="mbar" style="height:'+Math.max(5,v/mx*110)+'px"></div><div class="mlab">'+monthName(m).split(' ')[0]+'</div></div>'}).join('');let cols=['#2563eb','#06b6d4','#22c55e','#f59e0b','#9333ea','#ec4899'],share=names.map((n,i)=>((cards[n]/(grand||1))*360)+'deg '+cols[i%cols.length]).join(',');let start=0,stops=names.map((n,i)=>{let e=start+(cards[n]/(grand||1))*360;let x=cols[i%cols.length]+' '+start+'deg '+e+'deg';start=e;return x}).join(',');let legend=names.map((n,i)=>'<div class="legendrow"><span><i class="dot" style="background:'+cols[i%cols.length]+'"></i>'+esc(n)+'</span><b>'+money(cards[n])+'</b></div>').join('');$('cc').innerHTML=`<div class="minihero"><div class="label" style="color:#bfdbfe">${globalView==='overall'?'Overall card position':globalView==='period'?'Period card position':'Credit-card position'}</div><div class="kpi">${money(grand)}</div><div style="font-size:12px;color:#dbeafe;font-weight:750">${names.length} card${names.length===1?'':'s'} with bill data</div></div><div class="card" id="ccCards"><div class="sectionhead"><h3>💳 Your Cards</h3><button class="primary" onclick="openAdd('cc')">＋ Add</button></div><div class="grid2">${tiles||`<div class="empty" style="grid-column:1/-1">${emptySVG()}<div style="margin-top:8px">No credit-card bills in this view.</div></div>`}</div></div><div class="card" id="ccTrend"><div class="sectionhead"><h3>📈 Monthly Bill Trend</h3><span class="pill">Last 9 months</span></div><div class="monthchart">${bars}</div></div><div class="card" id="ccShare"><div class="sectionhead"><h3>🏆 Card Share</h3><span class="pill">'+names.length+' cards</span></div><div class="donutwrap"><div class="donut" style="background:conic-gradient(${stops||'var(--stat-border) 0deg 360deg'})"><span>${names.length}<small style="font-size:10px;display:block">cards</small></span></div><div class="legend">${legend||`<div class="empty">No data</div>`}</div></div></div><div class="card" id="ccHistory"><div class="sectionhead"><h3>🗓️ Bill History</h3><span class="pill">Swipe left to delete</span></div>${txRows(rs.sort((a,b)=>b.date.localeCompare(a.date)||b.row-a.row))}</div>`}
 function renderTransfers(){
   let all = scopedRows(); let rs = all.filter(r => r.type === 'ATM' || r.type === 'Personal Transfer').sort((a,b)=>b.date.localeCompare(a.date)||b.row-a.row);
   let atmTotal = sum(rs.filter(r => r.type === 'ATM')); let ptTotal = sum(rs.filter(r => r.type === 'Personal Transfer'));
