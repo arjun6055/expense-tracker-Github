@@ -8,7 +8,7 @@
 <meta name="theme-color" content="#101a2c">
 
 <style>
-/* V4.6 DYNAMIC CSS VARIABLE ENGINE & PARALLEL LOADING */
+/* V5.0 DYNAMIC CSS VARIABLE ENGINE & OFFLINE QUEUE */
 :root {
   --bg: #f4f7fb; --card: #ffffff; --ink: #152238; --muted: #718096; --line: #e7ecf3; --dark: #101a2c;
   --blue: #2563eb; --cyan: #06b6d4; --green: #16a34a; --orange: #f59e0b; --pink: #ec4899; --purple: #7c3aed; --red: #dc2626;
@@ -113,7 +113,7 @@ textarea{min-height:90px;resize:vertical}.row{display:grid;grid-template-columns
 .nav button.on{background:#eef2ff;color:var(--blue)}
 .dark-mode .nav button.on{background:rgba(37,99,235,0.15);color:#60a5fa}
 
-.fab{position:fixed;right:20px;bottom:115px;width:66px;height:66px;border-radius:50%;background:var(--blue);color:#fff;font-size:32px;box-shadow:0 14px 34px rgba(37,99,235,.4);z-index:31}
+.fab{position:fixed;right:20px;bottom:115px;width:66px;height:66px;border-radius:50%;background:var(--blue);color:#fff;font-size:32px;box-shadow:0 14px 34px rgba(37,99,235,.4);z-index:31;display:flex;align-items:center;justify-content:center}
 .modal{position:fixed;inset:0;background:#0009;display:none;align-items:flex-end;z-index:60}.modal.show{display:flex}
 .sheet{width:100%;max-width:none;max-height:94svh;overflow:auto;background:var(--card);margin:auto;padding:24px 20px;border-radius:32px 32px 0 0;box-shadow:0 -20px 70px rgba(0,0,0,.6)}
 .close{float:right}.checklist{display:grid;grid-template-columns:1fr 1fr;gap:10px}
@@ -134,6 +134,14 @@ textarea{min-height:90px;resize:vertical}.row{display:grid;grid-template-columns
 .swipe-bg{position:absolute;inset:0;display:flex;justify-content:space-between;z-index:0;background:var(--stat-bg)}
 .swipe-bg > div{width:85px;display:grid;place-items:center;font-weight:850;color:#fff;font-size:14px}
 .swipe-fg{position:relative;z-index:1;background:var(--card);border-bottom:none;transition:transform .2s cubic-bezier(.2,.8,.2,1);will-change:transform}
+
+/* Voice & Camera Buttons */
+.mic-btn { width:100%; padding:14px; border-radius:16px; background:#eef2ff; color:#4f46e5; font-size:16px; font-weight:800; display:flex; align-items:center; justify-content:center; gap:8px; margin-top:8px; border:1px solid #c7d2fe; transition:0.2s }
+.mic-btn:active { background:#c7d2fe; transform:scale(0.98) }
+.cam-btn { padding:14px; border-radius:16px; background:var(--btn-sec-bg); color:var(--ink); font-size:14px; font-weight:800; display:flex; align-items:center; justify-content:center; gap:8px; width:100%; margin-bottom:12px; border:1px solid var(--line); transition:0.2s }
+
+/* Offline Mode Indicator */
+#offlineBanner { position:fixed; top:0; left:0; right:0; background:var(--orange); color:#fff; text-align:center; padding:6px; font-size:12px; font-weight:800; z-index:9999; display:none; }
 
 @media(max-width:390px){
  .content{padding:12px 10px 18px}.viewbox{margin:0 10px 12px;padding:10px}.grid2,.grid3,.grid4{gap:8px}.card{padding:16px;border-radius:22px}.stat{padding:12px}.ico{width:40px;min-width:40px;height:40px;font-size:19px}.nav button{font-size:9px}.nav button .navico{font-size:19px;line-height:19px}.caticon{width:44px;min-width:44px;height:44px;font-size:22px}
@@ -185,6 +193,7 @@ const google = {
 </head>
 <body class="pin-locked phone-device">
 
+<div id="offlineBanner">📶 Offline Mode - Changes saved locally</div>
 <div id="pinGate"><div class="pinbox"><div class="pinlogo">💰</div><h1>My Expense Analyzer</h1><p>Private family expense tracker</p><div class="pin-dots" id="pinDots"></div><div class="pinpad"><button onclick="pinKey('1')">1</button><button onclick="pinKey('2')">2</button><button onclick="pinKey('3')">3</button><button onclick="pinKey('4')">4</button><button onclick="pinKey('5')">5</button><button onclick="pinKey('6')">6</button><button onclick="pinKey('7')">7</button><button onclick="pinKey('8')">8</button><button onclick="pinKey('9')">9</button><button class="pin-del" onclick="pinClear()">⌫</button><button onclick="pinKey('0')">0</button><button class="pin-del" onclick="pinBack()">←</button></div><button class="pin-unlock" onclick="unlockApp()">Unlock</button><button id="bioBtn" class="pin-unlock" style="background:#2563eb;margin-top:12px;display:none;" onclick="unlockWithBiometrics()">🔓 Unlock with Fingerprint</button><div class="pin-msg" id="pinMsg"></div><p class="pin-foot">Enter your 4–6 digit family PIN</p></div></div>
 
 <div class="app">
@@ -217,15 +226,21 @@ const google = {
 <nav class="nav"><div class="navin"></div></nav>
 <button class="fab" onclick="openQuick()">＋</button>
 
-<div class="modal" id="quickModal"><div class="sheet"><button class="secondary close" onclick="closeQuick()">Close</button><h2>＋ Add Entry</h2><div class="notice">All entries are written to the same Google Sheet <b>Transactions</b> master.</div><div class="grid2" style="margin-top:16px">
+<div class="modal" id="quickModal"><div class="sheet"><button class="secondary close" onclick="closeQuick()">Close</button><h2>＋ Add Entry</h2><div class="notice">All entries are written to the same Google Sheet <b>Transactions</b> master.</div>
+ <button class="mic-btn" onclick="startVoiceEntry()">🎙️ Tap to Voice Add (e.g., "Spent 500 on Food")</button>
+ <div class="grid2" style="margin-top:16px">
  <button class="card" style="margin-bottom:0" onclick="closeQuick();openAdd('spend')"><h3>💸 Spend</h3><div class="meta">Daily expense · category</div></button>
  <button class="card" style="margin-bottom:0" onclick="closeQuick();openAdd('investment')"><h3>📈 Investment</h3><div class="meta">FD/RD · MF · stocks</div></button>
  <button class="card" style="margin-bottom:0" onclick="closeQuick();openAdd('income')"><h3>💰 Income</h3><div class="meta">Salary · reimbursement</div></button>
  <button class="card" style="margin-bottom:0" onclick="closeQuick();openAdd('cc')"><h3>💳 CC Bill</h3><div class="meta">Card · billing month</div></button>
- <button class="card" style="margin-bottom:0" onclick="closeQuick();openAdd('transfer')"><h3>↔️ Transfer/ATM</h3><div class="meta">Cash withdrawal · P2P</div></button>
+ <button class="card" style="margin-bottom:0;grid-column:1/-1" onclick="closeQuick();openAdd('transfer')"><h3>↔️ Transfer/ATM</h3><div class="meta">Cash withdrawal · P2P</div></button>
  </div></div></div>
 
 <div class="modal" id="entryModal"><div class="sheet"><button class="secondary close" onclick="closeModal()">Close</button><h2 id="entryTitle">Add Spend</h2>
+ 
+ <input type="file" id="fReceipt" accept="image/*" capture="environment" style="display:none" onchange="handleReceiptUpload(this)">
+ <button id="receiptBtn" class="cam-btn" onclick="document.getElementById('fReceipt').click()">📸 Attach Receipt Photo</button>
+
  <div class="row"><div class="field"><label>Date *</label><input type="date" id="fDate"></div><div class="field"><label>Amount ₹ *</label><input type="text" id="fAmount" inputmode="decimal" autocomplete="off" placeholder="Any amount"></div></div>
  <div class="row"><div class="field"><label>Who (Family Member)</label><select id="fAccount"></select></div><div class="field"><label>Type</label><select id="fType"></select></div></div>
  <div class="row"><div class="field"><label>Category / To Person</label><select id="fCategory"></select></div><div class="field"><label>Sub-category</label><select id="fSubcategory"></select></div></div>
@@ -285,6 +300,7 @@ const google = {
 <script>
 let DATA={rows:[],options:{}},SETTINGS={};
 let globalView='monthly',activeMonth='',periodStart='',periodEnd='',currentScreen='home',editRow=null,entryMode='spend',sectionSettingsTab='home',tfType='',tfVal='',filtersExpanded=false;
+let receiptBase64 = null;
 const DEFAULT_TAB_ORDER=['home','spends','income','investment','money','cc','transfers','insights','more'];
 const TAB_META={home:['⌂','Home'],spends:['🧾','Spends'],income:['💰','Income'],investment:['📈','Investment'],money:['₹','Money'],cc:['💳','CC Bills'],transfers:['↔️','Transfers'],insights:['💡','Insights'],more:['•••','More']};
 const SECTION_META={
@@ -370,14 +386,103 @@ function triggerConfetti() {
   }
 }
 
-// V4.6 PARALLEL LOADING INIT ENGINE
+// V5.0 VOICE-TO-EXPENSE ENGINE
+function startVoiceEntry() {
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SpeechRecognition) { toast("Voice input is not supported on this browser."); return; }
+  
+  let rec = new SpeechRecognition();
+  rec.lang = 'en-IN';
+  rec.onstart = () => { toast("Listening... Speak now"); };
+  rec.onresult = (e) => {
+    let txt = e.results[0][0].transcript.toLowerCase();
+    toast("Processing: " + txt);
+    closeQuick();
+    openAdd('spend');
+    
+    // Parse Amount
+    let amtMatch = txt.match(/\d+/);
+    if(amtMatch) $('fAmount').value = amtMatch[0];
+    
+    // Parse Description
+    $('fDesc').value = txt;
+    
+    // Guess Category
+    if(txt.includes('food')||txt.includes('eat')||txt.includes('restaurant')) $('fCategory').value = 'Food';
+    else if(txt.includes('grocery')||txt.includes('supermarket')) $('fCategory').value = 'Grocery';
+    else if(txt.includes('travel')||txt.includes('uber')||txt.includes('cab')) $('fCategory').value = 'Travel';
+    else if(txt.includes('shopping')||txt.includes('clothes')) $('fCategory').value = 'Shopping';
+    else if(txt.includes('medical')||txt.includes('pharmacy')||txt.includes('doctor')) $('fCategory').value = 'Medical';
+  };
+  rec.start();
+}
+
+// V5.0 RECEIPT SNAPSHOT ENGINE
+function handleReceiptUpload(input) {
+  if(!input.files || !input.files[0]) return;
+  let file = input.files[0];
+  let reader = new FileReader();
+  reader.onload = function(e) {
+    let img = new Image();
+    img.onload = function() {
+       let canvas = document.createElement('canvas');
+       let max_size = 800; // Compress image to 800px max
+       let w = img.width, h = img.height;
+       if(w > h && w > max_size) { h *= max_size/w; w = max_size; }
+       else if(h > max_size) { w *= max_size/h; h = max_size; }
+       canvas.width = w; canvas.height = h;
+       let ctx = canvas.getContext('2d');
+       ctx.drawImage(img, 0, 0, w, h);
+       receiptBase64 = canvas.toDataURL('image/jpeg', 0.6); // 60% quality JPEG
+       
+       let btn = $('receiptBtn');
+       btn.textContent = '📸 Receipt Attached ✓';
+       btn.style.background = 'var(--green)';
+       btn.style.color = '#fff';
+       toast("Receipt ready to upload");
+    }
+    img.src = e.target.result;
+  }
+  reader.readAsDataURL(file);
+}
+
+// V5.0 OFFLINE SYNC QUEUE ENGINE
+let offlineQueue = JSON.parse(localStorage.getItem('expenseOfflineQueue') || '[]');
+function updateOfflineUI() {
+  if(!navigator.onLine || offlineQueue.length > 0) {
+     $('offlineBanner').style.display = 'block';
+     $('offlineBanner').textContent = navigator.onLine ? `📶 Syncing ${offlineQueue.length} offline entries...` : `📶 Offline Mode - Changes saved locally`;
+  } else {
+     $('offlineBanner').style.display = 'none';
+  }
+}
+
+function processOfflineQueue() {
+  if(offlineQueue.length === 0 || !navigator.onLine) { updateOfflineUI(); return; }
+  updateOfflineUI();
+  let d = offlineQueue[0]; // Take first
+  
+  google.script.run.withSuccessHandler(()=>{
+     offlineQueue.shift(); // Remove from queue on success
+     localStorage.setItem('expenseOfflineQueue', JSON.stringify(offlineQueue));
+     processOfflineQueue(); // Loop until empty
+     if(offlineQueue.length === 0) refresh();
+  }).withFailureHandler(()=>{
+     console.error("Failed to sync offline item");
+  }).saveTransaction(d, authToken);
+}
+
+window.addEventListener('online', processOfflineQueue);
+window.addEventListener('offline', updateOfflineUI);
+
+// PARALLEL LOADING INIT ENGINE
 function init() {
   activeMonth = monthNow();
+  updateOfflineUI();
   
   let pData = new Promise((resolve, reject) => {
     google.script.run.withSuccessHandler(resolve).withFailureHandler(reject).getAppData(authToken);
   });
-  
   let pSettings = new Promise((resolve, reject) => {
     google.script.run.withSuccessHandler(resolve).withFailureHandler(reject).getSettings(authToken);
   });
@@ -385,10 +490,8 @@ function init() {
   Promise.all([pData, pSettings]).then(results => {
     DATA = results[0] || {rows:[], options:{}};
     SETTINGS = results[1] || {};
-    applySettings();
-    buildForms();
-    initGlobal();
-    renderAll();
+    applySettings(); buildForms(); initGlobal(); renderAll();
+    processOfflineQueue();
   }).catch(showErr);
 }
 
@@ -707,7 +810,6 @@ function renderTransfers(){
   </div>`;
 }
 
-// V4.6 ALGORITHMIC INSIGHTS
 function renderInsights() {
   let rs = scopedRows('Spend'); 
   let bud = Number(SETTINGS.budget) || 0;
@@ -844,14 +946,45 @@ function openAdd(mode,row=null){
   $('deleteBtn').classList.toggle('hidden',!row);
   let db = $('dupBtn'); if(db) db.classList.toggle('hidden',!row);
   resetForm();
+  
   let r=row?DATA.rows.find(x=>x.row===row):null;
   if(r){$('fDate').value=r.date;$('fAmount').value=r.amount;$('fAccount').value=r.account;$('fType').value=r.type;$('fCategory').value=r.category;$('fSubcategory').value=r.subcategory;$('fNeed').value=r.need;$('fPayment').value=r.payment;$('fCard').value=r.accountCard;$('fBillMonth').value=r.billMonth;$('fDesc').value=r.description}
   else{$('fDate').value=today();$('fBillMonth').value=activeMonth||monthNow();let types={spend:'Spend',income:'Income',investment:'Investment',cc:'CC Bill'};if(mode==='transfer'){$('fType').value='Personal Transfer';$('fCategory').value='';$('fDesc').value='Transfer'}else{$('fType').value=types[mode];if(mode==='income')$('fCategory').value='Income';if(mode==='investment')$('fCategory').value='Investment';if(mode==='cc'){$('fCategory').value='Credit Card Bill';$('fSubcategory').value='Monthly Bill';$('fDesc').value='Credit Card Bill'}}}
 }
 
-function resetForm(){$('fDate').value=today();$('fAmount').value='';$('fDesc').value='';$('fBillMonth').value=activeMonth||monthNow();['fAccount','fType','fCategory','fSubcategory','fNeed','fPayment','fCard'].forEach(id=>$(id).value='')}
+function resetForm(){
+  $('fDate').value=today();$('fAmount').value='';$('fDesc').value='';$('fBillMonth').value=activeMonth||monthNow();
+  ['fAccount','fType','fCategory','fSubcategory','fNeed','fPayment','fCard'].forEach(id=>$(id).value='');
+  $('receiptBtn').textContent = '📸 Attach Receipt Photo';
+  $('receiptBtn').style.background = 'var(--btn-sec-bg)';
+  $('receiptBtn').style.color = 'var(--ink)';
+  receiptBase64 = null;
+}
+
 function closeModal(){$('entryModal').classList.remove('show');editRow=null}
-function saveEntry(){let raw=String($('fAmount').value??'').trim().replace(/,/g,'');if(raw===''){toast('Enter an amount');return}let amount=Number(raw);if(!Number.isFinite(amount)){toast('Enter a valid number');return}let typeVal = $('fType').value;let d={row:editRow,date:$('fDate').value,amount:amount,account:$('fAccount').value,type:typeVal,category:$('fCategory').value,subcategory:$('fSubcategory').value,need:$('fNeed').value,payment:$('fPayment').value,accountCard:$('fCard').value,billMonth:$('fBillMonth').value,description:$('fDesc').value};let ok=()=>{closeModal();refresh();toast('Saved ✓'); if(!editRow && (typeVal === 'Investment' || typeVal === 'CC Bill' || typeVal === 'Income')) triggerConfetti(); };if(editRow)google.script.run.withSuccessHandler(ok).withFailureHandler(showErr).updateTransaction(d,authToken);else google.script.run.withSuccessHandler(ok).withFailureHandler(showErr).saveTransaction(d,authToken)}
+function saveEntry(){
+  let raw=String($('fAmount').value??'').trim().replace(/,/g,'');
+  if(raw===''){toast('Enter an amount');return}
+  let amount=Number(raw);if(!Number.isFinite(amount)){toast('Enter a valid number');return}
+  
+  let typeVal = $('fType').value;
+  let d={row:editRow,date:$('fDate').value,amount:amount,account:$('fAccount').value,type:typeVal,category:$('fCategory').value,subcategory:$('fSubcategory').value,need:$('fNeed').value,payment:$('fPayment').value,accountCard:$('fCard').value,billMonth:$('fBillMonth').value,description:$('fDesc').value};
+  
+  if(receiptBase64) d.receipt = receiptBase64; // Attach photo payload
+
+  if(!navigator.onLine) {
+     offlineQueue.push(d);
+     localStorage.setItem('expenseOfflineQueue', JSON.stringify(offlineQueue));
+     updateOfflineUI();
+     closeModal();
+     toast("Saved offline. Will sync later.");
+     return;
+  }
+
+  let ok=()=>{closeModal();refresh();toast('Saved ✓'); if(!editRow && (typeVal === 'Investment' || typeVal === 'CC Bill' || typeVal === 'Income')) triggerConfetti(); };
+  if(editRow)google.script.run.withSuccessHandler(ok).withFailureHandler(showErr).updateTransaction(d,authToken);
+  else google.script.run.withSuccessHandler(ok).withFailureHandler(showErr).saveTransaction(d,authToken)
+}
 
 function appConfirm(title,message,okText='OK',cancelText='Cancel'){
   return new Promise(resolve=>{
