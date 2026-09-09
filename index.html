@@ -394,54 +394,20 @@ function triggerConfetti() {
   }
 }
 
-// V5.3 WEBVIEW MICROPHONE GATE + SECURE VOICE BRIDGE
-// WebIntoApp: enable its Audio/Microphone permission.
-// We request getUserMedia first so Android/WebView gets a chance to grant
-// RECORD_AUDIO. If WebView speech recognition is unavailable, the existing
-// external-browser voice bridge is retained.
-
-let webViewMicStream = null;
-
-async function requestWebViewMicrophone() {
-    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-        return {ok:false, reason:'getUserMedia-unavailable'};
-    }
-    try {
-        webViewMicStream = await navigator.mediaDevices.getUserMedia({audio:true});
-        if (webViewMicStream) {
-            webViewMicStream.getTracks().forEach(t => t.stop());
-            webViewMicStream = null;
-        }
-        return {ok:true};
-    } catch(e) {
-        console.error('WebView microphone permission:', e);
-        return {ok:false, reason:(e && (e.name || e.message)) || 'permission-denied'};
-    }
-}
-
-async function handleMicClick() {
+// V5.2 SECURE VOICE BRIDGE ENGINE
+function handleMicClick() {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    const mic = await requestWebViewMicrophone();
-
-    if (mic.ok && SpeechRecognition) {
-        toast("🎙️ Microphone ready — listening...");
-        startVoiceEntry();
-        return;
-    }
-
     if (!SpeechRecognition) {
         toast("Opening secure voice bridge...");
         launchVoiceInBrowser();
-        return;
+    } else {
+        startVoiceEntry();
     }
-
-    toast("WebView microphone blocked. Opening browser voice...");
-    setTimeout(() => launchVoiceInBrowser(), 500);
 }
 
 function launchVoiceInBrowser() {
     let baseUrl = window.location.href.split('?')[0].split('#')[0];
-    let url = baseUrl + '?voice=1&t=' + encodeURIComponent(authToken);
+    let url = baseUrl + '?voice=1&t=' + authToken;
     let a = document.createElement('a');
     a.href = url;
     a.target = '_blank';
@@ -452,36 +418,25 @@ function launchVoiceInBrowser() {
 
 function startVoiceEntry() {
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if (!SpeechRecognition) { launchVoiceInBrowser(); return; }
-
   let rec = new SpeechRecognition();
   rec.lang = 'en-IN';
   rec.continuous = false;
   rec.interimResults = false;
 
   rec.onstart = () => { toast("🎙️ Listening... Speak now"); };
-  rec.onerror = (e) => {
-      console.error('SpeechRecognition:', e);
-      const err = e && e.error ? e.error : 'unknown';
-      if (['not-allowed','service-not-allowed','audio-capture'].includes(err)) {
-          toast("WebView speech unavailable — opening browser...");
-          setTimeout(() => launchVoiceInBrowser(), 500);
-      } else {
-          toast("Mic Error: " + err);
-      }
-  };
-
+  rec.onerror = (e) => { console.error(e); toast("Mic Error: " + e.error); };
+  
   rec.onresult = (e) => {
     let txt = e.results[0][0].transcript;
     toast("Processing: " + txt);
     closeQuick(); openAdd('spend');
-
+    
     let txtLower = txt.toLowerCase();
-
+    
     let amtMatch = txtLower.match(/\d+/);
     if(amtMatch) $('fAmount').value = amtMatch[0];
     $('fDesc').value = txt.charAt(0).toUpperCase() + txt.slice(1);
-
+    
     // SMART SYNONYM MATCHING
     let catSelect = $('fCategory');
     let matched = false;
