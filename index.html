@@ -8,7 +8,7 @@
 <meta name="theme-color" content="#101a2c">
 
 <style>
-/* V4.9 DYNAMIC CSS VARIABLE ENGINE & SMART VOICE MATCHING */
+/* V5.1 DYNAMIC CSS VARIABLE ENGINE & SECURE CHROME BRIDGE */
 :root {
   --bg: #f4f7fb; --card: #ffffff; --ink: #152238; --muted: #718096; --line: #e7ecf3; --dark: #101a2c;
   --blue: #2563eb; --cyan: #06b6d4; --green: #16a34a; --orange: #f59e0b; --pink: #ec4899; --purple: #7c3aed; --red: #dc2626;
@@ -231,9 +231,10 @@ const google = {
 <nav class="nav"><div class="navin"></div></nav>
 
 <button class="fab" onclick="openQuick()">＋</button>
-<button class="fab-mic" onclick="startVoiceEntry()">🎙️</button>
+<button class="fab-mic" onclick="handleMicClick()">🎙️</button>
 
 <div class="modal" id="quickModal"><div class="sheet"><button class="secondary close" onclick="closeQuick()">Close</button><h2>＋ Add Entry</h2><div class="notice">All entries are written to the same Google Sheet <b>Transactions</b> master.</div>
+ <button class="mic-btn" onclick="handleMicClick()">🎙️ Tap to Voice Add (e.g., "Spent 500 on Food")</button>
  <div class="grid2" style="margin-top:16px">
  <button class="card" style="margin-bottom:0" onclick="closeQuick();openAdd('spend')"><h3>💸 Spend</h3><div class="meta">Daily expense · category</div></button>
  <button class="card" style="margin-bottom:0" onclick="closeQuick();openAdd('investment')"><h3>📈 Investment</h3><div class="meta">FD/RD · MF · stocks</div></button>
@@ -245,7 +246,7 @@ const google = {
 <div class="modal" id="entryModal"><div class="sheet"><button class="secondary close" onclick="closeModal()">Close</button><h2 id="entryTitle">Add Spend</h2>
  
  <input type="file" id="fReceipt" accept="image/*" capture="environment" style="display:none" onchange="handleReceiptUpload(this)">
- <button id="receiptBtn" class="cam-btn" onclick="document.getElementById('fReceipt').click()">📸 Attach Receipt Photo</button>
+ <button id="receiptBtn" class="cam-btn">📸 Attach Receipt Photo</button>
 
  <div class="row"><div class="field"><label>Date *</label><input type="date" id="fDate"></div><div class="field"><label>Amount ₹ *</label><input type="text" id="fAmount" inputmode="decimal" autocomplete="off" placeholder="Any amount"></div></div>
  <div class="row"><div class="field"><label>Who (Family Member)</label><select id="fAccount"></select></div><div class="field"><label>Type</label><select id="fType"></select></div></div>
@@ -392,21 +393,37 @@ function triggerConfetti() {
   }
 }
 
-// V5.1 ROBUST VOICE-TO-EXPENSE ENGINE
+// V5.2 SECURE VOICE BRIDGE ENGINE
+function handleMicClick() {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+        toast("Opening secure voice bridge...");
+        launchVoiceInBrowser();
+    } else {
+        startVoiceEntry();
+    }
+}
+
+function launchVoiceInBrowser() {
+    let baseUrl = window.location.href.split('?')[0].split('#')[0];
+    let url = baseUrl + '?voice=1&t=' + authToken;
+    let a = document.createElement('a');
+    a.href = url;
+    a.target = '_blank';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+}
+
 function startVoiceEntry() {
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if (!SpeechRecognition) { toast("Voice input is not supported on this browser/app."); return; }
-  
   let rec = new SpeechRecognition();
   rec.lang = 'en-IN';
   rec.continuous = false;
   rec.interimResults = false;
 
   rec.onstart = () => { toast("🎙️ Listening... Speak now"); };
-  rec.onerror = (e) => { 
-    console.error(e); 
-    toast("Mic Error: " + e.error); 
-  };
+  rec.onerror = (e) => { console.error(e); toast("Mic Error: " + e.error); };
   
   rec.onresult = (e) => {
     let txt = e.results[0][0].transcript;
@@ -415,47 +432,38 @@ function startVoiceEntry() {
     
     let txtLower = txt.toLowerCase();
     
-    // Parse Amount
     let amtMatch = txtLower.match(/\d+/);
     if(amtMatch) $('fAmount').value = amtMatch[0];
-    
-    // Capitalize Description
     $('fDesc').value = txt.charAt(0).toUpperCase() + txt.slice(1);
     
-    // SMART CATEGORY MATCHING
+    // SMART SYNONYM MATCHING
     let catSelect = $('fCategory');
     let matched = false;
 
     const syn = {
-        'Food': ['food', 'eat', 'restaurant', 'zomato', 'swiggy', 'dine', 'lunch', 'dinner', 'breakfast'],
-        'Grocery': ['grocery', 'supermarket', 'mart', 'milk', 'vegetable', 'fruit'],
-        'Transport': ['travel', 'uber', 'cab', 'ola', 'auto', 'petrol', 'fuel', 'train', 'bus'],
-        'Shopping': ['shopping', 'clothes', 'myntra', 'amazon', 'flipkart'],
-        'Medical': ['medical', 'pharmacy', 'doctor', 'medicine', 'hospital', 'health'],
-        'Utility': ['utility', 'bill', 'recharge', 'electricity', 'wifi', 'broadband']
+        'Food': ['food', 'eat', 'restaurant', 'zomato', 'swiggy', 'dine', 'lunch', 'dinner', 'breakfast', 'snack', 'tea', 'coffee'],
+        'Grocery': ['grocery', 'supermarket', 'mart', 'milk', 'vegetable', 'fruit', 'bazaar', 'ration'],
+        'Transport': ['travel', 'uber', 'cab', 'ola', 'auto', 'petrol', 'fuel', 'train', 'bus', 'flight', 'ticket', 'toll'],
+        'Shopping': ['shopping', 'clothes', 'myntra', 'amazon', 'flipkart', 'shoes', 'dress', 'shirt'],
+        'Medical': ['medical', 'pharmacy', 'doctor', 'medicine', 'hospital', 'health', 'clinic', 'tablet'],
+        'Utility': ['utility', 'bill', 'recharge', 'electricity', 'wifi', 'broadband', 'phone', 'mobile', 'internet', 'gas']
     };
 
     let targetConcept = '';
     for (const [catName, keywords] of Object.entries(syn)) {
-        if (keywords.some(k => txtLower.includes(k))) {
-            targetConcept = catName.toLowerCase();
-            break;
-        }
+        if (keywords.some(k => txtLower.includes(k))) { targetConcept = catName.toLowerCase(); break; }
     }
 
     for(let i=0; i<catSelect.options.length; i++) {
         let optVal = catSelect.options[i].value.toLowerCase();
         if ((targetConcept && optVal.includes(targetConcept)) || (optVal && txtLower.includes(optVal))) {
-            catSelect.value = catSelect.options[i].value;
-            matched = true; break;
+            catSelect.value = catSelect.options[i].value; matched = true; break;
         }
     }
   };
-  
-  try { rec.start(); } catch(e) { toast("Mic is already in use or blocked."); }
+  try { rec.start(); } catch(e) { toast("Mic is already in use."); }
 }
 
-// V5.0 RECEIPT SNAPSHOT ENGINE
 function handleReceiptUpload(input) {
   if(!input.files || !input.files[0]) return;
   let file = input.files[0];
@@ -484,7 +492,7 @@ function handleReceiptUpload(input) {
   reader.readAsDataURL(file);
 }
 
-// V5.0 OFFLINE SYNC QUEUE ENGINE
+// OFFLINE SYNC QUEUE ENGINE
 let offlineQueue = JSON.parse(localStorage.getItem('expenseOfflineQueue') || '[]');
 function updateOfflineUI() {
   if(!navigator.onLine || offlineQueue.length > 0) {
@@ -499,7 +507,6 @@ function processOfflineQueue() {
   if(offlineQueue.length === 0 || !navigator.onLine) { updateOfflineUI(); return; }
   updateOfflineUI();
   let d = offlineQueue[0]; 
-  
   google.script.run.withSuccessHandler(()=>{
      offlineQueue.shift(); 
      localStorage.setItem('expenseOfflineQueue', JSON.stringify(offlineQueue));
@@ -512,6 +519,21 @@ function processOfflineQueue() {
 
 window.addEventListener('online', processOfflineQueue);
 window.addEventListener('offline', updateOfflineUI);
+
+// BACKGROUND SYNC WHEN RETURNING FROM CHROME BRIDGE
+document.addEventListener('visibilitychange', () => {
+   if (document.visibilityState === 'visible' && authToken) {
+       google.script.run.withSuccessHandler(d => {
+           if(d && d.rows) {
+               DATA.rows = d.rows;
+               if(currentScreen === 'spends') renderSpends();
+               if(currentScreen === 'home') renderHome();
+               if(currentScreen === 'money') renderMoney();
+               if(currentScreen === 'insights') renderInsights();
+           }
+       }).getAppData(authToken);
+   }
+});
 
 // PARALLEL LOADING INIT ENGINE
 function init() {
@@ -530,6 +552,15 @@ function init() {
     SETTINGS = results[1] || {};
     applySettings(); buildForms(); initGlobal(); renderAll();
     processOfflineQueue();
+    
+    // Auto-trigger voice if opened via Chrome Bridge
+    const urlParams = new URLSearchParams(window.location.search);
+    if(urlParams.get('voice') === '1') {
+       setTimeout(() => {
+           openAdd('spend');
+           setTimeout(startVoiceEntry, 600);
+       }, 300);
+    }
   }).catch(showErr);
 }
 
@@ -1030,7 +1061,20 @@ function saveEntry(){
      return;
   }
 
-  let ok=()=>{closeModal();refresh();toast('Saved ✓'); if(!editRow && (typeVal === 'Investment' || typeVal === 'CC Bill' || typeVal === 'Income')) triggerConfetti(); };
+  let ok=()=>{
+      closeModal();refresh();toast('Saved ✓'); 
+      if(!editRow && (typeVal === 'Investment' || typeVal === 'CC Bill' || typeVal === 'Income')) triggerConfetti(); 
+      
+      const urlParams = new URLSearchParams(window.location.search);
+      if(urlParams.get('voice') === '1') {
+          setTimeout(() => {
+              appConfirm('Saved Successfully', 'Your voice entry was saved to the cloud.\n\nYou can now close this browser tab and return to the App.', 'Got it', '').then(() => {
+                  try { window.close(); } catch(e) {}
+              });
+          }, 800);
+      }
+  };
+  
   if(editRow)google.script.run.withSuccessHandler(ok).withFailureHandler(showErr).updateTransaction(d,authToken);
   else google.script.run.withSuccessHandler(ok).withFailureHandler(showErr).saveTransaction(d,authToken)
 }
@@ -1044,11 +1088,12 @@ function appConfirm(title,message,okText='OK',cancelText='Cancel'){
       <div style="font-size:23px;font-weight:800;margin-bottom:14px;line-height:1.2;letter-spacing:-.5px">${title}</div>
       <div style="font-size:15px;line-height:1.55;white-space:pre-line;color:var(--muted);">${message}</div>
       <div style="display:flex;justify-content:flex-end;gap:12px;margin-top:28px;">
-        <button id="appConfirmCancel" style="border:0;border-radius:16px;padding:14px 20px;background:var(--btn-sec-bg);color:var(--ink);font-size:16px;font-weight:700;">${cancelText}</button>
+        ${cancelText ? `<button id="appConfirmCancel" style="border:0;border-radius:16px;padding:14px 20px;background:var(--btn-sec-bg);color:var(--ink);font-size:16px;font-weight:700;">${cancelText}</button>` : ''}
         <button id="appConfirmOk" style="border:0;border-radius:16px;padding:14px 20px;background:var(--red);color:#fff;font-size:16px;font-weight:800;">${okText}</button>
       </div></div>`;
     document.body.appendChild(ov); const finish=v=>{ov.remove();resolve(v)};
-    ov.querySelector('#appConfirmCancel').onclick=()=>finish(false); ov.querySelector('#appConfirmOk').onclick=()=>finish(true);
+    if(cancelText) ov.querySelector('#appConfirmCancel').onclick=()=>finish(false); 
+    ov.querySelector('#appConfirmOk').onclick=()=>finish(true);
     ov.addEventListener('click',e=>{if(e.target===ov)finish(false)});
   });
 }
@@ -1122,8 +1167,19 @@ function resetSettings(){let d={title:'My Expense Analyzer',budget:'',goalName:'
 function showErr(e){alert(e&&e.message?e.message:String(e))}function toast(t){$('toast').textContent=t;$('toast').style.display='block';setTimeout(()=>$('toast').style.display='none',2000)}
 window.onload=function(){
   if(localStorage.getItem('theme') === 'dark') document.body.classList.add('dark-mode');
-  renderPinDots();
-  if(localStorage.getItem('bio_enabled') === 'true') $('bioBtn').style.display = 'block';
+  
+  const urlParams = new URLSearchParams(window.location.search);
+  const passedToken = urlParams.get('t');
+
+  if (passedToken) {
+     authToken = passedToken;
+     $('pinGate').classList.add('hidden');
+     document.body.classList.remove('pin-locked');
+     init();
+  } else {
+     renderPinDots();
+     if(localStorage.getItem('bio_enabled') === 'true') $('bioBtn').style.display = 'block';
+  }
 };
 </script>
 </body>
