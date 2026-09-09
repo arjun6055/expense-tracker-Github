@@ -8,7 +8,7 @@
 <meta name="theme-color" content="#101a2c">
 
 <style>
-/* V3.6 DYNAMIC CSS VARIABLE ENGINE */
+/* V4.0 DYNAMIC CSS VARIABLE ENGINE */
 :root {
   --bg: #f4f7fb; --card: #ffffff; --ink: #152238; --muted: #718096; --line: #e7ecf3; --dark: #101a2c;
   --blue: #2563eb; --cyan: #06b6d4; --green: #16a34a; --orange: #f59e0b; --pink: #ec4899; --purple: #7c3aed; --red: #dc2626;
@@ -47,16 +47,9 @@ input:focus,select:focus,textarea:focus{outline:3px solid #2563eb25;outline-offs
 
 /* Strictly Enforced Single Row Numbers - Removed Ellipsis */
 .stat b, .cardtile .amount, .focusstat b {
-    display: block !important;
-    font-size: clamp(14px, 4.5vw, 21px) !important;
-    font-weight: 900 !important;
-    line-height: 1.2 !important;
-    letter-spacing: -0.6px !important;
-    white-space: nowrap !important;
-    word-break: keep-all !important;
-    overflow-wrap: normal !important;
-    text-overflow: clip !important;
-    overflow: visible !important;
+    display: block !important; font-size: clamp(14px, 4.5vw, 21px) !important; font-weight: 900 !important;
+    line-height: 1.2 !important; letter-spacing: -0.6px !important; white-space: nowrap !important;
+    word-break: keep-all !important; overflow-wrap: normal !important; text-overflow: clip !important; overflow: visible !important;
 }
 
 .stat span{display:block;color:var(--muted);font-size:11px;margin-top:4px;line-height:1.35;white-space:normal}.hero .stat span{color:#dbeafe}
@@ -109,10 +102,11 @@ textarea{min-height:90px;resize:vertical}.row{display:grid;grid-template-columns
 .view-btn.active{background:var(--blue);color:#fff}
 .monthbar{display:flex;align-items:center;gap:8px;margin-top:10px}
 .monthbar button{width:52px;min-width:52px;height:52px;border-radius:16px;background:var(--btn-sec-bg);color:var(--ink);font-size:24px;font-weight:900}
-.monthbar select{padding:12px;height:52px;border-radius:16px}.periodbar{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+.monthbar select{padding:12px;height:52px;border-radius:16px}
+.periodbar{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
 .viewhint{text-align:center;font-size:11px;color:var(--muted);padding-top:10px;font-weight:750}
 
-/* V3.6 RESTORED SCROLLABLE BOTTOM NAV */
+/* V4.0 NAV DESIGN */
 .nav{position:fixed;bottom:0;left:0;right:0;background:var(--nav-bg);border-top:1px solid var(--line);z-index:30;box-shadow:0 -12px 35px rgba(0,0,0,.06);padding-bottom:calc(25px + env(safe-area-inset-bottom));overflow-x:auto;overflow-y:hidden;scrollbar-width:none;-webkit-overflow-scrolling:touch}
 .nav::-webkit-scrollbar{display:none}
 .navin{min-width:100%;width:max-content;margin:0 auto;display:grid;gap:4px;padding:8px 6px}
@@ -148,36 +142,13 @@ textarea{min-height:90px;resize:vertical}.row{display:grid;grid-template-columns
 }
 
 @media(max-width:520px){
-    /* Uniform Stacked Layout for all Grid Items on Phones */
-    .phone-device .iconstat {
-        flex-direction: column !important;
-        align-items: flex-start !important;
-        padding: 14px 12px !important;
-        gap: 6px !important;
-    }
-    .phone-device .iconstat .ico {
-        width: 36px !important; min-width: 36px !important; height: 36px !important; font-size: 18px !important; margin-bottom: 2px !important;
-    }
-    .phone-device .iconstat b {
-        font-size: clamp(14px, 4.8vw, 19px) !important;
-        letter-spacing: -0.6px !important; 
-        width: 100% !important;
-        overflow: visible !important;
-    }
-
-    .phone-device .focusstat {
-        flex-direction: column !important; align-items: flex-start !important; text-align: left !important; padding: 16px 12px !important; gap: 8px !important;
-    }
-    .phone-device .focusstat .ico {
-        width: 44px !important; min-width: 44px !important; height: 44px !important; font-size: 22px !important;
-    }
-    .phone-device .focusstat > div:last-child {
-        align-items: flex-start !important; text-align: left !important; width: 100% !important; overflow: visible !important;
-    }
-    .phone-device .focusstat b {
-        font-size: clamp(16px, 5.5vw, 22px) !important; 
-        letter-spacing: -0.6px !important; width: 100% !important; text-align: left !important; overflow: visible !important;
-    }
+    .phone-device .iconstat { flex-direction: column !important; align-items: flex-start !important; padding: 14px 12px !important; gap: 6px !important; }
+    .phone-device .iconstat .ico { width: 36px !important; min-width: 36px !important; height: 36px !important; font-size: 18px !important; margin-bottom: 2px !important; }
+    .phone-device .iconstat b { font-size: clamp(14px, 4.8vw, 19px) !important; letter-spacing: -0.6px !important; width: 100% !important; overflow: visible !important; }
+    .phone-device .focusstat { flex-direction: column !important; align-items: flex-start !important; text-align: left !important; padding: 16px 12px !important; gap: 8px !important; }
+    .phone-device .focusstat .ico { width: 44px !important; min-width: 44px !important; height: 44px !important; font-size: 22px !important; }
+    .phone-device .focusstat > div:last-child { align-items: flex-start !important; text-align: left !important; width: 100% !important; overflow: visible !important; }
+    .phone-device .focusstat b { font-size: clamp(16px, 5.5vw, 22px) !important; letter-spacing: -0.6px !important; width: 100% !important; text-align: left !important; overflow: visible !important; }
 }
 
 /* PIN Screen */
@@ -243,7 +214,10 @@ const google = {
   <button class="view-btn" data-view="period" onclick="setGlobalView('period')">🗓️ Period</button>
  </div>
  <div class="monthbar" id="monthControls"><button onclick="shiftMonth(-1)">‹</button><select id="globalMonth" onchange="setGlobalMonth(this.value)"></select><button onclick="shiftMonth(1)">›</button></div>
- <div class="periodbar hidden" id="periodControls"><label>From<input id="periodStart" type="date" onchange="setPeriodDates()"></label><label>To<input id="periodEnd" type="date" onchange="setPeriodDates()"></label></div>
+ <div class="periodbar hidden" id="periodControls">
+   <div class="monthchips" style="grid-column:1/-1;margin-bottom:4px"><button onclick="setQuickPeriod(7)">Last 7 Days</button><button onclick="setQuickPeriod(30)">Last 30 Days</button><button onclick="setQuickPeriod('thisMonth')">This Month</button></div>
+   <label>From<input id="periodStart" type="date" onchange="setPeriodDates()"></label><label>To<input id="periodEnd" type="date" onchange="setPeriodDates()"></label>
+ </div>
  <div class="viewhint" id="viewHint">Monthly position</div>
 </div>
 
@@ -267,7 +241,7 @@ const google = {
  <button class="card" style="margin-bottom:0" onclick="closeQuick();openAdd('investment')"><h3>📈 Investment</h3><div class="meta">FD/RD · MF · stocks</div></button>
  <button class="card" style="margin-bottom:0" onclick="closeQuick();openAdd('income')"><h3>💰 Income</h3><div class="meta">Salary · reimbursement</div></button>
  <button class="card" style="margin-bottom:0" onclick="closeQuick();openAdd('cc')"><h3>💳 CC Bill</h3><div class="meta">Card · billing month</div></button>
- <button class="card" style="margin-bottom:0" onclick="closeQuick();openAdd('transfer')"><h3>↔️ Transfer/ATM</h3><div class="meta">Cash withdrawal · P2P</div></button>
+ <button class="card" style="margin-bottom:0;grid-column:1/-1" onclick="closeQuick();openAdd('transfer')"><h3>↔️ Transfer/ATM</h3><div class="meta">Cash withdrawal · P2P Transfer</div></button>
  </div></div></div>
 
 <div class="modal" id="entryModal"><div class="sheet"><button class="secondary close" onclick="closeModal()">Close</button><h2 id="entryTitle">Add Spend</h2>
@@ -277,10 +251,10 @@ const google = {
  <div class="row"><div class="field"><label>Need</label><select id="fNeed"></select></div><div class="field"><label>Payment</label><select id="fPayment"></select></div></div>
  <div class="row"><div class="field"><label>Account / Card</label><select id="fCard"></select></div><div class="field"><label>Bill Month</label><input type="month" id="fBillMonth"></div></div>
  <div class="field"><label>Description / Remarks</label><textarea id="fDesc"></textarea></div>
- <div class="actionline"><button class="redbtn hidden" id="deleteBtn" onclick="deleteEntryFromModal()">Delete</button><button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveEntry()">Save</button></div>
+ <div class="actionline"><button class="secondary hidden" id="duplicateBtn" onclick="duplicateEntry()">Duplicate</button><button class="redbtn hidden" id="deleteBtn" onclick="deleteEntryFromModal()">Delete</button><button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveEntry()">Save</button></div>
  </div></div>
 
-<div class="modal" id="settingsModal"><div class="sheet"><button class="secondary close" onclick="closeSettings()">Close</button><h2>⚙️ Settings</h2><p class="mini">Customize the app without editing the Google Sheet. Changes are shared across the family app.</p>
+<div class="modal" id="settingsModal"><div class="sheet"><button class="secondary close" onclick="closeSettings()">Close</button><h2>⚙️ Settings</h2><p class="mini">Customize the app without editing the Google Sheet.</p>
  <div class="field"><label>App title</label><input id="setTitle"></div>
  
  <div class="pin-change-box" style="margin-top:16px;">
@@ -296,10 +270,15 @@ const google = {
    <div class="field"><label>Monthly Budget Amount (₹)</label><input id="setBudget" type="number" inputmode="numeric" placeholder="e.g. 50000"></div>
  </div>
 
+ <div class="pin-change-box">
+   <h3>📅 Recurring Bills & SIPs Tracker</h3><p class="manage-note">Enter recurring monthly bills. Format exactly as: <b>Name:Amount</b>. Put each bill on a new line. The app will scan your month's Spends/Investments to automatically check them off.</p>
+   <div class="field"><textarea id="setBills" placeholder="Netflix:649&#10;Mutual Fund SIP:5000" style="min-height:110px"></textarea></div>
+ </div>
+
  <h3>Bottom navigation order</h3><p class="layout-note">Use ↑ / ↓ to move tabs. The order is saved for everyone using this family app.</p><div id="tabSettings" class="layout-list"></div>
  <h3 style="margin-top:20px">Section order by tab</h3><p class="layout-note">Choose a tab, then move its sections up or down. This applies to the sections/cards inside that tab.</p><div class="field"><label>Tab</label><select id="sectionOrderTab" onchange="sectionSettingsTab=this.value;renderSectionOrderUI()"></select></div><div id="sectionSettings" class="layout-list"></div>
- <h3 style="margin-top:24px">🧩 Dropdown / Master Options</h3><p class="manage-note">Add, rename or remove options used in the entry form. Renaming an existing value also updates matching transactions in the master sheet.</p><div id="optionManager"></div>
- <div class="pin-change-box"><h3>🔐 Change App PIN</h3><p class="manage-note">Use a new 4–6 digit PIN. This changes the PIN for everyone using this family app.</p><div class="row"><div class="field"><label>Current PIN</label><input id="oldPinChange" type="password" inputmode="numeric" maxlength="6"></div><div class="field"><label>New PIN</label><input id="newPinChange" type="password" inputmode="numeric" maxlength="6"></div></div><div class="field"><label>Confirm New PIN</label><input id="confirmPinChange" type="password" inputmode="numeric" maxlength="6"></div><button class="primary" onclick="changePinUI()">Change PIN</button></div>
+ <h3 style="margin-top:24px">🧩 Dropdown / Master Options</h3><p class="manage-note">Add, rename or remove options used in the entry form.</p><div id="optionManager"></div>
+ <div class="pin-change-box"><h3>🔐 Change App PIN</h3><div class="row"><div class="field"><label>Current PIN</label><input id="oldPinChange" type="password" inputmode="numeric" maxlength="6"></div><div class="field"><label>New PIN</label><input id="newPinChange" type="password" inputmode="numeric" maxlength="6"></div></div><div class="field"><label>Confirm New PIN</label><input id="confirmPinChange" type="password" inputmode="numeric" maxlength="6"></div><button class="primary" onclick="changePinUI()">Change PIN</button></div>
  <div class="actionline" style="margin-top:24px"><button class="secondary" onclick="resetSettings()">Reset View Settings</button><button class="primary" onclick="saveSettingsUI()">Save Settings</button></div>
 </div></div>
 <div class="toast" id="toast"></div>
@@ -310,11 +289,11 @@ let globalView='monthly',activeMonth='',periodStart='',periodEnd='',currentScree
 const DEFAULT_TAB_ORDER=['home','spends','income','investment','money','cc','transfers','more'];
 const TAB_META={home:['⌂','Home'],spends:['🧾','Spends'],income:['💰','Income'],investment:['📈','Investment'],money:['₹','Money'],cc:['💳','CC Bills'],transfers:['↔️','Transfers'],more:['•••','More']};
 const SECTION_META={
-  home:[['secBudget','🛡️ Safe to Spend'],['secSnapshot','🎯 Financial Snapshot'],['secAccount','👨‍👩‍👦 Account-wise Expenses'],['secMonth','📅 Explore by Month'],['secCategory','🌈 Where did it go?'],['secRecent','🧾 Recent Spends']],
+  home:[['secBudget','🛡️ Safe to Spend'],['secSnapshot','🎯 Financial Snapshot'],['secAccount','👨‍👩‍👦 Account-wise Expenses'],['secSettlement','⚖️ Family Settlement'],['secMonth','📅 Explore by Month'],['secCategory','🌈 Where did it go?'],['secRecent','🧾 Recent Spends']],
   spends:[['spendFilters','🔎 Spend Filters'],['spendTx','🧾 Transactions']],
   income:[['incomeTx','💰 Income']],
   investment:[['investmentTx','📈 Investment / Saving']],
-  money:[['moneyPosition','💼 Financial Position'],['moneyChart','📊 Income vs Outgoing'],['moneySummary','📅 Monthwise Summary']],
+  money:[['moneyFunnel','🌪️ Cash Flow Funnel'],['moneyBills','📅 Recurring & SIPs'],['moneyPosition','💼 Financial Position'],['moneyChart','📊 Income vs Outgoing'],['moneySummary','📅 Monthwise Summary']],
   cc:[['ccCards','💳 Your Cards'],['ccTrend','📈 Monthly Bill Trend'],['ccShare','🏆 Card Share'],['ccHistory','🗓️ Bill History']],
   transfers:[['transferStats','📊 Overview'],['transferTx','↔️ Transactions']],
   more:[['moreMain','••• More'],['moreMaster','🗂️ Master Data']]
@@ -322,12 +301,10 @@ const SECTION_META={
 const $=id=>document.getElementById(id), money=n=>'₹'+Number(n||0).toLocaleString('en-IN',{maximumFractionDigits:2}), esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
 const today=()=>new Date().toISOString().slice(0,10), monthNow=()=>today().slice(0,7), monthName=m=>{if(!m)return '';let [y,x]=String(m).split('-');return new Date(+y,+x-1,1).toLocaleString('en-IN',{month:'short',year:'numeric'})},sum=a=>a.reduce((x,r)=>x+(Number(r.amount)||0),0);
 const monthKeys=()=>[...new Set(DATA.rows.filter(r=>r.date).map(r=>r.date.slice(0,7)))].sort();
-const OPENING_SAVINGS=407764;
-const OPENING_SAVINGS_DATE='31 March 2026';
+const OPENING_SAVINGS=407764; const OPENING_SAVINGS_DATE='31 March 2026';
 const CAT_ICONS={Food:'🍔',Grocery:'🛒',Shopping:'🛍️',Travel:'✈️',Utility:'💡',Personal:'👤','Gift/Loan':'🎁',Investment:'📈',Transport:'🚗',Home:'🏠',Education:'🎓',Medical:'💊',Health:'💊',Entertainment:'🎬',Other:'📌',ATM:'🏧',Transfer:'↔️','Personal Transfer':'↔️'};
 const CAT_BG={Food:'orange',Grocery:'green',Shopping:'pink',Travel:'blue',Utility:'orange',Personal:'purple','Gift/Loan':'pink',Investment:'green',Transport:'blue',Home:'cyan',Education:'blue',Medical:'pink',Health:'pink',Entertainment:'purple',Other:'cyan',ATM:'purple',Transfer:'cyan','Personal Transfer':'cyan'};
-const catIcon=c=>CAT_ICONS[c]||'📌';
-const catBg=c=>CAT_BG[c]||'cyan';
+const catIcon=c=>CAT_ICONS[c]||'📌'; const catBg=c=>CAT_BG[c]||'cyan';
 const investmentAdded=()=>sum(DATA.rows.filter(r=>r.type==='Investment' && r.date>='2026-04-01'));
 const savingsBalance=()=>OPENING_SAVINGS+investmentAdded();
 
@@ -338,16 +315,25 @@ function pinBack(){pinValue=pinValue.slice(0,-1);renderPinDots();}
 function pinClear(){pinValue='';renderPinDots();$('pinMsg').textContent='';}
 function unlockApp(){if(!/^\d{4,6}$/.test(pinValue)){ $('pinMsg').textContent='Enter a 4 to 6 digit PIN.'; return; } $('pinMsg').textContent='Checking…';google.script.run.withSuccessHandler(r=>{authToken=r.token; $('pinGate').classList.add('hidden');document.body.classList.remove('pin-locked');pinValue='';renderPinDots();init();}).withFailureHandler(e=>{$('pinMsg').textContent=(e&&e.message)||'Incorrect PIN.';pinValue='';renderPinDots();}).authenticatePin(pinValue);}
 
+// V4.0 AUTO-LOCK TIMEOUT
+let hiddenTime = 0;
+document.addEventListener('visibilitychange', () => {
+  if(document.hidden) hiddenTime = Date.now();
+  else {
+    if(hiddenTime && Date.now() - hiddenTime > 120000 && !document.body.classList.contains('pin-locked')) {
+      pinClear(); document.body.classList.add('pin-locked'); $('pinGate').classList.remove('hidden');
+    }
+    hiddenTime = 0;
+  }
+});
+
 async function setupBiometrics() {
   if (!window.PublicKeyCredential) { toast("Fingerprint not supported here."); return; }
   let p = prompt("Enter your existing 4-6 digit family PIN to link your fingerprint:");
   if (!p || !/^\d{4,6}$/.test(p)) { toast("Valid PIN required"); return; }
   try {
-    const challenge = new Uint8Array(32); window.crypto.getRandomValues(challenge);
-    const userId = new Uint8Array(16); window.crypto.getRandomValues(userId);
-    await navigator.credentials.create({
-      publicKey: { challenge: challenge, rp: { name: "Expense Analyzer" }, user: { id: userId, name: "Family", displayName: "Family Member" }, pubKeyCredParams: [{ type: "public-key", alg: -7 }, { type: "public-key", alg: -257 }], authenticatorSelection: { authenticatorAttachment: "platform", userVerification: "required" }, timeout: 60000 }
-    });
+    const challenge = new Uint8Array(32); window.crypto.getRandomValues(challenge); const userId = new Uint8Array(16); window.crypto.getRandomValues(userId);
+    await navigator.credentials.create({ publicKey: { challenge: challenge, rp: { name: "Expense Analyzer" }, user: { id: userId, name: "Family", displayName: "Family Member" }, pubKeyCredParams: [{ type: "public-key", alg: -7 }, { type: "public-key", alg: -257 }], authenticatorSelection: { authenticatorAttachment: "platform", userVerification: "required" }, timeout: 60000 } });
     localStorage.setItem('bio_enabled', 'true'); localStorage.setItem('saved_pin', btoa(p));
     $('bioSetupBtn').classList.add('hidden'); $('bioRemoveBtn').classList.remove('hidden'); $('bioBtn').style.display = 'block'; toast("Fingerprint linked ✓");
   } catch(e) { console.error(e); toast("Setup cancelled or failed."); }
@@ -362,87 +348,51 @@ async function unlockWithBiometrics() {
   } catch(e) { console.error(e); $('pinMsg').textContent = "Fingerprint failed."; }
 }
 
-function removeBiometrics() {
-  localStorage.removeItem('bio_enabled'); localStorage.removeItem('saved_pin');
-  $('bioBtn').style.display = 'none'; $('bioSetupBtn').classList.remove('hidden'); $('bioRemoveBtn').classList.add('hidden'); toast("Fingerprint disabled");
-}
-
-function toggleDarkMode(isDark) {
-  if(isDark) { document.body.classList.add('dark-mode'); localStorage.setItem('theme', 'dark'); }
-  else { document.body.classList.remove('dark-mode'); localStorage.setItem('theme', 'light'); }
-}
+function removeBiometrics() { localStorage.removeItem('bio_enabled'); localStorage.removeItem('saved_pin'); $('bioBtn').style.display = 'none'; $('bioSetupBtn').classList.remove('hidden'); $('bioRemoveBtn').classList.add('hidden'); toast("Fingerprint disabled"); }
+function toggleDarkMode(isDark) { if(isDark) { document.body.classList.add('dark-mode'); localStorage.setItem('theme', 'dark'); } else { document.body.classList.remove('dark-mode'); localStorage.setItem('theme', 'light'); } }
 
 function triggerConfetti() {
   const colors = ['#2563eb', '#06b6d4', '#16a34a', '#f59e0b', '#ec4899', '#7c3aed'];
   for(let i=0; i<65; i++) {
-    let conf = document.createElement('div');
-    conf.style.position = 'fixed'; conf.style.left = '50%'; conf.style.top = '50%';
+    let conf = document.createElement('div'); conf.style.position = 'fixed'; conf.style.left = '50%'; conf.style.top = '50%';
     conf.style.width = Math.random()*10+5+'px'; conf.style.height = Math.random()*10+5+'px';
-    conf.style.backgroundColor = colors[Math.floor(Math.random()*colors.length)];
-    conf.style.borderRadius = Math.random()>0.5 ? '50%' : '3px';
-    conf.style.zIndex = '999999'; conf.style.pointerEvents = 'none';
-    document.body.appendChild(conf);
-    let angle = Math.random() * Math.PI * 2; let velocity = 50 + Math.random() * 250;
-    let tx = Math.cos(angle) * velocity; let ty = Math.sin(angle) * velocity - 180;
-    conf.animate([
-      { transform: 'translate(-50%, -50%) scale(1) rotate(0deg)', opacity: 1 },
-      { transform: `translate(calc(-50% + ${tx}px), calc(-50% + ${ty}px)) scale(0) rotate(${Math.random()*360}deg)`, opacity: 0 }
-    ], { duration: 900 + Math.random()*600, easing: 'cubic-bezier(.37,0,.23,1)' }).onfinish = () => conf.remove();
+    conf.style.backgroundColor = colors[Math.floor(Math.random()*colors.length)]; conf.style.borderRadius = Math.random()>0.5 ? '50%' : '3px';
+    conf.style.zIndex = '999999'; conf.style.pointerEvents = 'none'; document.body.appendChild(conf);
+    let angle = Math.random() * Math.PI * 2; let velocity = 50 + Math.random() * 250; let tx = Math.cos(angle) * velocity; let ty = Math.sin(angle) * velocity - 180;
+    conf.animate([{ transform: 'translate(-50%, -50%) scale(1) rotate(0deg)', opacity: 1 }, { transform: `translate(calc(-50% + ${tx}px), calc(-50% + ${ty}px)) scale(0) rotate(${Math.random()*360}deg)`, opacity: 0 }], { duration: 900 + Math.random()*600, easing: 'cubic-bezier(.37,0,.23,1)' }).onfinish = () => conf.remove();
   }
 }
 
-// V3.6 ISOLATED GESTURE ENGINE
 let touchStartX = null, touchStartY = null;
-document.addEventListener('touchstart', e => {
-  if (e.touches.length > 1) return;
-  touchStartX = e.touches[0].clientX; touchStartY = e.touches[0].clientY;
-}, {passive: true});
-
+document.addEventListener('touchstart', e => { if (e.touches.length > 1) return; touchStartX = e.touches[0].clientX; touchStartY = e.touches[0].clientY; }, {passive: true});
 document.addEventListener('touchend', e => {
   if (!touchStartX || SETTINGS.swipeTabs === false) return;
-  // Completely ignore swipes that start or end on the navigation bar
   if (e.target.closest('.swipe-wrap') || e.target.closest('.monthchart') || e.target.closest('.monthchips') || e.target.closest('.subtabs') || e.target.closest('.donutwrap') || e.target.closest('.sheet') || e.target.closest('.filtergrid') || e.target.closest('.nav')) return;
-  
-  let dX = e.changedTouches[0].clientX - touchStartX;
-  let dY = e.changedTouches[0].clientY - touchStartY;
-  
+  let dX = e.changedTouches[0].clientX - touchStartX; let dY = e.changedTouches[0].clientY - touchStartY;
   if (Math.abs(dX) > 35 && Math.abs(dX) > Math.abs(dY)*1.1) {
-    let s = mergedSettings();
-    let order = s.tabOrder.filter(id => s.tabs[id] !== false);
-    if (!order.includes('more')) order.push('more');
+    let s = mergedSettings(); let order = s.tabOrder.filter(id => s.tabs[id] !== false); if (!order.includes('more')) order.push('more');
     let idx = order.indexOf(currentScreen);
-    if (dX < 0 && idx < order.length - 1) go(order[idx + 1]);
-    if (dX > 0 && idx > 0) go(order[idx - 1]);
+    if (dX < 0 && idx < order.length - 1) go(order[idx + 1]); if (dX > 0 && idx > 0) go(order[idx - 1]);
   }
   touchStartX = null;
 }, {passive: true});
 
 let txTouchX = null, txTouchY = null, activeSwipeEl = null;
 function txTouchStart(e, el) {
-  if(SETTINGS.swipeRows === false) return;
-  if(e.touches.length > 1) return;
+  if(SETTINGS.swipeRows === false) return; if(e.touches.length > 1) return;
   txTouchX = e.touches[0].clientX; txTouchY = e.touches[0].clientY;
   if(activeSwipeEl && activeSwipeEl !== el) activeSwipeEl.style.transform = 'translateX(0)';
-  activeSwipeEl = el;
-  el.style.transition = 'none';
+  activeSwipeEl = el; el.style.transition = 'none';
 }
 function txTouchMove(e, el) {
   if(SETTINGS.swipeRows === false || !txTouchX) return;
-  let dx = e.touches[0].clientX - txTouchX;
-  let dy = e.touches[0].clientY - txTouchY;
-  if(Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 12) {
-    e.preventDefault(); 
-    let clamped = Math.max(-85, Math.min(85, dx));
-    el.style.transform = `translateX(${clamped}px)`;
-  }
+  let dx = e.touches[0].clientX - txTouchX; let dy = e.touches[0].clientY - txTouchY;
+  if(Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 12) { e.preventDefault(); let clamped = Math.max(-85, Math.min(85, dx)); el.style.transform = `translateX(${clamped}px)`; }
 }
 function txTouchEnd(e, el, rowId) {
   if(SETTINGS.swipeRows === false || !txTouchX) return;
-  let dx = e.changedTouches[0].clientX - txTouchX;
-  el.style.transition = 'transform 0.2s cubic-bezier(.2,.8,.2,1)';
-  if(dx > 60) { el.style.transform = 'translateX(0)'; editTx(rowId); } 
-  else if (dx < -60) { el.style.transform = 'translateX(0)'; quickDelete(rowId); } 
-  else { el.style.transform = 'translateX(0)'; }
+  let dx = e.changedTouches[0].clientX - txTouchX; el.style.transition = 'transform 0.2s cubic-bezier(.2,.8,.2,1)';
+  if(dx > 60) { el.style.transform = 'translateX(0)'; editTx(rowId); } else if (dx < -60) { el.style.transform = 'translateX(0)'; quickDelete(rowId); } else { el.style.transform = 'translateX(0)'; }
   txTouchX = null;
 }
 
@@ -454,59 +404,39 @@ function updateGlobalUI(){document.querySelectorAll('.view-btn').forEach(b=>b.cl
 function setGlobalView(v){globalView=['monthly','overall','period'].includes(v)?v:'monthly';if(globalView==='period'&&!periodStart)periodStart=activeMonth+'-01';if(globalView==='period'&&!periodEnd)periodEnd=today();updateGlobalUI();renderAll()}
 function setGlobalMonth(v){if(!v)return;activeMonth=String(v).slice(0,7);globalView='monthly';updateGlobalUI();renderAll()}
 function shiftMonth(delta){let [y,m]=activeMonth.split('-').map(Number),d=new Date(y,m-1+delta,1);setGlobalMonth(d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0'))}
+
+function setQuickPeriod(days) {
+  let end = new Date(); let start = new Date();
+  if(days === 'thisMonth') { start.setDate(1); }
+  else { start.setDate(end.getDate() - days); }
+  $('periodStart').value = start.toISOString().slice(0,10); $('periodEnd').value = end.toISOString().slice(0,10);
+  setPeriodDates();
+}
 function setPeriodDates(){periodStart=$('periodStart').value||'';periodEnd=$('periodEnd').value||'';if(periodStart&&periodEnd&&periodStart>periodEnd)[periodStart,periodEnd]=[periodEnd,periodStart];updateGlobalUI();renderAll()}
 function inScope(r){if(globalView==='overall')return true;if(globalView==='monthly')return String(r.date||'').startsWith(activeMonth);let d=String(r.date||'');return (!periodStart||d>=periodStart)&&(!periodEnd||d<=periodEnd)}
 function scopedRows(type){return DATA.rows.filter(r=>(!type||r.type===type)&&inScope(r))}
 
 function renderAll(){renderHome();renderSpends();renderIncome();renderInvestment();renderMoney();renderCC();renderTransfers();renderMore();applyAllSectionOrders();}
 
-// V3.6 Scrollable Nav Centering
 function go(id){
-  currentScreen=id; 
-  document.querySelectorAll('.screen').forEach(x=>x.classList.remove('active')); 
-  $(id).classList.add('active');
-  
-  renderNav();
-  let activeBtn = document.querySelector(`.nav button[data-screen="${id}"]`);
-  if(activeBtn) { 
-    try { activeBtn.scrollIntoView({behavior: 'smooth', block: 'nearest', inline: 'center'}); } catch(e) {} 
-  }
-
-  if(id==='income')renderIncome(); 
-  if(id==='investment')renderInvestment(); 
-  if(id==='spends')renderSpends();
-  if(id==='money')renderMoney(); 
-  if(id==='cc')renderCC(); 
-  if(id==='transfers'){ tfType=''; tfVal=''; renderTransfers(); }
-  if(id==='more')renderMore(); 
-  applyScreenSectionOrder(id); 
-  window.scrollTo({top:0,behavior:'smooth'})
+  currentScreen=id; document.querySelectorAll('.screen').forEach(x=>x.classList.remove('active')); $(id).classList.add('active');
+  renderNav(); let activeBtn = document.querySelector(`.nav button[data-screen="${id}"]`); if(activeBtn) { try { activeBtn.scrollIntoView({behavior: 'smooth', block: 'nearest', inline: 'center'}); } catch(e) {} }
+  if(id==='income')renderIncome(); if(id==='investment')renderInvestment(); if(id==='spends')renderSpends();
+  if(id==='money')renderMoney(); if(id==='cc')renderCC(); if(id==='transfers'){ tfType=''; tfVal=''; renderTransfers(); }
+  if(id==='more')renderMore(); applyScreenSectionOrder(id); window.scrollTo({top:0,behavior:'smooth'})
 }
 
 function currentLabel(){return globalView==='overall'?'Overall':globalView==='period'?'Selected Period':monthName(activeMonth)}
-
-function getGroupDateLabel(dStr) {
-  const d_obj = new Date(); const d_today = d_obj.toISOString().slice(0,10);
-  d_obj.setDate(d_obj.getDate() - 1); const d_yest = d_obj.toISOString().slice(0,10);
-  let jsDate = new Date(dStr);
-  if(dStr === d_today) return `Today (${jsDate.toLocaleString('en-IN', {day:'numeric', month:'short'})})`;
-  if(dStr === d_yest) return `Yesterday (${jsDate.toLocaleString('en-IN', {day:'numeric', month:'short'})})`;
-  return jsDate.toLocaleString('en-IN', {day:'numeric', month:'short', year:'numeric'});
-}
-
-function emptySVG() {
-  return `<svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"><rect x="4" y="4" width="16" height="16" rx="2" ry="2"></rect><rect x="9" y="9" width="6" height="6"></rect><line x1="9" y1="1" x2="9" y2="4"></line><line x1="15" y1="1" x2="15" y2="4"></line><line x1="9" y1="20" x2="9" y2="23"></line><line x1="15" y1="20" x2="15" y2="23"></line><line x1="20" y1="9" x2="23" y2="9"></line><line x1="20" y1="14" x2="23" y2="14"></line><line x1="1" y1="9" x2="4" y2="9"></line><line x1="1" y1="14" x2="4" y2="14"></line></svg>`;
-}
+function getGroupDateLabel(dStr) { const d_obj = new Date(); const d_today = d_obj.toISOString().slice(0,10); d_obj.setDate(d_obj.getDate() - 1); const d_yest = d_obj.toISOString().slice(0,10); let jsDate = new Date(dStr); if(dStr === d_today) return `Today (${jsDate.toLocaleString('en-IN', {day:'numeric', month:'short'})})`; if(dStr === d_yest) return `Yesterday (${jsDate.toLocaleString('en-IN', {day:'numeric', month:'short'})})`; return jsDate.toLocaleString('en-IN', {day:'numeric', month:'short', year:'numeric'}); }
+function emptySVG() { return `<svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"><rect x="4" y="4" width="16" height="16" rx="2" ry="2"></rect><rect x="9" y="9" width="6" height="6"></rect><line x1="9" y1="1" x2="9" y2="4"></line><line x1="15" y1="1" x2="15" y2="4"></line><line x1="9" y1="20" x2="9" y2="23"></line><line x1="15" y1="20" x2="15" y2="23"></line><line x1="20" y1="9" x2="23" y2="9"></line><line x1="20" y1="14" x2="23" y2="14"></line><line x1="1" y1="9" x2="4" y2="9"></line><line x1="1" y1="14" x2="4" y2="14"></line></svg>`; }
 
 function txRows(rs) {
   if(!rs.length) return `<div class="empty">${emptySVG()}<div style="margin-top:12px;font-weight:800;color:var(--ink)">No matching entries</div><div style="font-size:11px;margin-top:4px">Tap + Add to create one</div></div>`;
-  let groups = {}; rs.forEach(r => { if(!groups[r.date]) groups[r.date] = []; groups[r.date].push(r); });
-  let html = '';
+  let groups = {}; rs.forEach(r => { if(!groups[r.date]) groups[r.date] = []; groups[r.date].push(r); }); let html = '';
   Object.keys(groups).sort((a,b)=>b.localeCompare(a)).forEach(d => {
     html += `<div style="font-size:12px; font-weight:850; color:var(--muted); margin: 20px 0 6px 6px; text-transform:uppercase; letter-spacing:0.8px;">${getGroupDateLabel(d)}</div>`;
     groups[d].forEach(r => { html += txHtml(r); });
-  });
-  return html;
+  }); return html;
 }
 
 function txHtml(r){
@@ -521,8 +451,16 @@ function txHtml(r){
 
 function renderHome(){
  let all=scopedRows(), inc=sum(all.filter(r=>r.type==='Income')), sp=sum(all.filter(r=>r.type==='Spend')), inv=sum(all.filter(r=>r.type==='Investment')), cc=sum(all.filter(r=>r.type==='CC Bill')), out=sp+inv;
- let budgetHtml = '';
- let bud = Number(SETTINGS.budget);
+ let dObj=new Date(), tStr=dObj.toISOString().slice(0,7);
+ 
+ // V4.0 Projective Burn Rate Analytics
+ let projHtml = '';
+ if(globalView==='monthly' && activeMonth===tStr) {
+   let d = dObj.getDate(); let maxD = new Date(dObj.getFullYear(), dObj.getMonth()+1, 0).getDate();
+   projHtml = `<div style="font-size:12px;margin-top:6px;color:#bfdbfe;font-weight:750">📉 Proj. month-end spends: <b>${money((sp/d)*maxD)}</b></div>`;
+ }
+
+ let budgetHtml = ''; let bud = Number(SETTINGS.budget);
  if(bud > 0 && globalView==='monthly') {
    let pct = Math.min(100, Math.max(0, (sp / bud) * 100));
    let color = pct < 75 ? 'linear-gradient(90deg,#22c55e,#16a34a)' : (pct < 95 ? 'linear-gradient(90deg,#f59e0b,#d97706)' : 'linear-gradient(90deg,#ef4444,#dc2626)');
@@ -531,40 +469,54 @@ function renderHome(){
      <div style="height:14px;border-radius:99px;background:var(--stat-border);overflow:hidden"><div style="height:100%;width:${pct}%;background:${color};border-radius:99px;transition:width 0.5s ease"></div></div>
    </div>`;
  }
+
+ // V4.0 Family Settlement Logic
+ let accSpends = {}; all.filter(r=>r.type==='Spend').forEach(r=>{let a=r.account||'Unknown'; accSpends[a]=(accSpends[a]||0)+r.amount});
+ let accs = Object.entries(accSpends).sort((a,b)=>b[1]-a[1]); let stl = '';
+ if(accs.length>1 && accs[0][1]>0) stl = `<div class="notice" id="secSettlement" style="margin-top:12px;border-radius:18px">⚖️ <b>Settlement:</b> ${esc(accs[0][0])} paid ${money(accs[0][1]-accs[1][1])} more than ${esc(accs[1][0])} this period.</div>`;
+
+ // V4.0 Trend Data Preparation
+ let prevM = new Date(activeMonth+'-01'); prevM.setMonth(prevM.getMonth()-1); let pMStr = prevM.toISOString().slice(0,7);
+ let prevAll = DATA.rows.filter(r=>String(r.date).startsWith(pMStr));
+
  $('home').innerHTML=`
- <div class="card hero"><div class="label">${globalView==='overall'?'Overall position':globalView==='period'?'Period position':'Monthly position'}</div><div class="big">${money(out)}</div><div class="minihero" style="margin:0;background:#ffffff10;border:1px solid #ffffff1c"><div class="label">Total outgoing</div><div style="font-size:12px;margin-top:3px;color:#dbeafe;font-weight:750">Spends + Investment</div></div><div class="grid2" style="margin-top:14px"><div class="stat"><b>${money(sp)}</b><span>Spends</span></div><div class="stat"><b>${money(inv)}</b><span>Investment</span></div><div class="stat"><b>${money(inc)}</b><span>Money In</span></div><div class="stat"><b>${money(inc-out)}</b><span>Net position</span></div><div class="stat focusstat" style="grid-column:1/-1;text-align:center"><b>${money(savingsBalance())}</b><span>Total savings / investment</span></div></div></div>
+ <div class="card hero"><div class="label">${globalView==='overall'?'Overall position':globalView==='period'?'Period position':'Monthly position'}</div><div class="big">${money(out)}</div><div class="minihero" style="margin:0;background:#ffffff10;border:1px solid #ffffff1c"><div class="label">Total outgoing</div><div style="font-size:12px;margin-top:3px;color:#dbeafe;font-weight:750">Spends + Investment</div>${projHtml}</div><div class="grid2" style="margin-top:14px"><div class="stat"><b>${money(sp)}</b><span>Spends</span></div><div class="stat"><b>${money(inv)}</b><span>Investment</span></div><div class="stat"><b>${money(inc)}</b><span>Money In</span></div><div class="stat"><b>${money(inc-out)}</b><span>Net position</span></div><div class="stat focusstat" style="grid-column:1/-1;text-align:center"><b>${money(savingsBalance())}</b><span>Total savings / investment</span></div></div></div>
  ${budgetHtml}
  <div class="card" id="secSnapshot"><div class="sectionhead"><h3>🎯 Financial Snapshot</h3><span class="pill">${currentLabel()}</span></div><div class="grid4"><div class="stat iconstat"><div class="ico blue">💰</div><div><b>${money(inc)}</b><span>Income</span></div></div><div class="stat iconstat"><div class="ico orange">🧾</div><div><b>${money(sp)}</b><span>Spends</span></div></div><div class="stat iconstat"><div class="ico green">📈</div><div><b>${money(inv)}</b><span>Investment</span></div></div><div class="stat iconstat"><div class="ico purple">💳</div><div><b>${money(cc)}</b><span>CC Bills</span></div></div></div></div>
- <div class="card" id="secAccount"><div class="sectionhead"><h3>👨‍👩‍👦 Account-wise</h3><span class="pill">Spends</span></div>${summary(all.filter(r=>r.type==='Spend'),'account')}</div>
+ <div class="card" id="secAccount"><div class="sectionhead"><h3>👨‍👩‍👦 Account-wise</h3><span class="pill">Spends</span></div>${summary(all.filter(r=>r.type==='Spend'),'account')}${stl}</div>
  <div class="card" id="secMonth"><div class="sectionhead"><h3>📅 Explore by Month</h3></div><div class="monthchips">${monthKeys().slice().reverse().slice(0,12).map(m=>'<button class="'+(m===activeMonth&&globalView==='monthly'?'on':'')+'" onclick="setGlobalMonth(\''+m+'\')">'+monthName(m)+'</button>').join('')||'<span class="mini">No month data</span>'}</div></div>
- <div class="card" id="secCategory"><div class="sectionhead"><h3>🌈 Where did it go?</h3><span class="pill">Top categories</span></div>${summary(all.filter(r=>r.type==='Spend'),'category')}</div>
+ <div class="card" id="secCategory"><div class="sectionhead"><h3>🌈 Where did it go?</h3><span class="pill">Top categories</span></div>${summary(all.filter(r=>r.type==='Spend'),'category','routeToSpends', globalView==='monthly'?prevAll.filter(r=>r.type==='Spend'):null)}</div>
  <div class="card" id="secRecent"><div class="sectionhead"><h3>🧾 Recent Spends</h3><button class="secondary" onclick="go('spends')">View all</button></div>${txRows(all.filter(r=>r.type==='Spend').sort((a,b)=>b.date.localeCompare(a.date)||b.row-a.row).slice(0,7))}</div>`;
  applyHomeSections()
 }
-function applyHomeSections(){let s=mergedSettings();['secBudget','secSnapshot','secAccount','secMonth','secCategory','secRecent'].forEach(id=>{let e=$(id);if(e)e.style.display=s.sections[id]!==false?'block':'none'})}
+function applyHomeSections(){let s=mergedSettings();['secBudget','secSnapshot','secAccount','secSettlement','secMonth','secCategory','secRecent'].forEach(id=>{let e=$(id);if(e)e.style.display=s.sections[id]!==false?'block':'none'})}
 function routeToSpends(filterType, filterValue) {if($('spAccount')) $('spAccount').value = '';if($('spCategory')) $('spCategory').value = '';if($('spNeed')) $('spNeed').value = '';if($('spSearch')) $('spSearch').value = '';go('spends');let targetDropdown = filterType === 'category' ? $('spCategory') : $('spAccount');if(targetDropdown) targetDropdown.value = filterValue;renderSpends();}
 function filterTransfers(type, val) {tfType=type; tfVal=val; renderTransfers(); let tx=document.getElementById('transferTx'); if(tx)tx.scrollIntoView({behavior:'smooth'});}
 function clearTransferFilter() {tfType=''; tfVal=''; renderTransfers();}
-function summary(rs,key,routeFn){if(!routeFn)routeFn='routeToSpends';let a={};rs.forEach(r=>{let k=r[key]||'Unspecified';a[k]=(a[k]||0)+Number(r.amount||0)});let ar=Object.entries(a).sort((x,y)=>y[1]-x[1]),mx=ar[0]?.[1]||1;if(!ar.length)return `<div class="empty">${emptySVG()}<div style="margin-top:12px;font-weight:800;color:var(--ink)">No data</div></div>`;return ar.slice(0,8).map(x=>{let c=x[0];return '<div class="listrow txclick" style="padding:14px 10px" onclick="'+routeFn+'(\''+key+'\', \''+esc(c).replace(/'/g,"\\'")+'\')"><div class="catrow"><div class="caticon '+catBg(c)+'">'+catIcon(c)+'</div><div class="catname"><div class="title">'+esc(c)+'</div><div class="bar"><i style="width:'+Math.max(2,x[1]/mx*100)+'%"></i></div></div></div><div class="amt">'+money(x[1])+'</div></div>'}).join('')}
+
+// V4.0 MoM Analytics Engine injected into summary
+function summary(rs,key,routeFn,prevRs){
+  if(!routeFn)routeFn='routeToSpends'; let a={}; rs.forEach(r=>{let k=r[key]||'Unspecified';a[k]=(a[k]||0)+Number(r.amount||0)});
+  let pA={}; if(prevRs) prevRs.forEach(r=>{let k=r[key]||'Unspecified';pA[k]=(pA[k]||0)+Number(r.amount||0)});
+  let ar=Object.entries(a).sort((x,y)=>y[1]-x[1]), mx=ar[0]?.[1]||1;
+  if(!ar.length)return `<div class="empty">${emptySVG()}<div style="margin-top:12px;font-weight:800;color:var(--ink)">No data</div></div>`;
+  return ar.slice(0,8).map(x=>{
+    let c=x[0]; let pVal=pA[c]||0; let pct=pVal?Math.round(((x[1]-pVal)/pVal)*100):0;
+    let badge = prevRs ? (pct>0 ? `<span style="color:var(--red);font-size:10px;font-weight:850;margin-left:6px">▲${pct}%</span>` : (pct<0 ? `<span style="color:var(--green);font-size:10px;font-weight:850;margin-left:6px">▼${Math.abs(pct)}%</span>` : `<span style="color:var(--muted);font-size:10px;margin-left:6px">-</span>`)) : '';
+    return `<div class="listrow txclick" style="padding:14px 10px" onclick="${routeFn}('${key}', '${esc(c).replace(/'/g,"\\'")}')"><div class="catrow"><div class="caticon ${catBg(c)}">${catIcon(c)}</div><div class="catname"><div class="title">${esc(c)}</div><div class="bar"><i style="width:${Math.max(2,x[1]/mx*100)}%"></i></div></div></div><div class="amt">${money(x[1])}${badge}</div></div>`
+  }).join('');
+}
 
 function spendFilteredRows(qOverride){let rs=scopedRows('Spend'),q=(qOverride!==undefined?qOverride:($('spSearch')?.value||'')).toLowerCase(),a=$('spAccount')?.value||'',c=$('spCategory')?.value||'',n=$('spNeed')?.value||'',sort=$('spSort')?.value||'new';rs=rs.filter(r=>(!a||r.account===a)&&(!c||r.category===c)&&(!n||r.need===n)&&(!q||[r.description,r.category,r.subcategory,r.accountCard,r.payment,r.account].join(' ').toLowerCase().includes(q)));if(sort==='amount')rs.sort((a,b)=>b.amount-a.amount);else if(sort==='old')rs.sort((a,b)=>a.date.localeCompare(b.date)||a.row-b.row);else rs.sort((a,b)=>b.date.localeCompare(a.date)||b.row-a.row);return rs}
 
-function toggleFilters() {
-  filtersExpanded = !filtersExpanded;
-  $('filterContainer').style.display = filtersExpanded ? 'block' : 'none';
-  $('filterToggleBtn').textContent = filtersExpanded ? '˄ Hide Filters' : '˅ Show Filters';
-}
+function toggleFilters() { filtersExpanded = !filtersExpanded; $('filterContainer').style.display = filtersExpanded ? 'block' : 'none'; $('filterToggleBtn').textContent = filtersExpanded ? '˄ Hide Filters' : '˅ Show Filters'; }
 function clearFilters(){if($('spSearch'))$('spSearch').value='';if($('spAccount'))$('spAccount').value='';if($('spCategory'))$('spCategory').value='';if($('spNeed'))$('spNeed').value='';if($('spSort'))$('spSort').value='new';renderSpends()}
 
 function renderSpends(){
-  let rs=spendFilteredRows();
-  let q=($('spSearch')?.value||'').toLowerCase(),a=$('spAccount')?.value||'',c=$('spCategory')?.value||'',n=$('spNeed')?.value||'',sort=$('spSort')?.value||'new';
+  let rs=spendFilteredRows(); let q=($('spSearch')?.value||'').toLowerCase(),a=$('spAccount')?.value||'',c=$('spCategory')?.value||'',n=$('spNeed')?.value||'',sort=$('spSort')?.value||'new';
   $('spends').innerHTML=`
   <div class="card" id="spendFilters" style="position:sticky; top:8px; z-index:20; padding-bottom:14px; margin-bottom:14px; box-shadow:0 15px 35px var(--bg);">
-    <div class="sectionhead" style="margin-bottom:8px">
-      <h2 style="margin:0">🧾 Spends</h2>
-      <button class="secondary" onclick="toggleFilters()" id="filterToggleBtn" style="padding:10px 14px; border-radius:99px">${filtersExpanded ? '˄ Hide Filters' : '˅ Show Filters'}</button>
-    </div>
+    <div class="sectionhead" style="margin-bottom:8px"><h2 style="margin:0">🧾 Spends</h2><button class="secondary" onclick="toggleFilters()" id="filterToggleBtn" style="padding:10px 14px; border-radius:99px">${filtersExpanded ? '˄ Hide Filters' : '˅ Show Filters'}</button></div>
     <div class="data-note" id="spSummary" style="font-size:12px; font-weight:800; color:var(--ink)">${currentLabel()} · ${rs.length} tx · ${money(sum(rs))}</div>
     <div id="filterContainer" style="display:${filtersExpanded ? 'block' : 'none'}; margin-top:14px;">
       <div class="field"><input id="spSearch" placeholder="🔎 Search description, category..." value="${esc(q)}" oninput="liveSpendSearch(this)"></div>
@@ -577,26 +529,52 @@ function renderSpends(){
       <div style="text-align:right; margin-top:12px;"><button class="secondary" style="border-radius:99px" onclick="clearFilters()">✖ Clear All</button></div>
     </div>
   </div>
-  <div class="card" id="spendTx">
-    <div class="sectionhead"><h3>Transactions</h3><span class="pill">Swipe left to delete</span></div>
-    <div id="spTxList">${txRows(rs)}</div>
-  </div>`;
+  <div class="card" id="spendTx"><div class="sectionhead"><h3>Transactions</h3><span class="pill">Swipe left to delete</span></div><div id="spTxList">${txRows(rs)}</div></div>`;
 }
 
 function liveSpendSearch(input){let rs=spendFilteredRows(input.value),summary=$('spSummary'),list=$('spTxList');if(summary)summary.textContent=currentLabel()+' · '+rs.length+' tx · '+money(sum(rs));if(list)list.innerHTML=txRows(rs);if(document.activeElement!==input){input.focus()} }
 function renderIncome(){let rs=scopedRows('Income').sort((a,b)=>b.date.localeCompare(a.date)||b.row-a.row),total=sum(rs);$('income').innerHTML=`<div class="minihero"><div class="label" style="color:#bfdbfe">${globalView==='overall'?'Overall income':globalView==='period'?'Period income':'Monthly income'}</div><div class="kpi">${money(total)}</div><div style="font-size:12px;color:#dbeafe;font-weight:750">${rs.length} income entr${rs.length===1?'y':'ies'}</div></div><div class="card" id="incomeTx"><div class="sectionhead"><h3>💰 Income</h3><button class="primary" onclick="openAdd('income')">＋ Add</button></div>${txRows(rs)}</div>`}
 function renderInvestment(){let rs=scopedRows('Investment').sort((a,b)=>b.date.localeCompare(a.date)||b.row-a.row),added=investmentAdded(),balance=OPENING_SAVINGS+added,monthlyInv=sum(rs);let monthlyLabel=globalView==='overall'?'Total investments recorded':globalView==='period'?'Investment in selected period':'Investment in '+monthName(activeMonth);$('investment').innerHTML=`<div class="minihero"><div class="label" style="color:#bfdbfe">Total Savings / Investment</div><div class="kpi">${money(balance)}</div><div style="font-size:12px;color:#dbeafe;font-weight:750">Opening balance + investments added after 31 Mar 2026</div></div><div class="grid2"><div class="card"><div class="stat iconstat focusstat"><div class="ico purple">🏦</div><div><b>${money(OPENING_SAVINGS)}</b><span>Balance as on ${OPENING_SAVINGS_DATE}</span></div></div></div><div class="card"><div class="stat iconstat focusstat"><div class="ico green">📈</div><div><b>${money(monthlyInv)}</b><span>${monthlyLabel}</span></div></div></div></div><div class="card" id="investmentTx"><div class="sectionhead"><h3>📈 Investment / Saving</h3><button class="primary" onclick="openAdd('investment')">＋ Add</button></div><div class="data-note" style="font-size:13px;font-weight:800;color:var(--ink)">Current savings/investment balance: <b>${money(balance)}</b></div><div style="height:12px"></div>${txRows(rs)}</div>`}
+
 function renderMoney(){
  let all=scopedRows(),inc=sum(all.filter(r=>r.type==='Income')),sp=sum(all.filter(r=>r.type==='Spend')),inv=sum(all.filter(r=>r.type==='Investment')),net=inc-sp-inv;
  let months=monthKeys().slice(-12);
  let bars=months.map(m=>{let I=sum(DATA.rows.filter(r=>r.type==='Income'&&r.date.startsWith(m))),O=sum(DATA.rows.filter(r=>(r.type==='Spend'||r.type==='Investment')&&r.date.startsWith(m)));let mx=Math.max(Math.abs(I),Math.abs(O),1);return `<div class="mcol" onclick="showChartValue('${m}',${I},${O})" title="Tap to view values"><div style="width:100%;display:flex;gap:4px;align-items:end;justify-content:center;height:120px"><div class="mbar chartbar" style="height:${Math.max(5,Math.abs(I)/mx*105)}px;background:linear-gradient(180deg,#22c55e,#16a34a)" aria-label="Income"></div><div class="mbar chartbar" style="height:${Math.max(5,Math.abs(O)/mx*105)}px;background:linear-gradient(180deg,#ef4444,#dc2626)" aria-label="Outgoing"></div></div><div class="mlab">${esc(monthName(m).split(' ')[0])}</div></div>`}).join('');
  let rows=months.slice().reverse().map(m=>{let I=sum(DATA.rows.filter(r=>r.type==='Income'&&r.date.startsWith(m))),S=sum(DATA.rows.filter(r=>r.type==='Spend'&&r.date.startsWith(m))),V=sum(DATA.rows.filter(r=>r.type==='Investment'&&r.date.startsWith(m))),O=S+V,C=sum(DATA.rows.filter(r=>r.type==='CC Bill'&&r.date.startsWith(m)));return `<tr><td>${esc(monthName(m))}</td><td>${money(I)}</td><td>${money(S)}</td><td>${money(V)}</td><td>${money(O)}</td><td>${money(C)}</td></tr>`}).join('');
+ 
+ // V4.0 Cash Flow Funnel
+ let fSp = inc>0 ? Math.min(100, Math.max(25, (sp/inc)*100)) : 100;
+ let fInv = inc>0 ? Math.min(100, Math.max(25, (inv/inc)*100)) : 100;
+ let fNet = inc>0 ? Math.min(100, Math.max(25, (net/inc)*100)) : 100;
+ let funnelHtml = `<div class="card" id="moneyFunnel"><div class="sectionhead"><h3>🌪️ Cash Flow Funnel</h3><span class="pill">Current Income Breakdown</span></div>
+  <div style="display:grid;gap:5px;font-weight:850;font-size:14px;margin-top:12px;text-align:right">
+    <div style="background:linear-gradient(90deg, #3b82f6, #2563eb);color:#fff;padding:12px 18px;border-radius:12px;width:100%">💰 Income ${money(inc)}</div>
+    <div style="background:linear-gradient(90deg, #f59e0b, #d97706);color:#fff;padding:12px 18px;border-radius:12px;width:${fSp}%">🧾 Spends ${money(sp)}</div>
+    <div style="background:linear-gradient(90deg, #10b981, #059669);color:#fff;padding:12px 18px;border-radius:12px;width:${fInv}%">📈 Inv ${money(inv)}</div>
+    <div style="background:linear-gradient(90deg, #8b5cf6, #7c3aed);color:#fff;padding:12px 18px;border-radius:12px;width:${fNet}%">💼 Net ${money(net)}</div>
+  </div></div>`;
+
+ // V4.0 Recurring Planner
+ let setB = mergedSettings().bills || '';
+ let billsArr = setB.split('\n').map(x=>{let p=x.split(':'); return p.length===2?{n:p[0].trim(),v:Number(p[1])}:null}).filter(x=>x);
+ let billsHtml = '';
+ if(billsArr.length > 0) {
+   let bList = billsArr.map(b => {
+     let isPaid = all.some(r => r.description.toLowerCase().includes(b.n.toLowerCase()));
+     return `<div class="listrow"><div class="title">${esc(b.n)}</div><div class="amt" style="color:${isPaid?'var(--green)':'var(--red)'}">${isPaid?'✅ Paid':'⏳ '+money(b.v)}</div></div>`;
+   }).join('');
+   billsHtml = `<div class="card" id="moneyBills"><div class="sectionhead"><h3>📅 Recurring & SIPs</h3><span class="pill" onclick="openSettings()" style="cursor:pointer">⚙️ Configure</span></div>${bList}</div>`;
+ }
+
  $('money').innerHTML=`<div class="minihero"><div class="label" style="color:#bfdbfe">${currentLabel()} financial position</div><div class="kpi ${net<0?'negative':''}">${money(net)}</div><div style="font-size:12px;color:#dbeafe;font-weight:750">Money In − Total Outgoing (Spends + Investment)</div></div>
+ ${funnelHtml}
+ ${billsHtml}
  <div class="card" id="moneyPosition"><div class="sectionhead"><h3>💼 Financial Position</h3><span class="pill">${currentLabel()}</span></div><div class="grid2"><div class="stat iconstat"><div class="ico blue">💰</div><div><b>${money(inc)}</b><span>Money In</span></div></div><div class="stat iconstat"><div class="ico orange">🧾</div><div><b>${money(sp)}</b><span>Spends</span></div></div><div class="stat iconstat"><div class="ico green">📈</div><div><b>${money(inv)}</b><span>Investment</span></div></div><div class="stat iconstat"><div class="ico purple">🧮</div><div><b>${money(net)}</b><span>Net</span></div></div></div></div>
  <div class="card" id="moneyChart"><div class="sectionhead"><h3>📊 Income vs Outgoing</h3><span class="pill">Green = Income · Red = Outgoing</span></div><div class="monthchart">${bars||`<div class="empty" style="grid-column:1/-1">${emptySVG()}<div style="margin-top:8px">No monthly data</div></div>`}</div><div id="chartTip" class="charttip">Tap a month column to display its values.</div></div>
  <div class="card" id="moneySummary"><div class="sectionhead"><h3>📅 Monthwise Summary</h3><span class="pill">Income · Spends · Inv · Out · CC</span></div><div class="monthsummary"><table class="data" style="width:100%;text-align:left"><tr><th>Month</th><th>Income</th><th>Spends</th><th>Inv</th><th>Total Out</th><th>CC Bills</th></tr>${rows||'<tr><td colspan="6" class="empty">No monthly data</td></tr>'}</table></div></div>`;
  applyScreenSectionOrder('money');
 }
+
 function showChartValue(m,I,O){let e=$('chartTip');if(e)e.innerHTML=`<b style="font-size:13px">${esc(monthName(m))}</b> · <span style="color:var(--green);font-weight:800">In ${money(I)}</span> · <span style="color:var(--red);font-weight:800">Out ${money(O)}</span>`}
 function renderCC(){let rs=scopedRows('CC Bill'),cards={};rs.forEach(r=>{let k=r.accountCard||r.category||'Unspecified';cards[k]=(cards[k]||0)+Number(r.amount||0)});let names=Object.keys(cards).sort((a,b)=>cards[b]-cards[a]),grand=sum(rs),tiles=names.map((n,i)=>'<div class="cardtile tile'+(i%6+1)+'"><h4>💳 '+esc(n)+'</h4><div class="amount">'+money(cards[n])+'</div><small>'+currentLabel()+'</small></div>').join('');let months=monthKeys().slice(-9),mx=Math.max(...months.map(m=>sum(DATA.rows.filter(r=>r.type==='CC Bill'&&r.date.startsWith(m)))),1),bars=months.map(m=>{let v=sum(DATA.rows.filter(r=>r.type==='CC Bill'&&r.date.startsWith(m)));return '<div class="mcol"><div class="mval">'+money(v)+'</div><div class="mbar" style="height:'+Math.max(5,v/mx*110)+'px"></div><div class="mlab">'+monthName(m).split(' ')[0]+'</div></div>'}).join('');let cols=['#2563eb','#06b6d4','#22c55e','#f59e0b','#9333ea','#ec4899'],share=names.map((n,i)=>((cards[n]/(grand||1))*360)+'deg '+cols[i%cols.length]).join(',');let start=0,stops=names.map((n,i)=>{let e=start+(cards[n]/(grand||1))*360;let x=cols[i%cols.length]+' '+start+'deg '+e+'deg';start=e;return x}).join(',');let legend=names.map((n,i)=>'<div class="legendrow"><span><i class="dot" style="background:'+cols[i%cols.length]+'"></i>'+esc(n)+'</span><b>'+money(cards[n])+'</b></div>').join('');$('cc').innerHTML=`<div class="minihero"><div class="label" style="color:#bfdbfe">${globalView==='overall'?'Overall card position':globalView==='period'?'Period card position':'Credit-card position'}</div><div class="kpi">${money(grand)}</div><div style="font-size:12px;color:#dbeafe;font-weight:750">${names.length} card${names.length===1?'':'s'} with bill data</div></div><div class="card" id="ccCards"><div class="sectionhead"><h3>💳 Your Cards</h3><button class="primary" onclick="openAdd('cc')">＋ Add</button></div><div class="grid2">${tiles||`<div class="empty" style="grid-column:1/-1">${emptySVG()}<div style="margin-top:8px">No credit-card bills in this view.</div></div>`}</div></div><div class="card" id="ccTrend"><div class="sectionhead"><h3>📈 Monthly Bill Trend</h3><span class="pill">Last 9 months</span></div><div class="monthchart">${bars}</div></div><div class="card" id="ccShare"><div class="sectionhead"><h3>🏆 Card Share</h3><span class="pill">'+names.length+' cards</span></div><div class="donutwrap"><div class="donut" style="background:conic-gradient(${stops||'var(--stat-border) 0deg 360deg'})"><span>${names.length}<small style="font-size:10px;display:block">cards</small></span></div><div class="legend">${legend||`<div class="empty">No data</div>`}</div></div></div><div class="card" id="ccHistory"><div class="sectionhead"><h3>🗓️ Bill History</h3><span class="pill">Swipe left to delete</span></div>${txRows(rs.sort((a,b)=>b.date.localeCompare(a.date)||b.row-a.row))}</div>`}
 function renderTransfers(){
@@ -639,7 +617,7 @@ function exportCSV() {
 }
 
 function renderMore(){let s=mergedSettings();$('more').innerHTML=`<div class="card" id="moreMain"><h2>••• More</h2><div class="listrow" onclick="go('income')"><div><div class="title">💰 Income</div><div class="meta">View and add income entries</div></div><b>›</b></div><div class="listrow" onclick="go('investment')"><div><div class="title">📈 Investment</div><div class="meta">View and add investment entries</div></div><b>›</b></div><div class="listrow" onclick="go('cc')"><div><div class="title">💳 Credit Cards</div><div class="meta">View card bills and card history</div></div><b>›</b></div><div class="listrow" onclick="go('transfers')"><div><div class="title">↔️ Transfers</div><div class="meta">View ATM and personal transfers</div></div><b>›</b></div><div class="listrow" onclick="exportCSV()"><div><div class="title">📥 Export to CSV</div><div class="meta">Download full transaction sheet to device</div></div><b>›</b></div><div class="listrow" onclick="openSettings()"><div><div class="title">⚙️ Settings</div><div class="meta">Customize tabs, sections, dropdowns and PIN</div></div><b>›</b></div><div class="listrow" onclick="refresh()"><div><div class="title">↻ Refresh Data</div><div class="meta">Reload directly from Google Sheet master</div></div><b>›</b></div></div><div class="card" id="moreMaster"><h3>Master Data</h3><div class="notice"><b>Transactions</b> is the single master ledger. Every screen reads the same rows. App settings and dropdown choices are shared across the family.</div></div>`}
-function mergedSettings(){let o=Array.isArray(SETTINGS.tabOrder)?SETTINGS.tabOrder.slice():DEFAULT_TAB_ORDER.slice();if(!o.includes('cc')){let mi=o.indexOf('more');if(mi<0)o.push('cc');else o.splice(mi,0,'cc')}if(!o.includes('transfers')){let mi=o.indexOf('more');if(mi<0)o.push('transfers');else o.splice(mi,0,'transfers')}return {title:SETTINGS.title||'My Expense Analyzer',budget:SETTINGS.budget||'',swipeTabs:SETTINGS.swipeTabs!==false,swipeRows:SETTINGS.swipeRows!==false,tabs:{home:true,spends:true,income:true,investment:true,money:true,cc:true,transfers:true,more:true,...(SETTINGS.tabs||{})},tabOrder:o,sections:{secBudget:true,secSnapshot:true,secAccount:true,secMonth:true,secCategory:true,secRecent:true,...(SETTINGS.sections||{})},sectionOrders:SETTINGS.sectionOrders||{}}}
+function mergedSettings(){let o=Array.isArray(SETTINGS.tabOrder)?SETTINGS.tabOrder.slice():DEFAULT_TAB_ORDER.slice();if(!o.includes('cc')){let mi=o.indexOf('more');if(mi<0)o.push('cc');else o.splice(mi,0,'cc')}if(!o.includes('transfers')){let mi=o.indexOf('more');if(mi<0)o.push('transfers');else o.splice(mi,0,'transfers')}return {title:SETTINGS.title||'My Expense Analyzer',budget:SETTINGS.budget||'',bills:SETTINGS.bills||'',swipeTabs:SETTINGS.swipeTabs!==false,swipeRows:SETTINGS.swipeRows!==false,tabs:{home:true,spends:true,income:true,investment:true,money:true,cc:true,transfers:true,more:true,...(SETTINGS.tabs||{})},tabOrder:o,sections:{secBudget:true,secSnapshot:true,secAccount:true,secSettlement:true,secMonth:true,secCategory:true,secRecent:true,moneyFunnel:true,moneyBills:true,...(SETTINGS.sections||{})},sectionOrders:SETTINGS.sectionOrders||{}}}
 function sectionOrderFor(screen){let d=(SECTION_META[screen]||[]).map(x=>x[0]), saved=mergedSettings().sectionOrders[screen]||[];return [...saved.filter(x=>d.includes(x)),...d.filter(x=>!saved.includes(x))]}
 function applyScreenSectionOrder(screen){let el=$(screen);if(!el)return;let order=sectionOrderFor(screen);let nodes=order.map(id=>$(id)).filter(x=>x&&x.parentElement===el);nodes.forEach(n=>el.appendChild(n));if(screen==='home')applyHomeSections()}
 function applyAllSectionOrders(){Object.keys(SECTION_META).forEach(applyScreenSectionOrder)}
@@ -661,7 +639,16 @@ function syncTabVisibility(){let s=mergedSettings();document.querySelectorAll('[
 function moveTab(id,dir){let s=syncTabVisibility(),a=s.tabOrder.slice(),i=a.indexOf(id),j=i+dir;if(i<0||j<0||j>=a.length)return;[a[i],a[j]]=[a[j],a[i]];s.tabOrder=a;SETTINGS=s;renderTabSettings();renderNav();go(currentScreen);}
 function moveSection(screen,id,dir){let s=mergedSettings(),a=sectionOrderFor(screen),i=a.indexOf(id),j=i+dir;if(i<0||j<0||j>=a.length)return;[a[i],a[j]]=[a[j],a[i]];s.sectionOrders[screen]=a;SETTINGS=s;renderSectionOrderUI();applyScreenSectionOrder(screen)}
 function openQuick(){$('quickModal').classList.add('show')}function closeQuick(){$('quickModal').classList.remove('show')}
-function openAdd(mode,row=null){entryMode=mode;editRow=row;$('entryModal').classList.add('show');$('entryTitle').textContent=(row?'Edit ':'Add ')+({spend:'Spend',income:'Income',investment:'Investment / Saving',cc:'Credit Card Bill',transfer:'Transfer'}[mode]||'Entry');$('deleteBtn').classList.toggle('hidden',!row);resetForm();let r=row?DATA.rows.find(x=>x.row===row):null;if(r){$('fDate').value=r.date;$('fAmount').value=r.amount;$('fAccount').value=r.account;$('fType').value=r.type;$('fCategory').value=r.category;$('fSubcategory').value=r.subcategory;$('fNeed').value=r.need;$('fPayment').value=r.payment;$('fCard').value=r.accountCard;$('fBillMonth').value=r.billMonth;$('fDesc').value=r.description}else{$('fDate').value=today();$('fBillMonth').value=activeMonth||monthNow();let types={spend:'Spend',income:'Income',investment:'Investment',cc:'CC Bill'};if(mode==='transfer'){$('fType').value='Personal Transfer';$('fCategory').value='';$('fDesc').value='Transfer'}else{$('fType').value=types[mode];if(mode==='income')$('fCategory').value='Income';if(mode==='investment')$('fCategory').value='Investment';if(mode==='cc'){$('fCategory').value='Credit Card Bill';$('fSubcategory').value='Monthly Bill';$('fDesc').value='Credit Card Bill'}}}}
+
+function duplicateEntry() {
+  editRow = null;
+  $('deleteBtn').classList.add('hidden'); $('duplicateBtn').classList.add('hidden');
+  $('entryTitle').textContent = 'Duplicate Entry';
+  $('fDate').value = today();
+  toast('Details copied. Tap Save to log it to today.');
+}
+
+function openAdd(mode,row=null){entryMode=mode;editRow=row;$('entryModal').classList.add('show');$('entryTitle').textContent=(row?'Edit ':'Add ')+({spend:'Spend',income:'Income',investment:'Investment / Saving',cc:'Credit Card Bill',transfer:'Transfer'}[mode]||'Entry');$('deleteBtn').classList.toggle('hidden',!row);$('duplicateBtn').classList.toggle('hidden',!row);resetForm();let r=row?DATA.rows.find(x=>x.row===row):null;if(r){$('fDate').value=r.date;$('fAmount').value=r.amount;$('fAccount').value=r.account;$('fType').value=r.type;$('fCategory').value=r.category;$('fSubcategory').value=r.subcategory;$('fNeed').value=r.need;$('fPayment').value=r.payment;$('fCard').value=r.accountCard;$('fBillMonth').value=r.billMonth;$('fDesc').value=r.description}else{$('fDate').value=today();$('fBillMonth').value=activeMonth||monthNow();let types={spend:'Spend',income:'Income',investment:'Investment',cc:'CC Bill'};if(mode==='transfer'){$('fType').value='Personal Transfer';$('fCategory').value='';$('fDesc').value='Transfer'}else{$('fType').value=types[mode];if(mode==='income')$('fCategory').value='Income';if(mode==='investment')$('fCategory').value='Investment';if(mode==='cc'){$('fCategory').value='Credit Card Bill';$('fSubcategory').value='Monthly Bill';$('fDesc').value='Credit Card Bill'}}}}
 function resetForm(){$('fDate').value=today();$('fAmount').value='';$('fDesc').value='';$('fBillMonth').value=activeMonth||monthNow();['fAccount','fType','fCategory','fSubcategory','fNeed','fPayment','fCard'].forEach(id=>$(id).value='')}
 function closeModal(){$('entryModal').classList.remove('show');editRow=null}
 function saveEntry(){let raw=String($('fAmount').value??'').trim().replace(/,/g,'');if(raw===''){toast('Enter an amount');return}let amount=Number(raw);if(!Number.isFinite(amount)){toast('Enter a valid number');return}let typeVal = $('fType').value;let d={row:editRow,date:$('fDate').value,amount:amount,account:$('fAccount').value,type:typeVal,category:$('fCategory').value,subcategory:$('fSubcategory').value,need:$('fNeed').value,payment:$('fPayment').value,accountCard:$('fCard').value,billMonth:$('fBillMonth').value,description:$('fDesc').value};let ok=()=>{closeModal();refresh();toast('Saved ✓'); if(!editRow && (typeVal === 'Investment' || typeVal === 'CC Bill' || typeVal === 'Income')) triggerConfetti(); };if(editRow)google.script.run.withSuccessHandler(ok).withFailureHandler(showErr).updateTransaction(d,authToken);else google.script.run.withSuccessHandler(ok).withFailureHandler(showErr).saveTransaction(d,authToken)}
@@ -704,7 +691,7 @@ function renderSectionOrderUI(){let s=mergedSettings(),sel=$('sectionOrderTab');
 
 function openSettings(){
   let s=mergedSettings();
-  $('setTitle').value=s.title; $('setBudget').value=s.budget;
+  $('setTitle').value=s.title; $('setBudget').value=s.budget; $('setBills').value=s.bills;
   $('setDarkMode').checked = document.body.classList.contains('dark-mode');
   $('setSwipeTabs').checked = s.swipeTabs; $('setSwipeRows').checked = s.swipeRows;
   
@@ -716,7 +703,7 @@ function openSettings(){
 function closeSettings(){$('settingsModal').classList.remove('show')}
 function saveSettingsUI(){
   let s=mergedSettings();
-  s.title=$('setTitle').value.trim()||'My Expense Analyzer'; s.budget=$('setBudget').value.trim();
+  s.title=$('setTitle').value.trim()||'My Expense Analyzer'; s.budget=$('setBudget').value.trim(); s.bills=$('setBills').value.trim();
   s.swipeTabs=$('setSwipeTabs').checked; s.swipeRows=$('setSwipeRows').checked;
   document.querySelectorAll('[data-layout-tab]').forEach(x=>s.tabs[x.dataset.layoutTab]=x.checked);
   google.script.run.withSuccessHandler(v=>{SETTINGS=v||s;applySettings();closeSettings();toast('Settings saved ✓')}).withFailureHandler(showErr).saveSettings(s,authToken)
@@ -727,7 +714,7 @@ function addManagedOption(field,idx){let e=$('addOpt_'+idx),v=(e&&e.value||'').t
 function renameManagedOption(field,idx){let inputs=document.querySelectorAll('[data-opt-field="'+CSS.escape(field)+'"]');let input=inputs[idx],nv=(input&&input.value||'').trim(),vals=[...(DATA.options[field]||[])];if(!input||!nv||!vals[idx])return;if(nv===vals[idx]){toast('No change');return}if(vals.some((x,i)=>i!==idx&&x.toLowerCase()===nv.toLowerCase())){toast('Already exists');return}let old=vals[idx];vals[idx]=nv;google.script.run.withSuccessHandler(d=>{DATA.options[field]=d.options[field]||vals;buildForms();renderOptionManager();refresh();toast(old+' → '+nv)}).withFailureHandler(showErr).renameOption(field,old,nv,authToken)}
 function deleteManagedOption(field,idx){let vals=[...(DATA.options[field]||[])],old=vals[idx];if(!old)return;if(!confirm('Remove "'+old+'" from future dropdown choices? Existing transactions are kept.'))return;vals.splice(idx,1);persistManagedOptions(field,vals)}
 function changePinUI(){let old=$('oldPinChange').value.trim(),nw=$('newPinChange').value.trim(),cf=$('confirmPinChange').value.trim();if(!/^\d{4,6}$/.test(old)||!/^[0-9]{4,6}$/.test(nw)){toast('PIN must be 4–6 digits');return}if(nw!==cf){toast('New PINs do not match');return}google.script.run.withSuccessHandler(()=>{['oldPinChange','newPinChange','confirmPinChange'].forEach(id=>$(id).value='');toast('PIN changed ✓')}).withFailureHandler(showErr).changeAppPin(old,nw,authToken)}
-function resetSettings(){let d={title:'My Expense Analyzer',budget:'',swipeTabs:true,swipeRows:true,tabs:{home:true,spends:true,income:true,investment:true,money:true,cc:true,transfers:true,more:true},tabOrder:DEFAULT_TAB_ORDER.slice(),sectionOrders:{},sections:{secBudget:true,secSnapshot:true,secAccount:true,secMonth:true,secCategory:true,secRecent:true}};google.script.run.withSuccessHandler(v=>{SETTINGS=v||d;applySettings();openSettings();toast('Reset ✓')}).withFailureHandler(showErr).saveSettings(d,authToken)}
+function resetSettings(){let d={title:'My Expense Analyzer',budget:'',bills:'',swipeTabs:true,swipeRows:true,tabs:{home:true,spends:true,income:true,investment:true,money:true,cc:true,transfers:true,more:true},tabOrder:DEFAULT_TAB_ORDER.slice(),sectionOrders:{},sections:{secBudget:true,secSnapshot:true,secAccount:true,secSettlement:true,secMonth:true,secCategory:true,secRecent:true,moneyFunnel:true,moneyBills:true}};google.script.run.withSuccessHandler(v=>{SETTINGS=v||d;applySettings();openSettings();toast('Reset ✓')}).withFailureHandler(showErr).saveSettings(d,authToken)}
 function showErr(e){alert(e&&e.message?e.message:String(e))}function toast(t){$('toast').textContent=t;$('toast').style.display='block';setTimeout(()=>$('toast').style.display='none',2000)}
 window.onload=function(){
   if(localStorage.getItem('theme') === 'dark') document.body.classList.add('dark-mode');
