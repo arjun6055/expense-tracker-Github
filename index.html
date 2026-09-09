@@ -8,7 +8,7 @@
 <meta name="theme-color" content="#101a2c">
 
 <style>
-/* V4.2 DYNAMIC CSS VARIABLE ENGINE & RECURRING INSIGHTS */
+/* V4.3 DYNAMIC CSS VARIABLE ENGINE & DUPLICATE LOGIC */
 :root {
   --bg: #f4f7fb; --card: #ffffff; --ink: #152238; --muted: #718096; --line: #e7ecf3; --dark: #101a2c;
   --blue: #2563eb; --cyan: #06b6d4; --green: #16a34a; --orange: #f59e0b; --pink: #ec4899; --purple: #7c3aed; --red: #dc2626;
@@ -46,16 +46,9 @@ input:focus,select:focus,textarea:focus{outline:3px solid #2563eb25;outline-offs
 .hero .stat{background:#ffffff14;border-color:#ffffff22}
 
 .stat b, .cardtile .amount, .focusstat b {
-    display: block !important;
-    font-size: clamp(14px, 4.5vw, 21px) !important;
-    font-weight: 900 !important;
-    line-height: 1.2 !important;
-    letter-spacing: -0.6px !important;
-    white-space: nowrap !important;
-    word-break: keep-all !important;
-    overflow-wrap: normal !important;
-    text-overflow: clip !important;
-    overflow: visible !important;
+    display: block !important; font-size: clamp(14px, 4.5vw, 21px) !important; font-weight: 900 !important;
+    line-height: 1.2 !important; letter-spacing: -0.6px !important; white-space: nowrap !important;
+    word-break: keep-all !important; overflow-wrap: normal !important; text-overflow: clip !important; overflow: visible !important;
 }
 
 .stat span{display:block;color:var(--muted);font-size:11px;margin-top:4px;line-height:1.35;white-space:normal}.hero .stat span{color:#dbeafe}
@@ -111,7 +104,6 @@ textarea{min-height:90px;resize:vertical}.row{display:grid;grid-template-columns
 .monthbar select{padding:12px;height:52px;border-radius:16px}.periodbar{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
 .viewhint{text-align:center;font-size:11px;color:var(--muted);padding-top:10px;font-weight:750}
 
-/* NAV */
 .nav{position:fixed;bottom:0;left:0;right:0;background:var(--nav-bg);border-top:1px solid var(--line);z-index:30;box-shadow:0 -12px 35px rgba(0,0,0,.06);padding-bottom:calc(25px + env(safe-area-inset-bottom));overflow-x:auto;overflow-y:hidden;scrollbar-width:none;-webkit-overflow-scrolling:touch}
 .nav::-webkit-scrollbar{display:none}
 .navin{min-width:100%;width:max-content;margin:0 auto;display:grid;gap:4px;padding:8px 6px}
@@ -147,27 +139,13 @@ textarea{min-height:90px;resize:vertical}.row{display:grid;grid-template-columns
 }
 
 @media(max-width:520px){
-    .phone-device .iconstat {
-        flex-direction: column !important; align-items: flex-start !important; padding: 14px 12px !important; gap: 6px !important;
-    }
-    .phone-device .iconstat .ico {
-        width: 36px !important; min-width: 36px !important; height: 36px !important; font-size: 18px !important; margin-bottom: 2px !important;
-    }
-    .phone-device .iconstat b {
-        font-size: clamp(14px, 4.8vw, 19px) !important; letter-spacing: -0.6px !important; width: 100% !important; overflow: visible !important;
-    }
-    .phone-device .focusstat {
-        flex-direction: column !important; align-items: flex-start !important; text-align: left !important; padding: 16px 12px !important; gap: 8px !important;
-    }
-    .phone-device .focusstat .ico {
-        width: 44px !important; min-width: 44px !important; height: 44px !important; font-size: 22px !important;
-    }
-    .phone-device .focusstat > div:last-child {
-        align-items: flex-start !important; text-align: left !important; width: 100% !important; overflow: visible !important;
-    }
-    .phone-device .focusstat b {
-        font-size: clamp(16px, 5.5vw, 22px) !important; letter-spacing: -0.6px !important; width: 100% !important; text-align: left !important; overflow: visible !important;
-    }
+    .phone-device .iconstat { flex-direction: column !important; align-items: flex-start !important; padding: 14px 12px !important; gap: 6px !important; }
+    .phone-device .iconstat .ico { width: 36px !important; min-width: 36px !important; height: 36px !important; font-size: 18px !important; margin-bottom: 2px !important; }
+    .phone-device .iconstat b { font-size: clamp(14px, 4.8vw, 19px) !important; letter-spacing: -0.6px !important; width: 100% !important; overflow: visible !important; }
+    .phone-device .focusstat { flex-direction: column !important; align-items: flex-start !important; text-align: left !important; padding: 16px 12px !important; gap: 8px !important; }
+    .phone-device .focusstat .ico { width: 44px !important; min-width: 44px !important; height: 44px !important; font-size: 22px !important; }
+    .phone-device .focusstat > div:last-child { align-items: flex-start !important; text-align: left !important; width: 100% !important; overflow: visible !important; }
+    .phone-device .focusstat b { font-size: clamp(16px, 5.5vw, 22px) !important; letter-spacing: -0.6px !important; width: 100% !important; text-align: left !important; overflow: visible !important; }
 }
 
 /* PIN Screen */
@@ -253,7 +231,12 @@ const google = {
  <div class="row"><div class="field"><label>Need</label><select id="fNeed"></select></div><div class="field"><label>Payment Mode</label><select id="fPayment"></select></div></div>
  <div class="row"><div class="field"><label>Payment Source (Bank/Card)</label><select id="fCard"></select></div><div class="field"><label>Bill Month</label><input type="month" id="fBillMonth"></div></div>
  <div class="field"><label>Description / Remarks</label><textarea id="fDesc"></textarea></div>
- <div class="actionline"><button class="redbtn hidden" id="deleteBtn" onclick="deleteEntryFromModal()">Delete</button><button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveEntry()">Save</button></div>
+ <div class="actionline">
+   <button class="redbtn hidden" id="deleteBtn" onclick="deleteEntryFromModal()">Delete</button>
+   <button class="secondary hidden" id="dupBtn" onclick="duplicateEntryFromModal()">Copy</button>
+   <button class="secondary" onclick="closeModal()">Cancel</button>
+   <button class="primary" onclick="saveEntry()">Save</button>
+ </div>
  </div></div>
 
 <div class="modal" id="settingsModal"><div class="sheet"><button class="secondary close" onclick="closeSettings()">Close</button><h2>⚙️ Settings</h2><p class="mini">Customize the app without editing the Google Sheet. Changes are shared across the family app.</p>
@@ -263,7 +246,7 @@ const google = {
    <h3>📱 Device Preferences</h3><p class="manage-note">These specific options save only to your local phone.</p>
    <div class="settingrow"><span>🌙 Dark Mode</span><label class="switch"><input type="checkbox" id="setDarkMode" onchange="toggleDarkMode(this.checked)"><span class="slider"></span></label></div>
    <div class="settingrow"><span>👆 Swipe to change tabs</span><label class="switch"><input type="checkbox" id="setSwipeTabs"><span class="slider"></span></label></div>
-   <div class="settingrow"><span>↔️ Swipe rows to Edit/Delete</span><label class="switch"><input type="checkbox" id="setSwipeRows"><span class="slider"></span></label></div>
+   <div class="settingrow"><span>↔️ Swipe rows to Edit/Copy</span><label class="switch"><input type="checkbox" id="setSwipeRows"><span class="slider"></span></label></div>
    <div class="settingrow"><span>🔓 Fingerprint / Biometric Bypass</span><button class="secondary" id="bioSetupBtn" onclick="setupBiometrics()" style="padding:8px 12px;font-size:12px">Setup</button><button class="redbtn hidden" id="bioRemoveBtn" onclick="removeBiometrics()" style="padding:8px 12px;font-size:12px">Disable</button></div>
  </div>
 
@@ -386,7 +369,7 @@ function triggerConfetti() {
   }
 }
 
-// V4.2 GESTURE ENGINE
+// V4.3 GESTURE ENGINE (With Duplicate action on Swipe Right)
 let touchStartX = null, touchStartY = null;
 document.addEventListener('touchstart', e => {
   if (e.touches.length > 1) return;
@@ -434,7 +417,7 @@ function txTouchEnd(e, el, rowId) {
   if(SETTINGS.swipeRows === false || !txTouchX) return;
   let dx = e.changedTouches[0].clientX - txTouchX;
   el.style.transition = 'transform 0.2s cubic-bezier(.2,.8,.2,1)';
-  if(dx > 60) { el.style.transform = 'translateX(0)'; editTx(rowId); } 
+  if(dx > 60) { el.style.transform = 'translateX(0)'; duplicateTx(rowId); } 
   else if (dx < -60) { el.style.transform = 'translateX(0)'; quickDelete(rowId); } 
   else { el.style.transform = 'translateX(0)'; }
   txTouchX = null;
@@ -491,6 +474,7 @@ function emptySVG() {
 }
 
 function txRows(rs) {
+  let swipeInfo = SETTINGS.swipeRows === false ? 'Tap to edit' : 'Swipe ➡️ Copy | ⬅️ Delete';
   if(!rs.length) return `<div class="empty">${emptySVG()}<div style="margin-top:12px;font-weight:800;color:var(--ink)">No matching entries</div><div style="font-size:11px;margin-top:4px">Tap + Add to create one</div></div>`;
   let groups = {}; rs.forEach(r => { if(!groups[r.date]) groups[r.date] = []; groups[r.date].push(r); });
   let html = '';
@@ -504,7 +488,7 @@ function txRows(rs) {
 function txHtml(r){
   let c = r.category || r.type || 'Transaction';
   return `<div class="swipe-wrap">
-    <div class="swipe-bg"><div style="background:var(--green)">Edit</div><div style="background:var(--red)">Delete</div></div>
+    <div class="swipe-bg"><div style="background:var(--blue)">Copy</div><div style="background:var(--red)">Delete</div></div>
     <div class="swipe-fg listrow txclick" ontouchstart="txTouchStart(event, this)" ontouchmove="txTouchMove(event, this)" ontouchend="txTouchEnd(event, this, ${r.row})" onclick="editTx(${r.row})">
       <div class="catrow"><div class="caticon ${catBg(c)}">${catIcon(c)}</div><div class="catname"><div class="title">${esc(r.description||c)}</div><div class="meta">${esc(r.type)} · ${esc(c)}${r.account?' · '+esc(r.account):''}${r.accountCard?' · '+esc(r.accountCard):''}</div></div></div>
       <div class="amt">${money(r.amount)}</div>
@@ -552,7 +536,9 @@ function renderSpends(){
   let rs=spendFilteredRows();
   let q=($('spSearch')?.value||'').toLowerCase(),a=$('spAccount')?.value||'',c=$('spCategory')?.value||'',n=$('spNeed')?.value||'',sort=$('spSort')?.value||'new';
   let isFiltered = (q || a || c || n || sort !== 'new');
-  let clearBtnHtml = isFiltered ? `<button class="secondary" onclick="clearFilters()" style="padding:10px 14px; border-radius:99px; color:var(--red); font-weight:850; border:1px solid #fee2e2">✖ Clear</button>` : '';
+  let clearBtnHtml = isFiltered ? `<button onclick="clearFilters()" style="background:#fee2e2; color:#991b1b; padding:10px 14px; border-radius:99px; font-size:13px; font-weight:850">✖ Clear</button>` : '';
+
+  let swipeInfo = SETTINGS.swipeRows === false ? 'Tap to edit' : 'Swipe ➡️ Copy | ⬅️ Delete';
 
   $('spends').innerHTML=`
   <div class="card" id="spendFilters" style="position:sticky; top:8px; z-index:20; padding-bottom:14px; margin-bottom:14px; box-shadow:0 15px 35px var(--bg);">
@@ -575,7 +561,7 @@ function renderSpends(){
     </div>
   </div>
   <div class="card" id="spendTx">
-    <div class="sectionhead"><h3>Transactions</h3><span class="pill">Swipe left to delete</span></div>
+    <div class="sectionhead"><h3>Transactions</h3><span class="pill">${swipeInfo}</span></div>
     <div id="spTxList">${txRows(rs)}</div>
   </div>`;
 }
@@ -660,28 +646,39 @@ function renderTransfers(){
   </div>`;
 }
 
+// V4.1 ALGORITHMIC INSIGHTS
 function renderInsights() {
   let rs = scopedRows('Spend'); 
   let bud = Number(SETTINGS.budget) || 0;
   let d = new Date();
+  
+  // Logic Fix: Only calculate Burn Rate and Anomalies if viewing exactly ONE specific month.
   let isMonthlyView = globalView === 'monthly';
   let isCurrentMonth = isMonthlyView && (activeMonth === d.toISOString().slice(0,7));
   
   let burnHtml = '';
+  
   if(bud > 0 && isCurrentMonth) {
     let daysInMonth = new Date(d.getFullYear(), d.getMonth()+1, 0).getDate();
     let currentDay = d.getDate() || 1;
-    let sp = sum(rs); let projected = (sp / currentDay) * daysInMonth; let diff = bud - projected;
+    let sp = sum(rs);
+    let projected = (sp / currentDay) * daysInMonth;
+    let diff = bud - projected;
     let status = diff >= 0 ? 'under budget' : 'over budget';
     let color = diff >= 0 ? 'var(--green)' : 'var(--red)';
     burnHtml = `<div class="card"><div class="sectionhead"><h3>⏱️ Predictive Burn Rate</h3></div>
-      <p style="font-size:14px;color:var(--muted);line-height:1.5;margin:0">At your current velocity of <b>${money(sp/currentDay)}</b>/day, you are projected to spend <b style="color:var(--ink)">${money(projected)}</b> this month. You are tracking <b style="color:${color}">${money(Math.abs(diff))} ${status}</b>.</p></div>`;
+      <p style="font-size:14px;color:var(--muted);line-height:1.5;margin:0">At your current velocity of <b>${money(sp/currentDay)}</b>/day, you are projected to spend <b style="color:var(--ink)">${money(projected)}</b> this month. You are tracking <b style="color:${color}">${money(Math.abs(diff))} ${status}</b>.</p>
+    </div>`;
   } else if (bud > 0 && isMonthlyView) {
     burnHtml = `<div class="card"><div class="sectionhead"><h3>⏱️ Budget Performance</h3></div>
-      <p style="font-size:14px;color:var(--muted);line-height:1.5;margin:0">You spent <b>${money(sum(rs))}</b> against a budget of <b>${money(bud)}</b>.</p></div>`;
+      <p style="font-size:14px;color:var(--muted);line-height:1.5;margin:0">You spent <b>${money(sum(rs))}</b> against a budget of <b>${money(bud)}</b>.</p>
+    </div>`;
   } else if (bud > 0) {
     burnHtml = `<div class="card"><div class="sectionhead"><h3>⏱️ Budget Tracking</h3></div>
-      <p style="font-size:14px;color:var(--muted);line-height:1.5;margin:0">In this view, total spends are <b>${money(sum(rs))}</b>. (Your monthly budget target is <b>${money(bud)}</b>).</p></div>`;
+      <p style="font-size:14px;color:var(--muted);line-height:1.5;margin:0">In this view, total spends are <b>${money(sum(rs))}</b>. (Your monthly budget target is <b>${money(bud)}</b>).</p>
+    </div>`;
+  } else {
+    burnHtml = `<div class="card"><div class="sectionhead"><h3>⏱️ Predictive Burn Rate</h3></div><p style="font-size:13px;color:var(--muted);margin:0">Set a Monthly Budget in Settings for predictive insights.</p></div>`;
   }
 
   let anomalyHtml = '';
@@ -692,6 +689,7 @@ function renderInsights() {
       let prevD = new Date(y, m-2, 1);
       let prevMonth = prevD.getFullYear() + '-' + String(prevD.getMonth()+1).padStart(2,'0');
       let prevRs = DATA.rows.filter(r => r.type === 'Spend' && String(r.date).startsWith(prevMonth));
+      
       let prevCat = {}; prevRs.forEach(r => prevCat[r.category] = (prevCat[r.category]||0) + Number(r.amount));
       
       let anomalies = [];
@@ -704,7 +702,9 @@ function renderInsights() {
       if(anomalies.length) anomalyHtml = `<div class="card"><div class="sectionhead"><h3>📈 Spending Spikes</h3></div><ul style="margin:0;padding-left:18px;font-size:14px;color:var(--muted);line-height:1.6">` + anomalies.map(a => `<li style="margin-bottom:8px">${a}</li>`).join('') + `</ul></div>`;
   } else {
       let topCats = Object.entries(curCat).sort((a,b)=>b[1]-a[1]).slice(0,3);
-      if(topCats.length) anomalyHtml = `<div class="card"><div class="sectionhead"><h3>📈 Top Categories</h3></div><ul style="margin:0;padding-left:18px;font-size:14px;color:var(--muted);line-height:1.6">` + topCats.map(c => `<li style="margin-bottom:8px"><b>${esc(c[0])}</b>: ${money(c[1])}</li>`).join('') + `</ul></div>`;
+      if(topCats.length) {
+         anomalyHtml = `<div class="card"><div class="sectionhead"><h3>📈 Top Categories</h3></div><ul style="margin:0;padding-left:18px;font-size:14px;color:var(--muted);line-height:1.6">` + topCats.map(c => `<li style="margin-bottom:8px"><b>${esc(c[0])}</b>: ${money(c[1])}</li>`).join('') + `</ul></div>`;
+      }
   }
 
   let drainerHtml = '';
@@ -717,7 +717,8 @@ function renderInsights() {
       <ul style="margin:0;padding-left:18px;font-size:14px;color:var(--muted);line-height:1.6">
         <li style="margin-bottom:8px">Largest single spend: <b>${money(topTx.amount)}</b> at ${esc(topTx.description||topTx.category)}.</li>
         <li style="margin-bottom:8px"><b>${nonPct}%</b> of categorized spends are marked as Non-Essential.</li>
-      </ul></div>`;
+      </ul>
+     </div>`;
   }
   
   let familyHtml = '';
@@ -770,7 +771,34 @@ function syncTabVisibility(){let s=mergedSettings();document.querySelectorAll('[
 function moveTab(id,dir){let s=syncTabVisibility(),a=s.tabOrder.slice(),i=a.indexOf(id),j=i+dir;if(i<0||j<0||j>=a.length)return;[a[i],a[j]]=[a[j],a[i]];s.tabOrder=a;SETTINGS=s;renderTabSettings();renderNav();go(currentScreen);}
 function moveSection(screen,id,dir){let s=mergedSettings(),a=sectionOrderFor(screen),i=a.indexOf(id),j=i+dir;if(i<0||j<0||j>=a.length)return;[a[i],a[j]]=[a[j],a[i]];s.sectionOrders[screen]=a;SETTINGS=s;renderSectionOrderUI();applyScreenSectionOrder(screen)}
 function openQuick(){$('quickModal').classList.add('show')}function closeQuick(){$('quickModal').classList.remove('show')}
-function openAdd(mode,row=null){entryMode=mode;editRow=row;$('entryModal').classList.add('show');$('entryTitle').textContent=(row?'Edit ':'Add ')+({spend:'Spend',income:'Income',investment:'Investment / Saving',cc:'Credit Card Bill',transfer:'Transfer'}[mode]||'Entry');$('deleteBtn').classList.toggle('hidden',!row);resetForm();let r=row?DATA.rows.find(x=>x.row===row):null;if(r){$('fDate').value=r.date;$('fAmount').value=r.amount;$('fAccount').value=r.account;$('fType').value=r.type;$('fCategory').value=r.category;$('fSubcategory').value=r.subcategory;$('fNeed').value=r.need;$('fPayment').value=r.payment;$('fCard').value=r.accountCard;$('fBillMonth').value=r.billMonth;$('fDesc').value=r.description}else{$('fDate').value=today();$('fBillMonth').value=activeMonth||monthNow();let types={spend:'Spend',income:'Income',investment:'Investment',cc:'CC Bill'};if(mode==='transfer'){$('fType').value='Personal Transfer';$('fCategory').value='';$('fDesc').value='Transfer'}else{$('fType').value=types[mode];if(mode==='income')$('fCategory').value='Income';if(mode==='investment')$('fCategory').value='Investment';if(mode==='cc'){$('fCategory').value='Credit Card Bill';$('fSubcategory').value='Monthly Bill';$('fDesc').value='Credit Card Bill'}}}}
+
+function duplicateTx(rowId){
+    let r=DATA.rows.find(x=>x.row===rowId);if(!r)return;
+    let mode=r.type==='CC Bill'?'cc':(r.type==='ATM'||r.type==='Personal Transfer')?'transfer':r.type.toLowerCase();
+    openAdd(mode,rowId);
+    setTimeout(duplicateEntryFromModal, 50);
+}
+
+function duplicateEntryFromModal() {
+    if(!editRow) return;
+    editRow = null;
+    $('entryTitle').textContent = $('entryTitle').textContent.replace('Edit ', 'Copy ');
+    $('fDate').value = today();
+    $('deleteBtn').classList.add('hidden');
+    let db = $('dupBtn'); if(db) db.classList.add('hidden');
+    toast('Draft created. Edit and Save.');
+}
+
+function openAdd(mode,row=null){
+  entryMode=mode;editRow=row;$('entryModal').classList.add('show');$('entryTitle').textContent=(row?'Edit ':'Add ')+({spend:'Spend',income:'Income',investment:'Investment / Saving',cc:'Credit Card Bill',transfer:'Transfer'}[mode]||'Entry');
+  $('deleteBtn').classList.toggle('hidden',!row);
+  let db = $('dupBtn'); if(db) db.classList.toggle('hidden',!row);
+  resetForm();
+  let r=row?DATA.rows.find(x=>x.row===row):null;
+  if(r){$('fDate').value=r.date;$('fAmount').value=r.amount;$('fAccount').value=r.account;$('fType').value=r.type;$('fCategory').value=r.category;$('fSubcategory').value=r.subcategory;$('fNeed').value=r.need;$('fPayment').value=r.payment;$('fCard').value=r.accountCard;$('fBillMonth').value=r.billMonth;$('fDesc').value=r.description}
+  else{$('fDate').value=today();$('fBillMonth').value=activeMonth||monthNow();let types={spend:'Spend',income:'Income',investment:'Investment',cc:'CC Bill'};if(mode==='transfer'){$('fType').value='Personal Transfer';$('fCategory').value='';$('fDesc').value='Transfer'}else{$('fType').value=types[mode];if(mode==='income')$('fCategory').value='Income';if(mode==='investment')$('fCategory').value='Investment';if(mode==='cc'){$('fCategory').value='Credit Card Bill';$('fSubcategory').value='Monthly Bill';$('fDesc').value='Credit Card Bill'}}}
+}
+
 function resetForm(){$('fDate').value=today();$('fAmount').value='';$('fDesc').value='';$('fBillMonth').value=activeMonth||monthNow();['fAccount','fType','fCategory','fSubcategory','fNeed','fPayment','fCard'].forEach(id=>$(id).value='')}
 function closeModal(){$('entryModal').classList.remove('show');editRow=null}
 function saveEntry(){let raw=String($('fAmount').value??'').trim().replace(/,/g,'');if(raw===''){toast('Enter an amount');return}let amount=Number(raw);if(!Number.isFinite(amount)){toast('Enter a valid number');return}let typeVal = $('fType').value;let d={row:editRow,date:$('fDate').value,amount:amount,account:$('fAccount').value,type:typeVal,category:$('fCategory').value,subcategory:$('fSubcategory').value,need:$('fNeed').value,payment:$('fPayment').value,accountCard:$('fCard').value,billMonth:$('fBillMonth').value,description:$('fDesc').value};let ok=()=>{closeModal();refresh();toast('Saved ✓'); if(!editRow && (typeVal === 'Investment' || typeVal === 'CC Bill' || typeVal === 'Income')) triggerConfetti(); };if(editRow)google.script.run.withSuccessHandler(ok).withFailureHandler(showErr).updateTransaction(d,authToken);else google.script.run.withSuccessHandler(ok).withFailureHandler(showErr).saveTransaction(d,authToken)}
