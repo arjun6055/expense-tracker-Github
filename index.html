@@ -267,7 +267,8 @@ const google = {
 
 <div class="modal" id="entryModal"><div class="sheet"><button class="secondary close" onclick="closeModal()">Close</button><h2 id="entryTitle">Add Spend</h2>
  
- <input type="file" id="fReceipt" accept="image/*" capture="environment" style="display:none" onchange="handleReceiptUpload(this)">
+ <!-- Removed "capture=environment" to allow both Camera AND Files/Gallery -->
+ <input type="file" id="fReceipt" accept="image/*" style="display:none" onchange="handleReceiptUpload(this)">
  <div style="display:flex;gap:8px;margin-bottom:12px;">
    <button id="receiptBtn" class="cam-btn" style="margin-bottom:0;flex:1" onclick="document.getElementById('fReceipt').click()">📸 Attach Receipt Photo</button>
    <button id="delReceiptBtn" class="redbtn hidden" style="border-radius:16px;padding:0 16px;font-size:18px;" onclick="clearReceiptUI()" title="Remove Receipt">✖</button>
