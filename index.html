@@ -166,8 +166,6 @@ textarea{min-height:90px;resize:vertical}.row{display:grid;grid-template-columns
 .pinpad .pin-del{font-size:20px}.pin-unlock{width:100%;margin-top:16px;height:56px;border-radius:20px;background:var(--dark);color:#fff;font-size:17px;font-weight:900}.pin-msg{min-height:22px;margin-top:12px;color:var(--red);font-size:13px;font-weight:750}.pin-foot{font-size:11px!important;margin:14px 0 0!important;color:var(--muted)!important}
 body.pin-locked{overflow:hidden}
 
-/* --- ADDED LAYOUT FIXES START HERE --- */
-
 /* Fix for Money Table Overflow */
 .monthsummary { width: 100%; overflow-x: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch; padding-bottom: 8px; }
 .monthsummary::-webkit-scrollbar { display: none; }
@@ -188,7 +186,6 @@ body.pin-locked{overflow:hidden}
 .manage-note, .layout-note { font-size: 12px; color: var(--muted); margin: -4px 0 12px; line-height: 1.4; }
 .pin-change-box { margin-top: 24px; }
 
-/* --- ADDED LAYOUT FIXES END HERE --- */
 </style>
 <script>
 const SCRIPT_API_URL = "https://script.google.com/macros/s/AKfycbwnBVOVjMfGkd9bB8-qU6SvQ0z_KD9kMFCLm6qu20DA8K2ikm73qB8dpVRIx0sXX4Y/exec";
@@ -201,8 +198,26 @@ const google = {
           if (prop === 'withSuccessHandler') return (fn) => { onSuccess = fn; return runner; };
           if (prop === 'withFailureHandler') return (fn) => { onFailure = fn; return runner; };
           return (...args) => {
-            fetch(SCRIPT_API_URL, { redirect: "follow", method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ action: prop, args: args }) })
-            .then(res => res.text()).then(text => { try { const data = JSON.parse(text); if (data.error) onFailure(new Error(data.error)); else onSuccess(data.result); } catch(e) { onFailure(new Error("API Link Error. Ensure New Version was deployed.")); } }).catch(err => onFailure(err));
+            fetch(SCRIPT_API_URL, {
+              method: "POST",
+              mode: "cors",
+              cache: "no-cache",
+              redirect: "follow",
+              headers: { "Content-Type": "text/plain;charset=utf-8" },
+              body: JSON.stringify({ action: prop, args: args })
+            })
+            .then(res => res.text())
+            .then(text => {
+              try {
+                const data = JSON.parse(text);
+                if (data.error) onFailure(new Error(data.error));
+                else onSuccess(data.result);
+              } catch(e) {
+                // Return a snippet of the raw HTML instead of failing silently, this helps identify auth redirects
+                onFailure(new Error(text.slice(0, 100) || "API Link Error. Ensure New Version was deployed."));
+              }
+            })
+            .catch(err => onFailure(err));
           };
         }
       }); return runner;
@@ -617,6 +632,7 @@ document.addEventListener('touchstart', e => {
 
 document.addEventListener('touchend', e => {
   if (!touchStartX || SETTINGS.swipeTabs === false) return;
+  
   if (e.target.closest('.swipe-wrap') || e.target.closest('.monthchart') || e.target.closest('.monthchips') || e.target.closest('.subtabs') || e.target.closest('.donutwrap') || e.target.closest('.sheet') || e.target.closest('.filtergrid') || e.target.closest('.nav') || e.target.closest('.monthsummary')) return;
   
   let dX = e.changedTouches[0].clientX - touchStartX;
