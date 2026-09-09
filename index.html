@@ -1,4 +1,3 @@
-
 <!doctype html>
 <html>
 <head>
@@ -9,7 +8,7 @@
 <meta name="theme-color" content="#101a2c">
 
 <style>
-/* V5.1 DYNAMIC CSS VARIABLE ENGINE & SECURE CHROME BRIDGE */
+/* V5.2 DYNAMIC CSS VARIABLE ENGINE */
 :root {
   --bg: #f4f7fb; --card: #ffffff; --ink: #152238; --muted: #718096; --line: #e7ecf3; --dark: #101a2c;
   --blue: #2563eb; --cyan: #06b6d4; --green: #16a34a; --orange: #f59e0b; --pink: #ec4899; --purple: #7c3aed; --red: #dc2626;
@@ -105,7 +104,6 @@ textarea{min-height:90px;resize:vertical}.row{display:grid;grid-template-columns
 .monthbar select{padding:12px;height:52px;border-radius:16px}.periodbar{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
 .viewhint{text-align:center;font-size:11px;color:var(--muted);padding-top:10px;font-weight:750}
 
-/* NAV */
 .nav{position:fixed;bottom:0;left:0;right:0;background:var(--nav-bg);border-top:1px solid var(--line);z-index:30;box-shadow:0 -12px 35px rgba(0,0,0,.06);padding-bottom:calc(25px + env(safe-area-inset-bottom));overflow-x:auto;overflow-y:hidden;scrollbar-width:none;-webkit-overflow-scrolling:touch}
 .nav::-webkit-scrollbar{display:none}
 .navin{min-width:100%;width:max-content;margin:0 auto;display:grid;gap:4px;padding:8px 6px}
@@ -114,7 +112,6 @@ textarea{min-height:90px;resize:vertical}.row{display:grid;grid-template-columns
 .nav button.on{background:#eef2ff;color:var(--blue)}
 .dark-mode .nav button.on{background:rgba(37,99,235,0.15);color:#60a5fa}
 
-/* FAB BUTTONS */
 .fab{position:fixed;right:20px;bottom:115px;width:66px;height:66px;border-radius:50%;background:var(--blue);color:#fff;font-size:32px;box-shadow:0 14px 34px rgba(37,99,235,.4);z-index:31;display:flex;align-items:center;justify-content:center}
 .fab-mic{position:fixed;right:26px;bottom:196px;width:54px;height:54px;border-radius:50%;background:var(--card);color:var(--ink);font-size:24px;box-shadow:0 10px 25px rgba(0,0,0,.15);z-index:31;display:flex;align-items:center;justify-content:center;border:1px solid var(--line)}
 
@@ -132,19 +129,16 @@ textarea{min-height:90px;resize:vertical}.row{display:grid;grid-template-columns
 .caticon{width:52px;height:52px;min-width:52px;border-radius:16px;display:grid;place-items:center;font-size:26px;box-shadow:inset 0 0 0 1px rgba(255,255,255,.25)}
 .catname{min-width:0;flex:1}.catname .title{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.catrow{display:flex;align-items:center;gap:12px;min-width:0;flex:1}
 
-/* Swipe-to-action logic */
 .swipe-wrap{position:relative;overflow:hidden;border-bottom:1px solid var(--line)}
 .swipe-wrap:last-child{border-bottom:0}
 .swipe-bg{position:absolute;inset:0;display:flex;justify-content:space-between;z-index:0;background:var(--stat-bg)}
 .swipe-bg > div{width:85px;display:grid;place-items:center;font-weight:850;color:#fff;font-size:14px}
 .swipe-fg{position:relative;z-index:1;background:var(--card);border-bottom:none;transition:transform .2s cubic-bezier(.2,.8,.2,1);will-change:transform}
 
-/* Voice/Camera Buttons */
 .mic-btn { width:100%; padding:14px; border-radius:16px; background:#eef2ff; color:#4f46e5; font-size:16px; font-weight:800; display:flex; align-items:center; justify-content:center; gap:8px; margin-top:8px; border:1px solid #c7d2fe; transition:0.2s }
 .mic-btn:active { background:#c7d2fe; transform:scale(0.98) }
 .cam-btn { padding:14px; border-radius:16px; background:var(--btn-sec-bg); color:var(--ink); font-size:14px; font-weight:800; display:flex; align-items:center; justify-content:center; gap:8px; width:100%; margin-bottom:12px; border:1px solid var(--line); transition:0.2s }
 
-/* Offline Mode Indicator */
 #offlineBanner { position:fixed; top:0; left:0; right:0; background:var(--orange); color:#fff; text-align:center; padding:6px; font-size:12px; font-weight:800; z-index:9999; display:none; }
 
 @media(max-width:390px){
@@ -163,7 +157,6 @@ textarea{min-height:90px;resize:vertical}.row{display:grid;grid-template-columns
     .phone-device .focusstat b { font-size: clamp(16px, 5.5vw, 22px) !important; letter-spacing: -0.6px !important; width: 100% !important; text-align: left !important; overflow: visible !important; }
 }
 
-/* PIN Screen */
 #pinGate{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;padding:24px;background:radial-gradient(circle at 90% 5%,#38bdf8 0,#2563eb 24%,transparent 45%),linear-gradient(145deg,#0b1425,#172554 58%,#0891b2);color:#fff;}
 #pinGate.hidden{display:none}
 .pinbox{width:min(390px,100%);background:var(--card);color:var(--ink);border-radius:36px;padding:32px 24px 28px;box-shadow:0 30px 80px rgba(0,0,0,.4);text-align:center;}
@@ -173,8 +166,6 @@ textarea{min-height:90px;resize:vertical}.row{display:grid;grid-template-columns
 .pinpad{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;max-width:320px;margin:auto}.pinpad button{height:60px;border-radius:20px;background:var(--btn-sec-bg);color:var(--ink);font-size:24px;font-weight:850;border:1px solid var(--line)}.pinpad button:active{transform:scale(.95);background:var(--blue);color:#fff}
 .pinpad .pin-del{font-size:20px}.pin-unlock{width:100%;margin-top:16px;height:56px;border-radius:20px;background:var(--dark);color:#fff;font-size:17px;font-weight:900}.pin-msg{min-height:22px;margin-top:12px;color:var(--red);font-size:13px;font-weight:750}.pin-foot{font-size:11px!important;margin:14px 0 0!important;color:var(--muted)!important}
 body.pin-locked{overflow:hidden}
-
-.layout-list{display:grid;gap:9px}.layout-item{display:grid;grid-template-columns:1fr auto auto;gap:9px;align-items:center;padding:12px 14px;background:var(--stat-bg);border:1px solid var(--stat-border);border-radius:16px}.layout-item .draglabel{font-weight:800;font-size:14px}.layout-item button{min-width:44px;padding:10px 12px}.layout-note{font-size:12px;color:var(--muted);line-height:1.45;margin:6px 0 12px}.section-order-box{background:var(--stat-bg);border:1px solid var(--stat-border);border-radius:20px;padding:14px;margin-top:12px}.chartbar{cursor:pointer;transition:transform .12s,opacity .12s}.chartbar:active{transform:scaleY(.96);transform-origin:bottom}.charttip{font-size:11px;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 12px;margin-top:10px;min-height:20px}.monthsummary{overflow:auto}.monthsummary table{min-width:650px}.monthsummary th,.monthsummary td{white-space:nowrap;padding:8px;font-size:13px}.manage-note{font-size:12px;color:var(--muted);line-height:1.5;margin:6px 0 12px}.manage-list{display:grid;gap:9px}.manage-item{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:9px;align-items:center}.manage-item input{min-width:0}.manage-add{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:9px;margin-top:10px}.pin-change-box{background:var(--stat-bg);border:1px solid var(--stat-border);border-radius:20px;padding:16px;margin-top:14px}.pin-change-box .row{margin-top:8px}
 </style>
 <script>
 const SCRIPT_API_URL = "https://script.google.com/macros/s/AKfycbwnBVOVjMfGkd9bB8-qU6SvQ0z_KD9kMFCLm6qu20DA8K2ikm73qB8dpVRIx0sXX4Y/exec";
@@ -247,7 +238,7 @@ const google = {
 <div class="modal" id="entryModal"><div class="sheet"><button class="secondary close" onclick="closeModal()">Close</button><h2 id="entryTitle">Add Spend</h2>
  
  <input type="file" id="fReceipt" accept="image/*" capture="environment" style="display:none" onchange="handleReceiptUpload(this)">
- <button id="receiptBtn" class="cam-btn">📸 Attach Receipt Photo</button>
+ <button id="receiptBtn" class="cam-btn" onclick="document.getElementById('fReceipt').click()">📸 Attach Receipt Photo</button>
 
  <div class="row"><div class="field"><label>Date *</label><input type="date" id="fDate"></div><div class="field"><label>Amount ₹ *</label><input type="text" id="fAmount" inputmode="decimal" autocomplete="off" placeholder="Any amount"></div></div>
  <div class="row"><div class="field"><label>Who (Family Member)</label><select id="fAccount"></select></div><div class="field"><label>Type</label><select id="fType"></select></div></div>
@@ -394,26 +385,22 @@ function triggerConfetti() {
   }
 }
 
-// V5.2 SECURE VOICE BRIDGE ENGINE
 function handleMicClick() {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognition) {
         toast("Opening secure voice bridge...");
-        launchVoiceInBrowser();
+        
+        let baseUrl = window.location.href.split('?')[0].split('#')[0];
+        let url = baseUrl + '?voice=1&t=' + authToken;
+        let a = document.createElement('a');
+        a.href = url;
+        a.target = '_blank';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
     } else {
         startVoiceEntry();
     }
-}
-
-function launchVoiceInBrowser() {
-    let baseUrl = window.location.href.split('?')[0].split('#')[0];
-    let url = baseUrl + '?voice=1&t=' + authToken;
-    let a = document.createElement('a');
-    a.href = url;
-    a.target = '_blank';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
 }
 
 function startVoiceEntry() {
@@ -437,7 +424,6 @@ function startVoiceEntry() {
     if(amtMatch) $('fAmount').value = amtMatch[0];
     $('fDesc').value = txt.charAt(0).toUpperCase() + txt.slice(1);
     
-    // SMART SYNONYM MATCHING
     let catSelect = $('fCategory');
     let matched = false;
 
@@ -473,27 +459,28 @@ function handleReceiptUpload(input) {
     let img = new Image();
     img.onload = function() {
        let canvas = document.createElement('canvas');
-       let max_size = 800; // Compress image
+       let max_size = 600; 
        let w = img.width, h = img.height;
        if(w > h && w > max_size) { h *= max_size/w; w = max_size; }
        else if(h > max_size) { w *= max_size/h; h = max_size; }
        canvas.width = w; canvas.height = h;
        let ctx = canvas.getContext('2d');
        ctx.drawImage(img, 0, 0, w, h);
-       receiptBase64 = canvas.toDataURL('image/jpeg', 0.6); 
+       receiptBase64 = canvas.toDataURL('image/jpeg', 0.4); 
        
        let btn = $('receiptBtn');
        btn.textContent = '📸 Receipt Attached ✓';
        btn.style.background = 'var(--green)';
        btn.style.color = '#fff';
-       toast("Receipt ready to upload");
+       toast("Receipt compressed to " + Math.round(receiptBase64.length / 1024) + "kb");
     }
+    img.onerror = function() { alert("Image processing failed."); }
     img.src = e.target.result;
   }
+  reader.onerror = function() { alert("File read failed."); }
   reader.readAsDataURL(file);
 }
 
-// OFFLINE SYNC QUEUE ENGINE
 let offlineQueue = JSON.parse(localStorage.getItem('expenseOfflineQueue') || '[]');
 function updateOfflineUI() {
   if(!navigator.onLine || offlineQueue.length > 0) {
@@ -521,7 +508,6 @@ function processOfflineQueue() {
 window.addEventListener('online', processOfflineQueue);
 window.addEventListener('offline', updateOfflineUI);
 
-// BACKGROUND SYNC WHEN RETURNING FROM CHROME BRIDGE
 document.addEventListener('visibilitychange', () => {
    if (document.visibilityState === 'visible' && authToken) {
        google.script.run.withSuccessHandler(d => {
@@ -536,7 +522,6 @@ document.addEventListener('visibilitychange', () => {
    }
 });
 
-// PARALLEL LOADING INIT ENGINE
 function init() {
   activeMonth = monthNow();
   updateOfflineUI();
@@ -554,7 +539,6 @@ function init() {
     applySettings(); buildForms(); initGlobal(); renderAll();
     processOfflineQueue();
     
-    // Auto-trigger voice if opened via Chrome Bridge
     const urlParams = new URLSearchParams(window.location.search);
     if(urlParams.get('voice') === '1') {
        setTimeout(() => {
