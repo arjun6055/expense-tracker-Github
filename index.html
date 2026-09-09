@@ -377,7 +377,26 @@ function txTouchEnd(e, el, rowId) {
   txTouchX = null;
 }
 
-function init(){activeMonth=monthNow();google.script.run.withSuccessHandler(d=>{DATA=d||{rows:[],options:{}};google.script.run.withSuccessHandler(s=>{SETTINGS=s||{};applySettings();buildForms();initGlobal();renderAll();}).withFailureHandler(showErr).getSettings(authToken);}).withFailureHandler(showErr).getAppData(authToken)}
+// V4.1 PARALLEL DATA FETCHING FOR INSTANT LOAD
+function init() {
+  activeMonth = monthNow();
+  let dataLoaded = false, settingsLoaded = false;
+  
+  const checkDone = () => {
+    if(dataLoaded && settingsLoaded) {
+      applySettings(); buildForms(); initGlobal(); renderAll();
+    }
+  };
+
+  google.script.run.withSuccessHandler(d => {
+    DATA = d || {rows:[], options:{}}; dataLoaded = true; checkDone();
+  }).withFailureHandler(showErr).getAppData(authToken);
+
+  google.script.run.withSuccessHandler(s => {
+    SETTINGS = s || {}; settingsLoaded = true; checkDone();
+  }).withFailureHandler(showErr).getSettings(authToken);
+}
+
 function buildForms(){const mp={fAccount:'Account',fType:'Type',fCategory:'Category',fSubcategory:'Sub-category',fNeed:'Need',fPayment:'Payment',fCard:'Account/Card'};Object.entries(mp).forEach(([id,key])=>fillSelect($(id),DATA.options[key]||[],'Select...'));if(entryMode==='income')$('fCategory').value='Income';if(entryMode==='investment')$('fCategory').value='Investment';if(entryMode==='cc'){$('fCategory').value='Credit Card Bill';$('fSubcategory').value='Monthly Bill'}}
 function fillSelect(el,vals,first){el.innerHTML='<option value="">'+esc(first)+'</option>'+vals.map(v=>'<option value="'+esc(v)+'">'+esc(v)+'</option>').join('')}
 function initGlobal(){let ms=monthKeys();if(!ms.includes(activeMonth))activeMonth=ms[ms.length-1]||monthNow();$('globalMonth').innerHTML=ms.slice().reverse().map(m=>'<option value="'+m+'">'+monthName(m)+'</option>').join('')||'<option value="'+activeMonth+'">'+monthName(activeMonth)+'</option>';$('globalMonth').value=activeMonth;periodStart=periodStart||((ms[0]||activeMonth)+'-01');periodEnd=periodEnd||today();updateGlobalUI()}
@@ -489,15 +508,16 @@ function spendFilteredRows(qOverride){let rs=scopedRows('Spend'),q=(qOverride!==
 function toggleFilters() { filtersExpanded = !filtersExpanded; $('filterContainer').style.display = filtersExpanded ? 'block' : 'none'; $('filterToggleBtn').textContent = filtersExpanded ? '˄ Hide Filters' : '˅ Show Filters'; }
 function clearFilters(){if($('spSearch'))$('spSearch').value='';if($('spAccount'))$('spAccount').value='';if($('spCategory'))$('spCategory').value='';if($('spNeed'))$('spNeed').value='';if($('spSort'))$('spSort').value='new';renderSpends()}
 
+// V4.1 Fixed Clear Button Logic
 function renderSpends(){
   let rs=spendFilteredRows(); let q=($('spSearch')?.value||'').toLowerCase(),a=$('spAccount')?.value||'',c=$('spCategory')?.value||'',n=$('spNeed')?.value||'',sort=$('spSort')?.value||'new';
-  let hasFilter = q || a || c || n || sort!=='new';
+  
   $('spends').innerHTML=`
   <div class="card" id="spendFilters" style="position:sticky; top:8px; z-index:20; padding-bottom:14px; margin-bottom:14px; box-shadow:0 15px 35px var(--bg);">
     <div class="sectionhead" style="margin-bottom:8px; flex-wrap:wrap">
       <h2 style="margin:0">🧾 Spends</h2>
       <div style="display:flex; gap:8px; align-items:center;">
-        ${hasFilter ? '<button class="redbtn" onclick="clearFilters()" style="padding:8px 12px; border-radius:99px; font-size:12px">✖ Clear</button>' : ''}
+        <button class="redbtn" onclick="clearFilters()" style="padding:8px 12px; border-radius:99px; font-size:12px">✖ Clear</button>
         <button class="secondary" onclick="toggleFilters()" id="filterToggleBtn" style="padding:8px 12px; border-radius:99px; font-size:12px">${filtersExpanded ? '˄ Hide Filters' : '˅ Show Filters'}</button>
       </div>
     </div>
