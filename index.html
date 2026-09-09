@@ -1,3 +1,4 @@
+
 <!doctype html>
 <html>
 <head>
@@ -8,7 +9,7 @@
 <meta name="theme-color" content="#101a2c">
 
 <style>
-/* V5.2 DYNAMIC CSS VARIABLE ENGINE */
+/* V5.3 DYNAMIC CSS VARIABLE ENGINE & RECEIPT CLEANUP UI */
 :root {
   --bg: #f4f7fb; --card: #ffffff; --ink: #152238; --muted: #718096; --line: #e7ecf3; --dark: #101a2c;
   --blue: #2563eb; --cyan: #06b6d4; --green: #16a34a; --orange: #f59e0b; --pink: #ec4899; --purple: #7c3aed; --red: #dc2626;
@@ -137,7 +138,7 @@ textarea{min-height:90px;resize:vertical}.row{display:grid;grid-template-columns
 
 .mic-btn { width:100%; padding:14px; border-radius:16px; background:#eef2ff; color:#4f46e5; font-size:16px; font-weight:800; display:flex; align-items:center; justify-content:center; gap:8px; margin-top:8px; border:1px solid #c7d2fe; transition:0.2s }
 .mic-btn:active { background:#c7d2fe; transform:scale(0.98) }
-.cam-btn { padding:14px; border-radius:16px; background:var(--btn-sec-bg); color:var(--ink); font-size:14px; font-weight:800; display:flex; align-items:center; justify-content:center; gap:8px; width:100%; margin-bottom:12px; border:1px solid var(--line); transition:0.2s }
+.cam-btn { padding:14px; border-radius:16px; background:var(--btn-sec-bg); color:var(--ink); font-size:14px; font-weight:800; display:flex; align-items:center; justify-content:center; gap:8px; transition:0.2s; border:1px solid var(--line); }
 
 #offlineBanner { position:fixed; top:0; left:0; right:0; background:var(--orange); color:#fff; text-align:center; padding:6px; font-size:12px; font-weight:800; z-index:9999; display:none; }
 
@@ -238,7 +239,10 @@ const google = {
 <div class="modal" id="entryModal"><div class="sheet"><button class="secondary close" onclick="closeModal()">Close</button><h2 id="entryTitle">Add Spend</h2>
  
  <input type="file" id="fReceipt" accept="image/*" capture="environment" style="display:none" onchange="handleReceiptUpload(this)">
- <button id="receiptBtn" class="cam-btn" onclick="document.getElementById('fReceipt').click()">📸 Attach Receipt Photo</button>
+ <div style="display:flex;gap:8px;margin-bottom:12px;">
+   <button id="receiptBtn" class="cam-btn" style="margin-bottom:0;flex:1" onclick="document.getElementById('fReceipt').click()">📸 Attach Receipt Photo</button>
+   <button id="delReceiptBtn" class="redbtn hidden" style="border-radius:16px;padding:0 16px;font-size:18px;" onclick="clearReceiptUI()" title="Remove Receipt">✖</button>
+ </div>
 
  <div class="row"><div class="field"><label>Date *</label><input type="date" id="fDate"></div><div class="field"><label>Amount ₹ *</label><input type="text" id="fAmount" inputmode="decimal" autocomplete="off" placeholder="Any amount"></div></div>
  <div class="row"><div class="field"><label>Who (Family Member)</label><select id="fAccount"></select></div><div class="field"><label>Type</label><select id="fType"></select></div></div>
@@ -300,6 +304,7 @@ const google = {
 let DATA={rows:[],options:{}},SETTINGS={};
 let globalView='monthly',activeMonth='',periodStart='',periodEnd='',currentScreen='home',editRow=null,entryMode='spend',sectionSettingsTab='home',tfType='',tfVal='',filtersExpanded=false;
 let receiptBase64 = null;
+let removeExistingReceipt = false;
 const DEFAULT_TAB_ORDER=['home','spends','income','investment','money','cc','transfers','insights','more'];
 const TAB_META={home:['⌂','Home'],spends:['🧾','Spends'],income:['💰','Income'],investment:['📈','Investment'],money:['₹','Money'],cc:['💳','CC Bills'],transfers:['↔️','Transfers'],insights:['💡','Insights'],more:['•••','More']};
 const SECTION_META={
@@ -391,13 +396,19 @@ function handleMicClick() {
         toast("Opening secure voice bridge...");
         
         let baseUrl = window.location.href.split('?')[0].split('#')[0];
-        let url = baseUrl + '?voice=1&t=' + authToken;
-        let a = document.createElement('a');
-        a.href = url;
-        a.target = '_blank';
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
+        let cleanUrl = baseUrl.replace('https://', '').replace('http://', '');
+        let intentUrl = 'intent://' + cleanUrl + '?voice=1&t=' + authToken + '#Intent;scheme=https;package=com.android.chrome;end;';
+        
+        window.location.href = intentUrl;
+        
+        setTimeout(() => {
+            let a = document.createElement('a');
+            a.href = baseUrl + '?voice=1&t=' + authToken;
+            a.target = '_blank';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }, 800);
     } else {
         startVoiceEntry();
     }
@@ -472,6 +483,11 @@ function handleReceiptUpload(input) {
        btn.textContent = '📸 Receipt Attached ✓';
        btn.style.background = 'var(--green)';
        btn.style.color = '#fff';
+       btn.onclick = () => document.getElementById('fReceipt').click();
+       
+       $('delReceiptBtn').classList.remove('hidden');
+       removeExistingReceipt = false;
+       
        toast("Receipt compressed to " + Math.round(receiptBase64.length / 1024) + "kb");
     }
     img.onerror = function() { alert("Image processing failed."); }
@@ -479,6 +495,18 @@ function handleReceiptUpload(input) {
   }
   reader.onerror = function() { alert("File read failed."); }
   reader.readAsDataURL(file);
+}
+
+function clearReceiptUI() {
+   removeExistingReceipt = true;
+   receiptBase64 = null;
+   $('fReceipt').value = ''; 
+   let btn = $('receiptBtn');
+   btn.textContent = '📸 Attach Receipt Photo';
+   btn.style.background = 'var(--btn-sec-bg)';
+   btn.style.color = 'var(--ink)';
+   btn.onclick = () => document.getElementById('fReceipt').click();
+   $('delReceiptBtn').classList.add('hidden');
 }
 
 let offlineQueue = JSON.parse(localStorage.getItem('expenseOfflineQueue') || '[]');
@@ -1011,6 +1039,7 @@ function openAdd(mode,row=null){
          btn.style.background = 'var(--blue)';
          btn.style.color = '#fff';
          btn.onclick = () => window.open(r.receipt, '_blank');
+         $('delReceiptBtn').classList.remove('hidden');
       }
   }
   else{$('fDate').value=today();$('fBillMonth').value=activeMonth||monthNow();let types={spend:'Spend',income:'Income',investment:'Investment',cc:'CC Bill'};if(mode==='transfer'){$('fType').value='Personal Transfer';$('fCategory').value='';$('fDesc').value='Transfer'}else{$('fType').value=types[mode];if(mode==='income')$('fCategory').value='Income';if(mode==='investment')$('fCategory').value='Investment';if(mode==='cc'){$('fCategory').value='Credit Card Bill';$('fSubcategory').value='Monthly Bill';$('fDesc').value='Credit Card Bill'}}}
@@ -1019,10 +1048,14 @@ function openAdd(mode,row=null){
 function resetForm(){
   $('fDate').value=today();$('fAmount').value='';$('fDesc').value='';$('fBillMonth').value=activeMonth||monthNow();
   ['fAccount','fType','fCategory','fSubcategory','fNeed','fPayment','fCard'].forEach(id=>$(id).value='');
-  $('receiptBtn').textContent = '📸 Attach Receipt Photo';
-  $('receiptBtn').style.background = 'var(--btn-sec-bg)';
-  $('receiptBtn').style.color = 'var(--ink)';
-  $('receiptBtn').onclick = () => document.getElementById('fReceipt').click();
+  
+  removeExistingReceipt = false;
+  let btn = $('receiptBtn');
+  btn.textContent = '📸 Attach Receipt Photo';
+  btn.style.background = 'var(--btn-sec-bg)';
+  btn.style.color = 'var(--ink)';
+  btn.onclick = () => document.getElementById('fReceipt').click();
+  $('delReceiptBtn').classList.add('hidden');
   receiptBase64 = null;
 }
 
@@ -1036,6 +1069,7 @@ function saveEntry(){
   let d={row:editRow,date:$('fDate').value,amount:amount,account:$('fAccount').value,type:typeVal,category:$('fCategory').value,subcategory:$('fSubcategory').value,need:$('fNeed').value,payment:$('fPayment').value,accountCard:$('fCard').value,billMonth:$('fBillMonth').value,description:$('fDesc').value};
   
   if(receiptBase64) d.receipt = receiptBase64;
+  d.removeReceipt = removeExistingReceipt;
 
   if(!navigator.onLine) {
      offlineQueue.push(d);
