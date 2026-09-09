@@ -8,7 +8,7 @@
 <meta name="theme-color" content="#101a2c">
 
 <style>
-/* V4.5 DYNAMIC CSS VARIABLE ENGINE & HYBRID RECURRING TOGGLES */
+/* V4.6 DYNAMIC CSS VARIABLE ENGINE & PARALLEL LOADING */
 :root {
   --bg: #f4f7fb; --card: #ffffff; --ink: #152238; --muted: #718096; --line: #e7ecf3; --dark: #101a2c;
   --blue: #2563eb; --cyan: #06b6d4; --green: #16a34a; --orange: #f59e0b; --pink: #ec4899; --purple: #7c3aed; --red: #dc2626;
@@ -370,7 +370,42 @@ function triggerConfetti() {
   }
 }
 
-// V4.5 GESTURE ENGINE
+// V4.6 PARALLEL LOADING INIT ENGINE
+function init() {
+  activeMonth = monthNow();
+  
+  let pData = new Promise((resolve, reject) => {
+    google.script.run.withSuccessHandler(resolve).withFailureHandler(reject).getAppData(authToken);
+  });
+  
+  let pSettings = new Promise((resolve, reject) => {
+    google.script.run.withSuccessHandler(resolve).withFailureHandler(reject).getSettings(authToken);
+  });
+
+  Promise.all([pData, pSettings]).then(results => {
+    DATA = results[0] || {rows:[], options:{}};
+    SETTINGS = results[1] || {};
+    applySettings();
+    buildForms();
+    initGlobal();
+    renderAll();
+  }).catch(showErr);
+}
+
+function buildForms(){const mp={fAccount:'Account',fType:'Type',fCategory:'Category',fSubcategory:'Sub-category',fNeed:'Need',fPayment:'Payment',fCard:'Account/Card'};Object.entries(mp).forEach(([id,key])=>fillSelect($(id),DATA.options[key]||[],'Select...'));if(entryMode==='income')$('fCategory').value='Income';if(entryMode==='investment')$('fCategory').value='Investment';if(entryMode==='cc'){$('fCategory').value='Credit Card Bill';$('fSubcategory').value='Monthly Bill'}}
+function fillSelect(el,vals,first){el.innerHTML='<option value="">'+esc(first)+'</option>'+vals.map(v=>'<option value="'+esc(v)+'">'+esc(v)+'</option>').join('')}
+function initGlobal(){let ms=monthKeys();if(!ms.includes(activeMonth))activeMonth=ms[ms.length-1]||monthNow();$('globalMonth').innerHTML=ms.slice().reverse().map(m=>'<option value="'+m+'">'+monthName(m)+'</option>').join('')||'<option value="'+activeMonth+'">'+monthName(activeMonth)+'</option>';$('globalMonth').value=activeMonth;periodStart=periodStart||((ms[0]||activeMonth)+'-01');periodEnd=periodEnd||today();updateGlobalUI()}
+function updateGlobalUI(){document.querySelectorAll('.view-btn').forEach(b=>b.classList.toggle('active',b.dataset.view===globalView));$('monthControls').classList.toggle('hidden',globalView!=='monthly');$('periodControls').classList.toggle('hidden',globalView!=='period');$('periodStart').value=periodStart||'';$('periodEnd').value=periodEnd||'';$('globalMonth').value=activeMonth;let hint=globalView==='overall'?'All recorded data':globalView==='period'?('Selected period · '+(periodStart||'—')+' to '+(periodEnd||'—')):('Monthly position · '+monthName(activeMonth));$('viewHint').textContent=hint}
+function setGlobalView(v){globalView=['monthly','overall','period'].includes(v)?v:'monthly';if(globalView==='period'&&!periodStart)periodStart=activeMonth+'-01';if(globalView==='period'&&!periodEnd)periodEnd=today();updateGlobalUI();renderAll()}
+function setGlobalMonth(v){if(!v)return;activeMonth=String(v).slice(0,7);globalView='monthly';updateGlobalUI();renderAll()}
+function shiftMonth(delta){let [y,m]=activeMonth.split('-').map(Number),d=new Date(y,m-1+delta,1);setGlobalMonth(d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0'))}
+function setPeriodDates(){periodStart=$('periodStart').value||'';periodEnd=$('periodEnd').value||'';if(periodStart&&periodEnd&&periodStart>periodEnd)[periodStart,periodEnd]=[periodEnd,periodStart];updateGlobalUI();renderAll()}
+function inScope(r){if(globalView==='overall')return true;if(globalView==='monthly')return String(r.date||'').startsWith(activeMonth);let d=String(r.date||'');return (!periodStart||d>=periodStart)&&(!periodEnd||d<=periodEnd)}
+function scopedRows(type){return DATA.rows.filter(r=>(!type||r.type===type)&&inScope(r))}
+
+function renderAll(){renderHome();renderSpends();renderIncome();renderInvestment();renderMoney();renderCC();renderTransfers();renderInsights();renderMore();applyAllSectionOrders();}
+
+// GESTURE ENGINE
 let touchStartX = null, touchStartY = null;
 document.addEventListener('touchstart', e => {
   if (e.touches.length > 1) return;
@@ -423,20 +458,6 @@ function txTouchEnd(e, el, rowId) {
   else { el.style.transform = 'translateX(0)'; }
   txTouchX = null;
 }
-
-function init(){activeMonth=monthNow();google.script.run.withSuccessHandler(d=>{DATA=d||{rows:[],options:{}};google.script.run.withSuccessHandler(s=>{SETTINGS=s||{};applySettings();buildForms();initGlobal();renderAll();}).withFailureHandler(showErr).getSettings(authToken);}).withFailureHandler(showErr).getAppData(authToken)}
-function buildForms(){const mp={fAccount:'Account',fType:'Type',fCategory:'Category',fSubcategory:'Sub-category',fNeed:'Need',fPayment:'Payment',fCard:'Account/Card'};Object.entries(mp).forEach(([id,key])=>fillSelect($(id),DATA.options[key]||[],'Select...'));if(entryMode==='income')$('fCategory').value='Income';if(entryMode==='investment')$('fCategory').value='Investment';if(entryMode==='cc'){$('fCategory').value='Credit Card Bill';$('fSubcategory').value='Monthly Bill'}}
-function fillSelect(el,vals,first){el.innerHTML='<option value="">'+esc(first)+'</option>'+vals.map(v=>'<option value="'+esc(v)+'">'+esc(v)+'</option>').join('')}
-function initGlobal(){let ms=monthKeys();if(!ms.includes(activeMonth))activeMonth=ms[ms.length-1]||monthNow();$('globalMonth').innerHTML=ms.slice().reverse().map(m=>'<option value="'+m+'">'+monthName(m)+'</option>').join('')||'<option value="'+activeMonth+'">'+monthName(activeMonth)+'</option>';$('globalMonth').value=activeMonth;periodStart=periodStart||((ms[0]||activeMonth)+'-01');periodEnd=periodEnd||today();updateGlobalUI()}
-function updateGlobalUI(){document.querySelectorAll('.view-btn').forEach(b=>b.classList.toggle('active',b.dataset.view===globalView));$('monthControls').classList.toggle('hidden',globalView!=='monthly');$('periodControls').classList.toggle('hidden',globalView!=='period');$('periodStart').value=periodStart||'';$('periodEnd').value=periodEnd||'';$('globalMonth').value=activeMonth;let hint=globalView==='overall'?'All recorded data':globalView==='period'?('Selected period · '+(periodStart||'—')+' to '+(periodEnd||'—')):('Monthly position · '+monthName(activeMonth));$('viewHint').textContent=hint}
-function setGlobalView(v){globalView=['monthly','overall','period'].includes(v)?v:'monthly';if(globalView==='period'&&!periodStart)periodStart=activeMonth+'-01';if(globalView==='period'&&!periodEnd)periodEnd=today();updateGlobalUI();renderAll()}
-function setGlobalMonth(v){if(!v)return;activeMonth=String(v).slice(0,7);globalView='monthly';updateGlobalUI();renderAll()}
-function shiftMonth(delta){let [y,m]=activeMonth.split('-').map(Number),d=new Date(y,m-1+delta,1);setGlobalMonth(d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0'))}
-function setPeriodDates(){periodStart=$('periodStart').value||'';periodEnd=$('periodEnd').value||'';if(periodStart&&periodEnd&&periodStart>periodEnd)[periodStart,periodEnd]=[periodEnd,periodStart];updateGlobalUI();renderAll()}
-function inScope(r){if(globalView==='overall')return true;if(globalView==='monthly')return String(r.date||'').startsWith(activeMonth);let d=String(r.date||'');return (!periodStart||d>=periodStart)&&(!periodEnd||d<=periodEnd)}
-function scopedRows(type){return DATA.rows.filter(r=>(!type||r.type===type)&&inScope(r))}
-
-function renderAll(){renderHome();renderSpends();renderIncome();renderInvestment();renderMoney();renderCC();renderTransfers();renderInsights();renderMore();applyAllSectionOrders();}
 
 function go(id){
   currentScreen=id; 
@@ -686,7 +707,7 @@ function renderTransfers(){
   </div>`;
 }
 
-// V4.4 ALGORITHMIC INSIGHTS
+// V4.6 ALGORITHMIC INSIGHTS
 function renderInsights() {
   let rs = scopedRows('Spend'); 
   let bud = Number(SETTINGS.budget) || 0;
