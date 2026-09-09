@@ -8,7 +8,7 @@
 <meta name="theme-color" content="#101a2c">
 
 <style>
-/* V4.0 DYNAMIC CSS VARIABLE ENGINE */
+/* V4.1 DYNAMIC CSS VARIABLE ENGINE */
 :root {
   --bg: #f4f7fb; --card: #ffffff; --ink: #152238; --muted: #718096; --line: #e7ecf3; --dark: #101a2c;
   --blue: #2563eb; --cyan: #06b6d4; --green: #16a34a; --orange: #f59e0b; --pink: #ec4899; --purple: #7c3aed; --red: #dc2626;
@@ -45,7 +45,6 @@ input:focus,select:focus,textarea:focus{outline:3px solid #2563eb25;outline-offs
 .stat{background:var(--stat-bg);border:1px solid var(--stat-border);border-radius:21px;padding:15px;min-width:0;overflow:visible}
 .hero .stat{background:#ffffff14;border-color:#ffffff22}
 
-/* Strictly Enforced Single Row Numbers - Removed Ellipsis */
 .stat b, .cardtile .amount, .focusstat b {
     display: block !important; font-size: clamp(14px, 4.5vw, 21px) !important; font-weight: 900 !important;
     line-height: 1.2 !important; letter-spacing: -0.6px !important; white-space: nowrap !important;
@@ -102,11 +101,9 @@ textarea{min-height:90px;resize:vertical}.row{display:grid;grid-template-columns
 .view-btn.active{background:var(--blue);color:#fff}
 .monthbar{display:flex;align-items:center;gap:8px;margin-top:10px}
 .monthbar button{width:52px;min-width:52px;height:52px;border-radius:16px;background:var(--btn-sec-bg);color:var(--ink);font-size:24px;font-weight:900}
-.monthbar select{padding:12px;height:52px;border-radius:16px}
-.periodbar{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+.monthbar select{padding:12px;height:52px;border-radius:16px}.periodbar{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
 .viewhint{text-align:center;font-size:11px;color:var(--muted);padding-top:10px;font-weight:750}
 
-/* V4.0 NAV DESIGN */
 .nav{position:fixed;bottom:0;left:0;right:0;background:var(--nav-bg);border-top:1px solid var(--line);z-index:30;box-shadow:0 -12px 35px rgba(0,0,0,.06);padding-bottom:calc(25px + env(safe-area-inset-bottom));overflow-x:auto;overflow-y:hidden;scrollbar-width:none;-webkit-overflow-scrolling:touch}
 .nav::-webkit-scrollbar{display:none}
 .navin{min-width:100%;width:max-content;margin:0 auto;display:grid;gap:4px;padding:8px 6px}
@@ -130,7 +127,6 @@ textarea{min-height:90px;resize:vertical}.row{display:grid;grid-template-columns
 .caticon{width:52px;height:52px;min-width:52px;border-radius:16px;display:grid;place-items:center;font-size:26px;box-shadow:inset 0 0 0 1px rgba(255,255,255,.25)}
 .catname{min-width:0;flex:1}.catname .title{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.catrow{display:flex;align-items:center;gap:12px;min-width:0;flex:1}
 
-/* Swipe-to-action logic */
 .swipe-wrap{position:relative;overflow:hidden;border-bottom:1px solid var(--line)}
 .swipe-wrap:last-child{border-bottom:0}
 .swipe-bg{position:absolute;inset:0;display:flex;justify-content:space-between;z-index:0;background:var(--stat-bg)}
@@ -151,7 +147,6 @@ textarea{min-height:90px;resize:vertical}.row{display:grid;grid-template-columns
     .phone-device .focusstat b { font-size: clamp(16px, 5.5vw, 22px) !important; letter-spacing: -0.6px !important; width: 100% !important; text-align: left !important; overflow: visible !important; }
 }
 
-/* PIN Screen */
 #pinGate{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;padding:24px;background:radial-gradient(circle at 90% 5%,#38bdf8 0,#2563eb 24%,transparent 45%),linear-gradient(145deg,#0b1425,#172554 58%,#0891b2);color:#fff;}
 #pinGate.hidden{display:none}
 .pinbox{width:min(390px,100%);background:var(--card);color:var(--ink);border-radius:36px;padding:32px 24px 28px;box-shadow:0 30px 80px rgba(0,0,0,.4);text-align:center;}
@@ -171,30 +166,17 @@ const SCRIPT_API_URL = "https://script.google.com/macros/s/AKfycbwnBVOVjMfGkd9bB
 const google = {
   script: {
     get run() {
-      let onSuccess = () => {};
-      let onFailure = console.error;
+      let onSuccess = () => {}; let onFailure = console.error;
       const runner = new Proxy({}, {
         get(target, prop) {
           if (prop === 'withSuccessHandler') return (fn) => { onSuccess = fn; return runner; };
           if (prop === 'withFailureHandler') return (fn) => { onFailure = fn; return runner; };
           return (...args) => {
-            fetch(SCRIPT_API_URL, {
-              redirect: "follow", method: "POST",
-              headers: { "Content-Type": "text/plain;charset=utf-8" },
-              body: JSON.stringify({ action: prop, args: args })
-            })
-            .then(res => res.text())
-            .then(text => {
-              try {
-                const data = JSON.parse(text);
-                if (data.error) onFailure(new Error(data.error));
-                else onSuccess(data.result);
-              } catch(e) { onFailure(new Error("API Link Error. Ensure New Version was deployed.")); }
-            }).catch(err => onFailure(err));
+            fetch(SCRIPT_API_URL, { redirect: "follow", method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ action: prop, args: args }) })
+            .then(res => res.text()).then(text => { try { const data = JSON.parse(text); if (data.error) onFailure(new Error(data.error)); else onSuccess(data.result); } catch(e) { onFailure(new Error("API Link Error. Ensure New Version was deployed.")); } }).catch(err => onFailure(err));
           };
         }
-      });
-      return runner;
+      }); return runner;
     }
   }
 };
@@ -315,7 +297,6 @@ function pinBack(){pinValue=pinValue.slice(0,-1);renderPinDots();}
 function pinClear(){pinValue='';renderPinDots();$('pinMsg').textContent='';}
 function unlockApp(){if(!/^\d{4,6}$/.test(pinValue)){ $('pinMsg').textContent='Enter a 4 to 6 digit PIN.'; return; } $('pinMsg').textContent='Checking…';google.script.run.withSuccessHandler(r=>{authToken=r.token; $('pinGate').classList.add('hidden');document.body.classList.remove('pin-locked');pinValue='';renderPinDots();init();}).withFailureHandler(e=>{$('pinMsg').textContent=(e&&e.message)||'Incorrect PIN.';pinValue='';renderPinDots();}).authenticatePin(pinValue);}
 
-// V4.0 AUTO-LOCK TIMEOUT
 let hiddenTime = 0;
 document.addEventListener('visibilitychange', () => {
   if(document.hidden) hiddenTime = Date.now();
@@ -453,7 +434,6 @@ function renderHome(){
  let all=scopedRows(), inc=sum(all.filter(r=>r.type==='Income')), sp=sum(all.filter(r=>r.type==='Spend')), inv=sum(all.filter(r=>r.type==='Investment')), cc=sum(all.filter(r=>r.type==='CC Bill')), out=sp+inv;
  let dObj=new Date(), tStr=dObj.toISOString().slice(0,7);
  
- // V4.0 Projective Burn Rate Analytics
  let projHtml = '';
  if(globalView==='monthly' && activeMonth===tStr) {
    let d = dObj.getDate(); let maxD = new Date(dObj.getFullYear(), dObj.getMonth()+1, 0).getDate();
@@ -470,12 +450,10 @@ function renderHome(){
    </div>`;
  }
 
- // V4.0 Family Settlement Logic
  let accSpends = {}; all.filter(r=>r.type==='Spend').forEach(r=>{let a=r.account||'Unknown'; accSpends[a]=(accSpends[a]||0)+r.amount});
  let accs = Object.entries(accSpends).sort((a,b)=>b[1]-a[1]); let stl = '';
  if(accs.length>1 && accs[0][1]>0) stl = `<div class="notice" id="secSettlement" style="margin-top:12px;border-radius:18px">⚖️ <b>Settlement:</b> ${esc(accs[0][0])} paid ${money(accs[0][1]-accs[1][1])} more than ${esc(accs[1][0])} this period.</div>`;
 
- // V4.0 Trend Data Preparation
  let prevM = new Date(activeMonth+'-01'); prevM.setMonth(prevM.getMonth()-1); let pMStr = prevM.toISOString().slice(0,7);
  let prevAll = DATA.rows.filter(r=>String(r.date).startsWith(pMStr));
 
@@ -494,7 +472,6 @@ function routeToSpends(filterType, filterValue) {if($('spAccount')) $('spAccount
 function filterTransfers(type, val) {tfType=type; tfVal=val; renderTransfers(); let tx=document.getElementById('transferTx'); if(tx)tx.scrollIntoView({behavior:'smooth'});}
 function clearTransferFilter() {tfType=''; tfVal=''; renderTransfers();}
 
-// V4.0 MoM Analytics Engine injected into summary
 function summary(rs,key,routeFn,prevRs){
   if(!routeFn)routeFn='routeToSpends'; let a={}; rs.forEach(r=>{let k=r[key]||'Unspecified';a[k]=(a[k]||0)+Number(r.amount||0)});
   let pA={}; if(prevRs) prevRs.forEach(r=>{let k=r[key]||'Unspecified';pA[k]=(pA[k]||0)+Number(r.amount||0)});
@@ -514,9 +491,16 @@ function clearFilters(){if($('spSearch'))$('spSearch').value='';if($('spAccount'
 
 function renderSpends(){
   let rs=spendFilteredRows(); let q=($('spSearch')?.value||'').toLowerCase(),a=$('spAccount')?.value||'',c=$('spCategory')?.value||'',n=$('spNeed')?.value||'',sort=$('spSort')?.value||'new';
+  let hasFilter = q || a || c || n || sort!=='new';
   $('spends').innerHTML=`
   <div class="card" id="spendFilters" style="position:sticky; top:8px; z-index:20; padding-bottom:14px; margin-bottom:14px; box-shadow:0 15px 35px var(--bg);">
-    <div class="sectionhead" style="margin-bottom:8px"><h2 style="margin:0">🧾 Spends</h2><button class="secondary" onclick="toggleFilters()" id="filterToggleBtn" style="padding:10px 14px; border-radius:99px">${filtersExpanded ? '˄ Hide Filters' : '˅ Show Filters'}</button></div>
+    <div class="sectionhead" style="margin-bottom:8px; flex-wrap:wrap">
+      <h2 style="margin:0">🧾 Spends</h2>
+      <div style="display:flex; gap:8px; align-items:center;">
+        ${hasFilter ? '<button class="redbtn" onclick="clearFilters()" style="padding:8px 12px; border-radius:99px; font-size:12px">✖ Clear</button>' : ''}
+        <button class="secondary" onclick="toggleFilters()" id="filterToggleBtn" style="padding:8px 12px; border-radius:99px; font-size:12px">${filtersExpanded ? '˄ Hide Filters' : '˅ Show Filters'}</button>
+      </div>
+    </div>
     <div class="data-note" id="spSummary" style="font-size:12px; font-weight:800; color:var(--ink)">${currentLabel()} · ${rs.length} tx · ${money(sum(rs))}</div>
     <div id="filterContainer" style="display:${filtersExpanded ? 'block' : 'none'}; margin-top:14px;">
       <div class="field"><input id="spSearch" placeholder="🔎 Search description, category..." value="${esc(q)}" oninput="liveSpendSearch(this)"></div>
@@ -526,7 +510,6 @@ function renderSpends(){
         <select id="spNeed" onchange="renderSpends()"><option value="">All need</option>${(DATA.options.Need||[]).map(v=>'<option '+(v===n?'selected':'')+'>'+esc(v)+'</option>').join('')}</select>
         <select id="spSort" onchange="renderSpends()"><option value="new" ${sort==='new'?'selected':''}>Newest</option><option value="old" ${sort==='old'?'selected':''}>Oldest</option><option value="amount" ${sort==='amount'?'selected':''}>Amount high</option></select>
       </div>
-      <div style="text-align:right; margin-top:12px;"><button class="secondary" style="border-radius:99px" onclick="clearFilters()">✖ Clear All</button></div>
     </div>
   </div>
   <div class="card" id="spendTx"><div class="sectionhead"><h3>Transactions</h3><span class="pill">Swipe left to delete</span></div><div id="spTxList">${txRows(rs)}</div></div>`;
@@ -542,7 +525,6 @@ function renderMoney(){
  let bars=months.map(m=>{let I=sum(DATA.rows.filter(r=>r.type==='Income'&&r.date.startsWith(m))),O=sum(DATA.rows.filter(r=>(r.type==='Spend'||r.type==='Investment')&&r.date.startsWith(m)));let mx=Math.max(Math.abs(I),Math.abs(O),1);return `<div class="mcol" onclick="showChartValue('${m}',${I},${O})" title="Tap to view values"><div style="width:100%;display:flex;gap:4px;align-items:end;justify-content:center;height:120px"><div class="mbar chartbar" style="height:${Math.max(5,Math.abs(I)/mx*105)}px;background:linear-gradient(180deg,#22c55e,#16a34a)" aria-label="Income"></div><div class="mbar chartbar" style="height:${Math.max(5,Math.abs(O)/mx*105)}px;background:linear-gradient(180deg,#ef4444,#dc2626)" aria-label="Outgoing"></div></div><div class="mlab">${esc(monthName(m).split(' ')[0])}</div></div>`}).join('');
  let rows=months.slice().reverse().map(m=>{let I=sum(DATA.rows.filter(r=>r.type==='Income'&&r.date.startsWith(m))),S=sum(DATA.rows.filter(r=>r.type==='Spend'&&r.date.startsWith(m))),V=sum(DATA.rows.filter(r=>r.type==='Investment'&&r.date.startsWith(m))),O=S+V,C=sum(DATA.rows.filter(r=>r.type==='CC Bill'&&r.date.startsWith(m)));return `<tr><td>${esc(monthName(m))}</td><td>${money(I)}</td><td>${money(S)}</td><td>${money(V)}</td><td>${money(O)}</td><td>${money(C)}</td></tr>`}).join('');
  
- // V4.0 Cash Flow Funnel
  let fSp = inc>0 ? Math.min(100, Math.max(25, (sp/inc)*100)) : 100;
  let fInv = inc>0 ? Math.min(100, Math.max(25, (inv/inc)*100)) : 100;
  let fNet = inc>0 ? Math.min(100, Math.max(25, (net/inc)*100)) : 100;
@@ -554,7 +536,6 @@ function renderMoney(){
     <div style="background:linear-gradient(90deg, #8b5cf6, #7c3aed);color:#fff;padding:12px 18px;border-radius:12px;width:${fNet}%">💼 Net ${money(net)}</div>
   </div></div>`;
 
- // V4.0 Recurring Planner
  let setB = mergedSettings().bills || '';
  let billsArr = setB.split('\n').map(x=>{let p=x.split(':'); return p.length===2?{n:p[0].trim(),v:Number(p[1])}:null}).filter(x=>x);
  let billsHtml = '';
