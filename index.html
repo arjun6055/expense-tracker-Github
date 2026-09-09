@@ -8,7 +8,7 @@
 <meta name="theme-color" content="#101a2c">
 
 <style>
-/* V4.0 DYNAMIC CSS VARIABLE ENGINE & ALGORITHMIC INSIGHTS */
+/* V4.1 DYNAMIC CSS VARIABLE ENGINE & ALGORITHMIC INSIGHTS */
 :root {
   --bg: #f4f7fb; --card: #ffffff; --ink: #152238; --muted: #718096; --line: #e7ecf3; --dark: #101a2c;
   --blue: #2563eb; --cyan: #06b6d4; --green: #16a34a; --orange: #f59e0b; --pink: #ec4899; --purple: #7c3aed; --red: #dc2626;
@@ -45,7 +45,7 @@ input:focus,select:focus,textarea:focus{outline:3px solid #2563eb25;outline-offs
 .stat{background:var(--stat-bg);border:1px solid var(--stat-border);border-radius:21px;padding:15px;min-width:0;overflow:visible}
 .hero .stat{background:#ffffff14;border-color:#ffffff22}
 
-/* Strictly Enforced Single Row Numbers - Removed Ellipsis */
+/* Strictly Enforced Single Row Numbers */
 .stat b, .cardtile .amount, .focusstat b {
     display: block !important;
     font-size: clamp(14px, 4.5vw, 21px) !important;
@@ -112,7 +112,7 @@ textarea{min-height:90px;resize:vertical}.row{display:grid;grid-template-columns
 .monthbar select{padding:12px;height:52px;border-radius:16px}.periodbar{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
 .viewhint{text-align:center;font-size:11px;color:var(--muted);padding-top:10px;font-weight:750}
 
-/* V4.0 SCROLLABLE BOTTOM NAV */
+/* V4.1 SCROLLABLE BOTTOM NAV */
 .nav{position:fixed;bottom:0;left:0;right:0;background:var(--nav-bg);border-top:1px solid var(--line);z-index:30;box-shadow:0 -12px 35px rgba(0,0,0,.06);padding-bottom:calc(25px + env(safe-area-inset-bottom));overflow-x:auto;overflow-y:hidden;scrollbar-width:none;-webkit-overflow-scrolling:touch}
 .nav::-webkit-scrollbar{display:none}
 .navin{min-width:100%;width:max-content;margin:0 auto;display:grid;gap:4px;padding:8px 6px}
@@ -401,7 +401,7 @@ function triggerConfetti() {
   }
 }
 
-// V4.0 GESTURE ENGINE
+// V4.1 GESTURE ENGINE
 let touchStartX = null, touchStartY = null;
 document.addEventListener('touchstart', e => {
   if (e.touches.length > 1) return;
@@ -559,18 +559,24 @@ function spendFilteredRows(qOverride){let rs=scopedRows('Spend'),q=(qOverride!==
 function toggleFilters() {
   filtersExpanded = !filtersExpanded;
   $('filterContainer').style.display = filtersExpanded ? 'block' : 'none';
-  $('filterToggleBtn').textContent = filtersExpanded ? '˄ Hide Filters' : '˅ Show Filters';
+  $('filterToggleBtn').textContent = filtersExpanded ? '˄ Hide' : '˅ Filters';
 }
 function clearFilters(){if($('spSearch'))$('spSearch').value='';if($('spAccount'))$('spAccount').value='';if($('spCategory'))$('spCategory').value='';if($('spNeed'))$('spNeed').value='';if($('spSort'))$('spSort').value='new';renderSpends()}
 
 function renderSpends(){
   let rs=spendFilteredRows();
   let q=($('spSearch')?.value||'').toLowerCase(),a=$('spAccount')?.value||'',c=$('spCategory')?.value||'',n=$('spNeed')?.value||'',sort=$('spSort')?.value||'new';
+  let isFiltered = (q || a || c || n || sort !== 'new');
+  let clearBtnHtml = isFiltered ? `<button class="secondary" onclick="clearFilters()" style="padding:10px 14px; border-radius:99px; color:var(--red); font-weight:850; border:1px solid #fee2e2">✖ Clear</button>` : '';
+
   $('spends').innerHTML=`
   <div class="card" id="spendFilters" style="position:sticky; top:8px; z-index:20; padding-bottom:14px; margin-bottom:14px; box-shadow:0 15px 35px var(--bg);">
     <div class="sectionhead" style="margin-bottom:8px">
       <h2 style="margin:0">🧾 Spends</h2>
-      <button class="secondary" onclick="toggleFilters()" id="filterToggleBtn" style="padding:10px 14px; border-radius:99px">${filtersExpanded ? '˄ Hide Filters' : '˅ Show Filters'}</button>
+      <div style="display:flex;gap:6px">
+        ${clearBtnHtml}
+        <button class="secondary" onclick="toggleFilters()" id="filterToggleBtn" style="padding:10px 14px; border-radius:99px">${filtersExpanded ? '˄ Hide' : '˅ Filters'}</button>
+      </div>
     </div>
     <div class="data-note" id="spSummary" style="font-size:12px; font-weight:800; color:var(--ink)">${currentLabel()} · ${rs.length} tx · ${money(sum(rs))}</div>
     <div id="filterContainer" style="display:${filtersExpanded ? 'block' : 'none'}; margin-top:14px;">
@@ -581,7 +587,6 @@ function renderSpends(){
         <select id="spNeed" onchange="renderSpends()"><option value="">All need</option>${(DATA.options.Need||[]).map(v=>'<option '+(v===n?'selected':'')+'>'+esc(v)+'</option>').join('')}</select>
         <select id="spSort" onchange="renderSpends()"><option value="new" ${sort==='new'?'selected':''}>Newest</option><option value="old" ${sort==='old'?'selected':''}>Oldest</option><option value="amount" ${sort==='amount'?'selected':''}>Amount high</option></select>
       </div>
-      <div style="text-align:right; margin-top:12px;"><button class="secondary" style="border-radius:99px" onclick="clearFilters()">✖ Clear All</button></div>
     </div>
   </div>
   <div class="card" id="spendTx">
@@ -653,13 +658,16 @@ function renderTransfers(){
   </div>`;
 }
 
-// V4.0 ALGORITHMIC INSIGHTS
+// V4.1 ALGORITHMIC INSIGHTS
 function renderInsights() {
   let rs = scopedRows('Spend'); 
-  
   let bud = Number(SETTINGS.budget) || 0;
   let d = new Date();
-  let isCurrentMonth = activeMonth === d.toISOString().slice(0,7);
+  
+  // Logic Fix: Only calculate Burn Rate and Anomalies if viewing exactly ONE specific month.
+  let isMonthlyView = globalView === 'monthly';
+  let isCurrentMonth = isMonthlyView && (activeMonth === d.toISOString().slice(0,7));
+  
   let burnHtml = '';
   
   if(bud > 0 && isCurrentMonth) {
@@ -673,30 +681,43 @@ function renderInsights() {
     burnHtml = `<div class="card"><div class="sectionhead"><h3>⏱️ Predictive Burn Rate</h3></div>
       <p style="font-size:14px;color:var(--muted);line-height:1.5;margin:0">At your current velocity of <b>${money(sp/currentDay)}</b>/day, you are projected to spend <b style="color:var(--ink)">${money(projected)}</b> this month. You are tracking <b style="color:${color}">${money(Math.abs(diff))} ${status}</b>.</p>
     </div>`;
-  } else if (bud > 0) {
+  } else if (bud > 0 && isMonthlyView) {
     burnHtml = `<div class="card"><div class="sectionhead"><h3>⏱️ Budget Performance</h3></div>
       <p style="font-size:14px;color:var(--muted);line-height:1.5;margin:0">You spent <b>${money(sum(rs))}</b> against a budget of <b>${money(bud)}</b>.</p>
+    </div>`;
+  } else if (bud > 0) {
+    burnHtml = `<div class="card"><div class="sectionhead"><h3>⏱️ Budget Tracking</h3></div>
+      <p style="font-size:14px;color:var(--muted);line-height:1.5;margin:0">In this view, total spends are <b>${money(sum(rs))}</b>. (Your monthly budget target is <b>${money(bud)}</b>).</p>
     </div>`;
   } else {
     burnHtml = `<div class="card"><div class="sectionhead"><h3>⏱️ Predictive Burn Rate</h3></div><p style="font-size:13px;color:var(--muted);margin:0">Set a Monthly Budget in Settings for predictive insights.</p></div>`;
   }
 
-  let [y, m] = activeMonth.split('-').map(Number);
-  let prevD = new Date(y, m-2, 1);
-  let prevMonth = prevD.getFullYear() + '-' + String(prevD.getMonth()+1).padStart(2,'0');
-  let prevRs = DATA.rows.filter(r => r.type === 'Spend' && String(r.date).startsWith(prevMonth));
-  
+  let anomalyHtml = '';
   let curCat = {}; rs.forEach(r => curCat[r.category] = (curCat[r.category]||0) + Number(r.amount));
-  let prevCat = {}; prevRs.forEach(r => prevCat[r.category] = (prevCat[r.category]||0) + Number(r.amount));
-  
-  let anomalies = [];
-  Object.keys(curCat).forEach(c => {
-     if(prevCat[c] && curCat[c] > prevCat[c] * 1.3 && curCat[c] > 1000) {
-        let pct = Math.round(((curCat[c] - prevCat[c]) / prevCat[c]) * 100);
-        anomalies.push(`Your <b>${esc(c)}</b> spending (${money(curCat[c])}) is <b>${pct}% higher</b> than last month.`);
-     }
-  });
-  let anomalyHtml = anomalies.length ? `<div class="card"><div class="sectionhead"><h3>📈 Spending Spikes</h3></div><ul style="margin:0;padding-left:18px;font-size:14px;color:var(--muted);line-height:1.6">` + anomalies.map(a => `<li style="margin-bottom:8px">${a}</li>`).join('') + `</ul></div>` : '';
+
+  if (isMonthlyView) {
+      let [y, m] = activeMonth.split('-').map(Number);
+      let prevD = new Date(y, m-2, 1);
+      let prevMonth = prevD.getFullYear() + '-' + String(prevD.getMonth()+1).padStart(2,'0');
+      let prevRs = DATA.rows.filter(r => r.type === 'Spend' && String(r.date).startsWith(prevMonth));
+      
+      let prevCat = {}; prevRs.forEach(r => prevCat[r.category] = (prevCat[r.category]||0) + Number(r.amount));
+      
+      let anomalies = [];
+      Object.keys(curCat).forEach(c => {
+         if(prevCat[c] && curCat[c] > prevCat[c] * 1.3 && curCat[c] > 1000) {
+            let pct = Math.round(((curCat[c] - prevCat[c]) / prevCat[c]) * 100);
+            anomalies.push(`Your <b>${esc(c)}</b> spending (${money(curCat[c])}) is <b>${pct}% higher</b> than last month.`);
+         }
+      });
+      if(anomalies.length) anomalyHtml = `<div class="card"><div class="sectionhead"><h3>📈 Spending Spikes</h3></div><ul style="margin:0;padding-left:18px;font-size:14px;color:var(--muted);line-height:1.6">` + anomalies.map(a => `<li style="margin-bottom:8px">${a}</li>`).join('') + `</ul></div>`;
+  } else {
+      let topCats = Object.entries(curCat).sort((a,b)=>b[1]-a[1]).slice(0,3);
+      if(topCats.length) {
+         anomalyHtml = `<div class="card"><div class="sectionhead"><h3>📈 Top Categories</h3></div><ul style="margin:0;padding-left:18px;font-size:14px;color:var(--muted);line-height:1.6">` + topCats.map(c => `<li style="margin-bottom:8px"><b>${esc(c[0])}</b>: ${money(c[1])}</li>`).join('') + `</ul></div>`;
+      }
+  }
 
   let drainerHtml = '';
   if(rs.length) {
