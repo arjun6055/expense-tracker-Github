@@ -8,7 +8,7 @@
 <meta name="theme-color" content="#101a2c">
 
 <style>
-/* V4.3 DYNAMIC CSS VARIABLE ENGINE & DUPLICATE LOGIC */
+/* V4.4 DYNAMIC CSS VARIABLE ENGINE & SMART RECURRING MATCHING */
 :root {
   --bg: #f4f7fb; --card: #ffffff; --ink: #152238; --muted: #718096; --line: #e7ecf3; --dark: #101a2c;
   --blue: #2563eb; --cyan: #06b6d4; --green: #16a34a; --orange: #f59e0b; --pink: #ec4899; --purple: #7c3aed; --red: #dc2626;
@@ -602,7 +602,15 @@ function renderMoney(){
     let totalRec = 0, totalPaid = 0;
     let rRows = recs.map(rc => {
        totalRec += Number(rc.amt);
-       let isPaid = curMonthTx.some(tx => (tx.description||'').toLowerCase().includes(rc.title.toLowerCase()) || (tx.category||'').toLowerCase().includes(rc.title.toLowerCase()));
+       
+       // V4.4 SMART RECURRING MATCHING: Match by partial text OR EXACT amount
+       let isPaid = curMonthTx.some(tx => {
+           let tTitle = String(rc.title).toLowerCase();
+           let matchText = (tx.description||'').toLowerCase().includes(tTitle) || (tx.category||'').toLowerCase().includes(tTitle) || (tx.subcategory||'').toLowerCase().includes(tTitle);
+           let matchAmt = (Number(tx.amount) === Number(rc.amt));
+           return matchText || matchAmt;
+       });
+       
        if(isPaid) totalPaid += Number(rc.amt);
        let stat = isPaid ? '<span style="color:var(--green);font-weight:900;font-size:12px;margin-left:8px">Paid ✓</span>' : '<span style="color:var(--orange);font-weight:900;font-size:12px;margin-left:8px">Pending</span>';
        return `<div class="listrow"><div class="title">${esc(rc.title)}</div><div><b style="font-size:16px">${money(rc.amt)}</b>${stat}</div></div>`;
@@ -646,37 +654,30 @@ function renderTransfers(){
   </div>`;
 }
 
-// V4.1 ALGORITHMIC INSIGHTS
+// V4.4 ALGORITHMIC INSIGHTS (Fixed Month Logic)
 function renderInsights() {
   let rs = scopedRows('Spend'); 
   let bud = Number(SETTINGS.budget) || 0;
   let d = new Date();
   
-  // Logic Fix: Only calculate Burn Rate and Anomalies if viewing exactly ONE specific month.
   let isMonthlyView = globalView === 'monthly';
   let isCurrentMonth = isMonthlyView && (activeMonth === d.toISOString().slice(0,7));
   
   let burnHtml = '';
-  
   if(bud > 0 && isCurrentMonth) {
     let daysInMonth = new Date(d.getFullYear(), d.getMonth()+1, 0).getDate();
     let currentDay = d.getDate() || 1;
-    let sp = sum(rs);
-    let projected = (sp / currentDay) * daysInMonth;
-    let diff = bud - projected;
+    let sp = sum(rs); let projected = (sp / currentDay) * daysInMonth; let diff = bud - projected;
     let status = diff >= 0 ? 'under budget' : 'over budget';
     let color = diff >= 0 ? 'var(--green)' : 'var(--red)';
     burnHtml = `<div class="card"><div class="sectionhead"><h3>⏱️ Predictive Burn Rate</h3></div>
-      <p style="font-size:14px;color:var(--muted);line-height:1.5;margin:0">At your current velocity of <b>${money(sp/currentDay)}</b>/day, you are projected to spend <b style="color:var(--ink)">${money(projected)}</b> this month. You are tracking <b style="color:${color}">${money(Math.abs(diff))} ${status}</b>.</p>
-    </div>`;
+      <p style="font-size:14px;color:var(--muted);line-height:1.5;margin:0">At your current velocity of <b>${money(sp/currentDay)}</b>/day, you are projected to spend <b style="color:var(--ink)">${money(projected)}</b> this month. You are tracking <b style="color:${color}">${money(Math.abs(diff))} ${status}</b>.</p></div>`;
   } else if (bud > 0 && isMonthlyView) {
     burnHtml = `<div class="card"><div class="sectionhead"><h3>⏱️ Budget Performance</h3></div>
-      <p style="font-size:14px;color:var(--muted);line-height:1.5;margin:0">You spent <b>${money(sum(rs))}</b> against a budget of <b>${money(bud)}</b>.</p>
-    </div>`;
+      <p style="font-size:14px;color:var(--muted);line-height:1.5;margin:0">You spent <b>${money(sum(rs))}</b> against a budget of <b>${money(bud)}</b>.</p></div>`;
   } else if (bud > 0) {
     burnHtml = `<div class="card"><div class="sectionhead"><h3>⏱️ Budget Tracking</h3></div>
-      <p style="font-size:14px;color:var(--muted);line-height:1.5;margin:0">In this view, total spends are <b>${money(sum(rs))}</b>. (Your monthly budget target is <b>${money(bud)}</b>).</p>
-    </div>`;
+      <p style="font-size:14px;color:var(--muted);line-height:1.5;margin:0">In this view, total spends are <b>${money(sum(rs))}</b>. (Your monthly budget target is <b>${money(bud)}</b>).</p></div>`;
   } else {
     burnHtml = `<div class="card"><div class="sectionhead"><h3>⏱️ Predictive Burn Rate</h3></div><p style="font-size:13px;color:var(--muted);margin:0">Set a Monthly Budget in Settings for predictive insights.</p></div>`;
   }
@@ -689,7 +690,6 @@ function renderInsights() {
       let prevD = new Date(y, m-2, 1);
       let prevMonth = prevD.getFullYear() + '-' + String(prevD.getMonth()+1).padStart(2,'0');
       let prevRs = DATA.rows.filter(r => r.type === 'Spend' && String(r.date).startsWith(prevMonth));
-      
       let prevCat = {}; prevRs.forEach(r => prevCat[r.category] = (prevCat[r.category]||0) + Number(r.amount));
       
       let anomalies = [];
@@ -702,9 +702,7 @@ function renderInsights() {
       if(anomalies.length) anomalyHtml = `<div class="card"><div class="sectionhead"><h3>📈 Spending Spikes</h3></div><ul style="margin:0;padding-left:18px;font-size:14px;color:var(--muted);line-height:1.6">` + anomalies.map(a => `<li style="margin-bottom:8px">${a}</li>`).join('') + `</ul></div>`;
   } else {
       let topCats = Object.entries(curCat).sort((a,b)=>b[1]-a[1]).slice(0,3);
-      if(topCats.length) {
-         anomalyHtml = `<div class="card"><div class="sectionhead"><h3>📈 Top Categories</h3></div><ul style="margin:0;padding-left:18px;font-size:14px;color:var(--muted);line-height:1.6">` + topCats.map(c => `<li style="margin-bottom:8px"><b>${esc(c[0])}</b>: ${money(c[1])}</li>`).join('') + `</ul></div>`;
-      }
+      if(topCats.length) anomalyHtml = `<div class="card"><div class="sectionhead"><h3>📈 Top Categories</h3></div><ul style="margin:0;padding-left:18px;font-size:14px;color:var(--muted);line-height:1.6">` + topCats.map(c => `<li style="margin-bottom:8px"><b>${esc(c[0])}</b>: ${money(c[1])}</li>`).join('') + `</ul></div>`;
   }
 
   let drainerHtml = '';
@@ -717,8 +715,7 @@ function renderInsights() {
       <ul style="margin:0;padding-left:18px;font-size:14px;color:var(--muted);line-height:1.6">
         <li style="margin-bottom:8px">Largest single spend: <b>${money(topTx.amount)}</b> at ${esc(topTx.description||topTx.category)}.</li>
         <li style="margin-bottom:8px"><b>${nonPct}%</b> of categorized spends are marked as Non-Essential.</li>
-      </ul>
-     </div>`;
+      </ul></div>`;
   }
   
   let familyHtml = '';
