@@ -267,7 +267,6 @@ const google = {
 
 <div class="modal" id="entryModal"><div class="sheet"><button class="secondary close" onclick="closeModal()">Close</button><h2 id="entryTitle">Add Spend</h2>
  
- <!-- Removed "capture=environment" to allow both Camera AND Files/Gallery -->
  <input type="file" id="fReceipt" accept="image/*" style="display:none" onchange="handleReceiptUpload(this)">
  <div style="display:flex;gap:8px;margin-bottom:12px;">
    <button id="receiptBtn" class="cam-btn" style="margin-bottom:0;flex:1" onclick="document.getElementById('fReceipt').click()">📸 Attach Receipt Photo</button>
@@ -618,7 +617,7 @@ document.addEventListener('touchstart', e => {
 
 document.addEventListener('touchend', e => {
   if (!touchStartX || SETTINGS.swipeTabs === false) return;
-  if (e.target.closest('.swipe-wrap') || e.target.closest('.monthchart') || e.target.closest('.monthchips') || e.target.closest('.subtabs') || e.target.closest('.donutwrap') || e.target.closest('.sheet') || e.target.closest('.filtergrid') || e.target.closest('.nav')) return;
+  if (e.target.closest('.swipe-wrap') || e.target.closest('.monthchart') || e.target.closest('.monthchips') || e.target.closest('.subtabs') || e.target.closest('.donutwrap') || e.target.closest('.sheet') || e.target.closest('.filtergrid') || e.target.closest('.nav') || e.target.closest('.monthsummary')) return;
   
   let dX = e.changedTouches[0].clientX - touchStartX;
   let dY = e.changedTouches[0].clientY - touchStartY;
