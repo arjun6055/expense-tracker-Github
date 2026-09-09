@@ -8,7 +8,7 @@
 <meta name="theme-color" content="#101a2c">
 
 <style>
-/* V4.7 DYNAMIC CSS VARIABLE ENGINE & EXTERNAL MIC UI */
+/* V4.8 DYNAMIC CSS VARIABLE ENGINE & SMART VOICE MATCHING */
 :root {
   --bg: #f4f7fb; --card: #ffffff; --ink: #152238; --muted: #718096; --line: #e7ecf3; --dark: #101a2c;
   --blue: #2563eb; --cyan: #06b6d4; --green: #16a34a; --orange: #f59e0b; --pink: #ec4899; --purple: #7c3aed; --red: #dc2626;
@@ -389,7 +389,7 @@ function triggerConfetti() {
   }
 }
 
-// V5.0 VOICE-TO-EXPENSE ENGINE
+// V4.8 ROBUST VOICE-TO-EXPENSE ENGINE
 function startVoiceEntry() {
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
   if (!SpeechRecognition) { toast("Voice input is not supported on this browser."); return; }
@@ -404,30 +404,61 @@ function startVoiceEntry() {
     console.error(e); 
     toast("Mic Error: " + e.error + " (Check browser permissions)"); 
   };
+  
   rec.onresult = (e) => {
-    let txt = e.results[0][0].transcript.toLowerCase();
+    let txt = e.results[0][0].transcript;
     toast("Processing: " + txt);
-    closeQuick();
-    openAdd('spend');
+    closeQuick(); openAdd('spend');
     
-    let amtMatch = txt.match(/\d+/);
+    let txtLower = txt.toLowerCase();
+    
+    // Parse Amount
+    let amtMatch = txtLower.match(/\d+/);
     if(amtMatch) $('fAmount').value = amtMatch[0];
     
+    // Capitalize Description
     $('fDesc').value = txt.charAt(0).toUpperCase() + txt.slice(1);
     
-    if(txt.includes('food')||txt.includes('eat')||txt.includes('restaurant')||txt.includes('zomato')||txt.includes('swiggy')) $('fCategory').value = 'Food';
-    else if(txt.includes('grocery')||txt.includes('supermarket')||txt.includes('mart')||txt.includes('milk')) $('fCategory').value = 'Grocery';
-    else if(txt.includes('travel')||txt.includes('uber')||txt.includes('cab')||txt.includes('ola')||txt.includes('auto')||txt.includes('petrol')) $('fCategory').value = 'Transport';
-    else if(txt.includes('shopping')||txt.includes('clothes')||txt.includes('myntra')||txt.includes('amazon')) $('fCategory').value = 'Shopping';
-    else if(txt.includes('medical')||txt.includes('pharmacy')||txt.includes('doctor')||txt.includes('medicine')) $('fCategory').value = 'Medical';
-    else if(txt.includes('bill')||txt.includes('recharge')||txt.includes('electricity')||txt.includes('wifi')||txt.includes('broadband')) $('fCategory').value = 'Utility';
+    // SMART CATEGORY MATCHING
+    let catSelect = $('fCategory');
+    let matched = false;
+
+    // 1. Try to match exact custom category names first
+    for(let i=0; i<catSelect.options.length; i++) {
+      let optVal = catSelect.options[i].value.toLowerCase();
+      if(optVal && txtLower.includes(optVal)) {
+         catSelect.value = catSelect.options[i].value;
+         matched = true; break;
+      }
+    }
+
+    // 2. If no exact match, fallback to Synonyms
+    if(!matched) {
+      const syn = {
+        'Food': ['eat', 'restaurant', 'zomato', 'swiggy', 'dine'],
+        'Grocery': ['supermarket', 'mart', 'milk', 'vegetable'],
+        'Transport': ['uber', 'cab', 'ola', 'auto', 'petrol', 'fuel', 'travel'],
+        'Shopping': ['clothes', 'myntra', 'amazon', 'flipkart'],
+        'Medical': ['pharmacy', 'doctor', 'medicine', 'hospital'],
+        'Utility': ['bill', 'recharge', 'electricity', 'wifi', 'broadband']
+      };
+      
+      for (const [catName, keywords] of Object.entries(syn)) {
+        if (keywords.some(k => txtLower.includes(k))) {
+          // Find actual case-sensitive option in dropdown
+          for(let i=0; i<catSelect.options.length; i++) {
+             if(catSelect.options[i].value.toLowerCase() === catName.toLowerCase()) {
+                catSelect.value = catSelect.options[i].value;
+                matched = true; break;
+             }
+          }
+        }
+        if(matched) break;
+      }
+    }
   };
   
-  try {
-    rec.start();
-  } catch(e) {
-    toast("Mic is already in use or blocked.");
-  }
+  try { rec.start(); } catch(e) { toast("Mic is already in use or blocked."); }
 }
 
 // V5.0 RECEIPT SNAPSHOT ENGINE
@@ -625,10 +656,11 @@ function txRows(rs) {
 
 function txHtml(r){
   let c = r.category || r.type || 'Transaction';
+  let recIcon = r.receipt ? ` <span style="font-size:14px" title="Receipt Attached">📎</span>` : '';
   return `<div class="swipe-wrap">
     <div class="swipe-bg"><div style="background:var(--blue)">Copy</div><div style="background:var(--red)">Delete</div></div>
     <div class="swipe-fg listrow txclick" ontouchstart="txTouchStart(event, this)" ontouchmove="txTouchMove(event, this)" ontouchend="txTouchEnd(event, this, ${r.row})" onclick="editTx(${r.row})">
-      <div class="catrow"><div class="caticon ${catBg(c)}">${catIcon(c)}</div><div class="catname"><div class="title">${esc(r.description||c)}</div><div class="meta">${esc(r.type)} · ${esc(c)}${r.account?' · '+esc(r.account):''}${r.accountCard?' · '+esc(r.accountCard):''}</div></div></div>
+      <div class="catrow"><div class="caticon ${catBg(c)}">${catIcon(c)}</div><div class="catname"><div class="title">${esc(r.description||c)}${recIcon}</div><div class="meta">${esc(r.type)} · ${esc(c)}${r.account?' · '+esc(r.account):''}${r.accountCard?' · '+esc(r.accountCard):''}</div></div></div>
       <div class="amt">${money(r.amount)}</div>
     </div></div>`;
 }
@@ -795,7 +827,7 @@ function renderMoney(){
  applyScreenSectionOrder('money');
 }
 function showChartValue(m,I,O){let e=$('chartTip');if(e)e.innerHTML=`<b style="font-size:13px">${esc(monthName(m))}</b> · <span style="color:var(--green);font-weight:800">In ${money(I)}</span> · <span style="color:var(--red);font-weight:800">Out ${money(O)}</span>`}
-function renderCC(){let rs=scopedRows('CC Bill'),cards={};rs.forEach(r=>{let k=r.accountCard||r.category||'Unspecified';cards[k]=(cards[k]||0)+Number(r.amount||0)});let names=Object.keys(cards).sort((a,b)=>cards[b]-cards[a]),grand=sum(rs),tiles=names.map((n,i)=>'<div class="cardtile tile'+(i%6+1)+'"><h4>💳 '+esc(n)+'</h4><div class="amount">'+money(cards[n])+'</div><small>'+currentLabel()+'</small></div>').join('');let months=monthKeys().slice(-9),mx=Math.max(...months.map(m=>sum(DATA.rows.filter(r=>r.type==='CC Bill'&&r.date.startsWith(m)))),1),bars=months.map(m=>{let v=sum(DATA.rows.filter(r=>r.type==='CC Bill'&&r.date.startsWith(m)));return '<div class="mcol"><div class="mval">'+money(v)+'</div><div class="mbar" style="height:'+Math.max(5,v/mx*110)+'px"></div><div class="mlab">'+monthName(m).split(' ')[0]+'</div></div>'}).join('');let cols=['#2563eb','#06b6d4','#22c55e','#f59e0b','#9333ea','#ec4899'],share=names.map((n,i)=>((cards[n]/(grand||1))*360)+'deg '+cols[i%cols.length]).join(',');let start=0,stops=names.map((n,i)=>{let e=start+(cards[n]/(grand||1))*360;let x=cols[i%cols.length]+' '+start+'deg '+e+'deg';start=e;return x}).join(',');let legend=names.map((n,i)=>'<div class="legendrow"><span><i class="dot" style="background:'+cols[i%cols.length]+'"></i>'+esc(n)+'</span><b>'+money(cards[n])+'</b></div>').join('');$('cc').innerHTML=`<div class="minihero"><div class="label" style="color:#bfdbfe">${globalView==='overall'?'Overall card position':globalView==='period'?'Period card position':'Credit-card position'}</div><div class="kpi">${money(grand)}</div><div style="font-size:12px;color:#dbeafe;font-weight:750">${names.length} card${names.length===1?'':'s'} with bill data</div></div><div class="card" id="ccCards"><div class="sectionhead"><h3>💳 Your Cards</h3><button class="primary" onclick="openAdd('cc')">＋ Add</button></div><div class="grid2">${tiles||`<div class="empty" style="grid-column:1/-1">${emptySVG()}<div style="margin-top:8px">No credit-card bills in this view.</div></div>`}</div></div><div class="card" id="ccTrend"><div class="sectionhead"><h3>📈 Monthly Bill Trend</h3><span class="pill">Last 9 months</span></div><div class="monthchart">${bars}</div></div><div class="card" id="ccShare"><div class="sectionhead"><h3>🏆 Card Share</h3><span class="pill">'+names.length+' cards</span></div><div class="donutwrap"><div class="donut" style="background:conic-gradient(${stops||'var(--stat-border) 0deg 360deg'})"><span>${names.length}<small style="font-size:10px;display:block">cards</small></span></div><div class="legend">${legend||`<div class="empty">No data</div>`}</div></div></div><div class="card" id="ccHistory"><div class="sectionhead"><h3>🗓️ Bill History</h3><span class="pill">Swipe left to delete</span></div>${txRows(rs.sort((a,b)=>b.date.localeCompare(a.date)||b.row-a.row))}</div>`}
+function renderCC(){let rs=scopedRows('CC Bill'),cards={};rs.forEach(r=>{let k=r.accountCard||r.category||'Unspecified';cards[k]=(cards[k]||0)+Number(r.amount||0)});let names=Object.keys(cards).sort((a,b)=>cards[b]-cards[a]),grand=sum(rs),tiles=names.map((n,i)=>'<div class="cardtile tile'+(i%6+1)+'"><h4>💳 '+esc(n)+'</h4><div class="amount">'+money(cards[n])+'</div><small>'+currentLabel()+'</small></div>').join('');let months=monthKeys().slice(-9),mx=Math.max(...months.map(m=>sum(DATA.rows.filter(r=>r.type==='CC Bill'&&r.date.startsWith(m)))),1),bars=months.map(m=>{let v=sum(DATA.rows.filter(r=>r.type==='CC Bill'&&r.date.startsWith(m)));return '<div class="mcol"><div class="mval">'+money(v)+'</div><div class="mbar" style="height:'+Math.max(5,v/mx*110)+'px"></div><div class="mlab">'+monthName(m).split(' ')[0]+'</div></div>'}).join('');let cols=['#2563eb','#06b6d4','#22c55e','#f59e0b','#9333ea','#ec4899'],share=names.map((n,i)=>((cards[n]/(grand||1))*360)+'deg '+cols[i%cols.length]).join(',');let start=0,stops=names.map((n,i)=>{let e=start+(cards[n]/(grand||1))*360;let x=cols[i%cols.length]+' '+start+'deg '+e+'deg';start=e;return x}).join(',');let legend=names.map((n,i)=>'<div class="legendrow"><span><i class="dot" style="background:'+cols[i%cols.length]+'"></i>'+esc(n)+'</span><b>'+money(cards[n])+'</b></div>').join('');$('cc').innerHTML=`<div class="minihero"><div class="label" style="color:#bfdbfe">${globalView==overall'?'Overall card position':globalView==='period'?'Period card position':'Credit-card position'}</div><div class="kpi">${money(grand)}</div><div style="font-size:12px;color:#dbeafe;font-weight:750">${names.length} card${names.length===1?'':'s'} with bill data</div></div><div class="card" id="ccCards"><div class="sectionhead"><h3>💳 Your Cards</h3><button class="primary" onclick="openAdd('cc')">＋ Add</button></div><div class="grid2">${tiles||`<div class="empty" style="grid-column:1/-1">${emptySVG()}<div style="margin-top:8px">No credit-card bills in this view.</div></div>`}</div></div><div class="card" id="ccTrend"><div class="sectionhead"><h3>📈 Monthly Bill Trend</h3><span class="pill">Last 9 months</span></div><div class="monthchart">${bars}</div></div><div class="card" id="ccShare"><div class="sectionhead"><h3>🏆 Card Share</h3><span class="pill">'+names.length+' cards</span></div><div class="donutwrap"><div class="donut" style="background:conic-gradient(${stops||'var(--stat-border) 0deg 360deg'})"><span>${names.length}<small style="font-size:10px;display:block">cards</small></span></div><div class="legend">${legend||`<div class="empty">No data</div>`}</div></div></div><div class="card" id="ccHistory"><div class="sectionhead"><h3>🗓️ Bill History</h3><span class="pill">Swipe left to delete</span></div>${txRows(rs.sort((a,b)=>b.date.localeCompare(a.date)||b.row-a.row))}</div>`}
 function renderTransfers(){
   let all = scopedRows(); let rs = all.filter(r => r.type === 'ATM' || r.type === 'Personal Transfer').sort((a,b)=>b.date.localeCompare(a.date)||b.row-a.row);
   let atmTotal = sum(rs.filter(r => r.type === 'ATM')); let ptTotal = sum(rs.filter(r => r.type === 'Personal Transfer'));
@@ -961,7 +993,16 @@ function openAdd(mode,row=null){
   resetForm();
   
   let r=row?DATA.rows.find(x=>x.row===row):null;
-  if(r){$('fDate').value=r.date;$('fAmount').value=r.amount;$('fAccount').value=r.account;$('fType').value=r.type;$('fCategory').value=r.category;$('fSubcategory').value=r.subcategory;$('fNeed').value=r.need;$('fPayment').value=r.payment;$('fCard').value=r.accountCard;$('fBillMonth').value=r.billMonth;$('fDesc').value=r.description}
+  if(r){
+      $('fDate').value=r.date;$('fAmount').value=r.amount;$('fAccount').value=r.account;$('fType').value=r.type;$('fCategory').value=r.category;$('fSubcategory').value=r.subcategory;$('fNeed').value=r.need;$('fPayment').value=r.payment;$('fCard').value=r.accountCard;$('fBillMonth').value=r.billMonth;$('fDesc').value=r.description;
+      if(r.receipt) {
+         let btn = $('receiptBtn');
+         btn.textContent = '📄 View Attached Receipt';
+         btn.style.background = 'var(--blue)';
+         btn.style.color = '#fff';
+         btn.onclick = () => window.open(r.receipt, '_blank');
+      }
+  }
   else{$('fDate').value=today();$('fBillMonth').value=activeMonth||monthNow();let types={spend:'Spend',income:'Income',investment:'Investment',cc:'CC Bill'};if(mode==='transfer'){$('fType').value='Personal Transfer';$('fCategory').value='';$('fDesc').value='Transfer'}else{$('fType').value=types[mode];if(mode==='income')$('fCategory').value='Income';if(mode==='investment')$('fCategory').value='Investment';if(mode==='cc'){$('fCategory').value='Credit Card Bill';$('fSubcategory').value='Monthly Bill';$('fDesc').value='Credit Card Bill'}}}
 }
 
@@ -971,6 +1012,7 @@ function resetForm(){
   $('receiptBtn').textContent = '📸 Attach Receipt Photo';
   $('receiptBtn').style.background = 'var(--btn-sec-bg)';
   $('receiptBtn').style.color = 'var(--ink)';
+  $('receiptBtn').onclick = () => document.getElementById('fReceipt').click();
   receiptBase64 = null;
 }
 
