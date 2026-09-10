@@ -679,7 +679,8 @@ document.addEventListener('touchstart', e => {
 document.addEventListener('touchend', e => {
   if (!touchStartX || SETTINGS.swipeTabs === false) return;
   
-  if (e.target.closest('.swipe-wrap') || e.target.closest('.monthchart') || e.target.closest('.monthchips') || e.target.closest('.subtabs') || e.target.closest('.donutwrap') || e.target.closest('.sheet') || e.target.closest('.filtergrid') || e.target.closest('.nav') || e.target.closest('.monthsummary')) return;
+  // Excluded .quickchips and #quickPeriodChips so horizontal chip scrolls do not switch tabs
+  if (e.target.closest('.swipe-wrap') || e.target.closest('.monthchart') || e.target.closest('.monthchips') || e.target.closest('.quickchips') || e.target.closest('#quickPeriodChips') || e.target.closest('.subtabs') || e.target.closest('.donutwrap') || e.target.closest('.sheet') || e.target.closest('.filtergrid') || e.target.closest('.nav') || e.target.closest('.monthsummary')) return;
   
   let dX = e.changedTouches[0].clientX - touchStartX;
   let dY = e.changedTouches[0].clientY - touchStartY;
