@@ -209,23 +209,29 @@ const google = {
           return (...args) => {
             fetch(SCRIPT_API_URL, {
               method: "POST",
-              mode: "cors",
-              cache: "no-cache",
-              redirect: "follow",
               headers: { "Content-Type": "text/plain;charset=utf-8" },
               body: JSON.stringify({ action: prop, args: args })
             })
             .then(res => res.text())
             .then(text => {
+              if (text.trim().startsWith("<!DOCTYPE html>") || text.includes("<html")) {
+                 throw new Error("Google Blocked Access. You must deploy Apps Script with 'Who has access' set to 'Anyone'.");
+              }
               try {
                 const data = JSON.parse(text);
                 if (data.error) onFailure(new Error(data.error));
                 else onSuccess(data.result);
               } catch(e) {
-                onFailure(new Error(text.slice(0, 100) || "API Link Error. Ensure New Version was deployed."));
+                onFailure(new Error("API Error. Ensure New Version was deployed."));
               }
             })
-            .catch(err => onFailure(err));
+            .catch(err => {
+               if(err.message === "Failed to fetch") {
+                  onFailure(new Error("Network Error. Check your internet connection or WebIntoApp settings."));
+               } else {
+                  onFailure(err);
+               }
+            });
           };
         }
       }); return runner;
@@ -679,7 +685,6 @@ document.addEventListener('touchstart', e => {
 document.addEventListener('touchend', e => {
   if (!touchStartX || SETTINGS.swipeTabs === false) return;
   
-  // Excluded .quickchips and #quickPeriodChips so horizontal chip scrolls do not switch tabs
   if (e.target.closest('.swipe-wrap') || e.target.closest('.monthchart') || e.target.closest('.monthchips') || e.target.closest('.quickchips') || e.target.closest('#quickPeriodChips') || e.target.closest('.subtabs') || e.target.closest('.donutwrap') || e.target.closest('.sheet') || e.target.closest('.filtergrid') || e.target.closest('.nav') || e.target.closest('.monthsummary')) return;
   
   let dX = e.changedTouches[0].clientX - touchStartX;
@@ -1066,228 +1071,33 @@ function exportCSV() {
 }
 
 function renderMore(){let s=mergedSettings();$('more').innerHTML=`<div class="card" id="moreMain"><h2>••• More</h2><div class="listrow" onclick="go('income')"><div><div class="title">💰 Income</div><div class="meta">View and add income entries</div></div><b>›</b></div><div class="listrow" onclick="go('investment')"><div><div class="title">📈 Investment</div><div class="meta">View and add investment entries</div></div><b>›</b></div><div class="listrow" onclick="go('cc')"><div><div class="title">💳 Credit Cards</div><div class="meta">View card bills and card history</div></div><b>›</b></div><div class="listrow" onclick="go('transfers')"><div><div class="title">↔️ Transfers</div><div class="meta">View ATM and personal transfers</div></div><b>›</b></div><div class="listrow" onclick="go('insights')"><div><div class="title">✨ Smart Insights</div><div class="meta">Algorithmic spending analysis</div></div><b>›</b></div><div class="listrow" onclick="exportCSV()"><div><div class="title">📥 Export to CSV</div><div class="meta">Download full transaction sheet to device</div></div><b>›</b></div><div class="listrow" onclick="openSettings()"><div><div class="title">⚙️ Settings</div><div class="meta">Customize tabs, sections, dropdowns and PIN</div></div><b>›</b></div><div class="listrow" onclick="refresh()"><div><div class="title">↻ Refresh Data</div><div class="meta">Reload directly from Google Sheet master</div></div><b>›</b></div></div><div class="card" id="moreMaster"><h3>Master Data</h3><div class="notice"><b>Transactions</b> is the single master ledger. Every screen reads the same rows. App settings and dropdown choices are shared across the family.</div></div>`}
-function mergedSettings(){let o=Array.isArray(SETTINGS.tabOrder)?SETTINGS.tabOrder.slice():DEFAULT_TAB_ORDER.slice();if(!o.includes('cc')){let mi=o.indexOf('more');if(mi<0)o.push('cc');else o.splice(mi,0,'cc')}if(!o.includes('transfers')){let mi=o.indexOf('more');if(mi<0)o.push('transfers');else o.splice(mi,0,'transfers')}if(!o.includes('insights')){let mi=o.indexOf('more');if(mi<0)o.push('insights');else o.splice(mi,0,'insights')}return {title:SETTINGS.title||'My Expense Analyzer',budget:SETTINGS.budget||'',goalName:SETTINGS.goalName||'',goalAmount:SETTINGS.goalAmount||'',recurring:SETTINGS.recurring||[],recState:SETTINGS.recState||{},swipeTabs:SETTINGS.swipeTabs!==false,swipeRows:SETTINGS.swipeRows!==false,tabs:{home:true,spends:true,income:true,investment:true,money:true,cc:true,transfers:true,insights:true,more:true,...(SETTINGS.tabs||{})},tabOrder:o,sections:{secBudget:true,secSnapshot:true,secAccount:true,secMonth:true,secCategory:true,secRecent:true,...(SETTINGS.sections||{})},sectionOrders:SETTINGS.sectionOrders||{}}}
-function sectionOrderFor(screen){let d=(SECTION_META[screen]||[]).map(x=>x[0]), saved=mergedSettings().sectionOrders[screen]||[];return [...saved.filter(x=>d.includes(x)),...d.filter(x=>!saved.includes(x))]}
-function applyScreenSectionOrder(screen){let el=$(screen);if(!el)return;let order=sectionOrderFor(screen);let nodes=order.map(id=>$(id)).filter(x=>x&&x.parentElement===el);nodes.forEach(n=>el.appendChild(n));if(screen==='home')applyHomeSections()}
-function applyAllSectionOrders(){Object.keys(SECTION_META).forEach(applyScreenSectionOrder)}
+function mergedSettings(){let o=Array.isArray(SETTINGS.tabOrder)?SETTINGS.tabOrder.slice():DEFAULT_TAB_ORDER.slice();if(!o.includes('cc')){let mi=o.indexOf('more');if(mi<0)o.push('cc');else o.splice(mi,0,'cc')}if(!o.includes('transfers')){let mi=o.indexOf('more');if(mi<0)o.push('transfers');else o.splice(mi,0,'transfers')}if(!o.includes('insights')){let miThese errors—specifically the `Failed to fetch` message and the raw HTML string (`<!DOCTYPE html>...`) appearing in the UI and alerts—indicate that your frontend is failing to communicate properly with your backend API or database. 
 
-function renderNav(){
-  let s=mergedSettings(), order=s.tabOrder.filter(id=>TAB_META[id]);
-  let nav=document.querySelector('.navin'); if(!nav) return;
-  let visible=order.filter(id=>s.tabs[id]!==false);
-  if(!visible.includes('more')) visible.push('more');
-  nav.style.gridTemplateColumns=`repeat(${visible.length},minmax(64px,1fr))`;
-  nav.innerHTML=visible.map(id=>{
-    let m=TAB_META[id];
-    return `<button data-screen="${id}" onclick="go('${id}')" class="${currentScreen===id?'on':''}"><span class="navico">${m[0]}</span>${esc(m[1])}</button>`;
-  }).join('');
-}
+Because the app mentions "Reload directly from Google Sheet master," it is highly likely you are using a **Google Apps Script Web App** as your backend. The HTML string you are seeing is actually a Google authentication or error page being returned instead of the JSON data your app expects.
 
-function applySettings(){let s=mergedSettings();SETTINGS=s;$('brandTitle').textContent=s.title;renderNav();applyHomeSections();applyAllSectionOrders();}
-function syncTabVisibility(){let s=mergedSettings();document.querySelectorAll('[data-layout-tab]').forEach(x=>s.tabs[x.dataset.layoutTab]=x.checked);SETTINGS=s;return s}
-function moveTab(id,dir){let s=syncTabVisibility(),a=s.tabOrder.slice(),i=a.indexOf(id),j=i+dir;if(i<0||j<0||j>=a.length)return;[a[i],a[j]]=[a[j],a[i]];s.tabOrder=a;SETTINGS=s;renderTabSettings();renderNav();go(currentScreen);}
-function moveSection(screen,id,dir){let s=mergedSettings(),a=sectionOrderFor(screen),i=a.indexOf(id),j=i+dir;if(i<0||j<0||j>=a.length)return;[a[i],a[j]]=[a[j],a[i]];s.sectionOrders[screen]=a;SETTINGS=s;renderSectionOrderUI();applyScreenSectionOrder(screen)}
-function openQuick(){$('quickModal').classList.add('show')}function closeQuick(){$('quickModal').classList.remove('show')}
+Here is how to resolve the issue:
 
-function duplicateTx(rowId){
-    let r=DATA.rows.find(x=>x.row===rowId);if(!r)return;
-    let mode=r.type==='CC Bill'?'cc':(r.type==='ATM'||r.type==='Personal Transfer')?'transfer':r.type.toLowerCase();
-    openAdd(mode,rowId);
-    setTimeout(duplicateEntryFromModal, 50);
-}
+**1. Fix Google Apps Script Permissions (Most Common Cause)**
+When your frontend tries to fetch data, Google is blocking the request and asking for a login because the permissions are set incorrectly.
+* Open your Google Apps Script project.
+* Click **Deploy** > **New deployment** (or **Manage deployments** and create a new version).
+* Under the configuration gear icon, ensure it is set up as a **Web app**.
+* Set **Execute as** strictly to **Me** (your Google account).
+* Set **Who has access** strictly to **Anyone**. *(If this is set to "Anyone with a Google account" or "Only myself", the fetch will fail with the exact errors shown).*
+* Click **Deploy**.
+* **Crucial:** Google will generate a *new* Web App URL. You must copy this new URL, update it in your frontend code, and push the changes to GitHub/rebuild the APK.
 
-function duplicateEntryFromModal() {
-    if(!editRow) return;
-    editRow = null;
-    $('entryTitle').textContent = $('entryTitle').textContent.replace('Edit ', 'Copy ');
-    $('fDate').value = today();
-    $('deleteBtn').classList.add('hidden');
-    let db = $('dupBtn'); if(db) db.classList.add('hidden');
-    toast('Draft created. Edit and Save.');
-}
+**2. Address CORS (Cross-Origin Resource Sharing) Issues**
+If the permissions are correct but you still see `Failed to fetch`, the browser is blocking the request for security reasons. 
+* If using Apps Script, ensure your script is returning data using the correct MIME type so the browser accepts it:
+  `return ContentService.createTextOutput(JSON.stringify(data)).setMimeType(ContentService.MimeType.JSON);`
+* If you are using a different custom backend (like Node.js or Python), you must explicitly allow your GitHub Pages URL by adding the header `Access-Control-Allow-Origin: *` to your server responses.
 
-function openAdd(mode,row=null){
-  entryMode=mode;editRow=row;$('entryModal').classList.add('show');$('entryTitle').textContent=(row?'Edit ':'Add ')+({spend:'Spend',income:'Income',investment:'Investment / Saving',cc:'Credit Card Bill',transfer:'Transfer'}[mode]||'Entry');
-  $('deleteBtn').classList.toggle('hidden',!row);
-  let db = $('dupBtn'); if(db) db.classList.toggle('hidden',!row);
-  resetForm();
-  
-  let r=row?DATA.rows.find(x=>x.row===row):null;
-  if(r){
-      $('fDate').value=r.date;$('fAmount').value=r.amount;$('fAccount').value=r.account;$('fType').value=r.type;$('fCategory').value=r.category;$('fSubcategory').value=r.subcategory;$('fNeed').value=r.need;$('fPayment').value=r.payment;$('fCard').value=r.accountCard;$('fBillMonth').value=r.billMonth;$('fDesc').value=r.description;
-      if(r.receipt) {
-         let btn = $('receiptBtn');
-         btn.textContent = '📄 View Attached Receipt';
-         btn.style.background = 'var(--blue)';
-         btn.style.color = '#fff';
-         btn.onclick = () => {
-             document.getElementById('rvImg').src = r.receipt;
-             document.getElementById('receiptViewerModal').style.display = 'flex';
-         };
-         $('delReceiptBtn').classList.remove('hidden');
-      }
-  }
-  else{$('fDate').value=today();$('fBillMonth').value=activeMonth||monthNow();let types={spend:'Spend',income:'Income',investment:'Investment',cc:'CC Bill'};if(mode==='transfer'){$('fType').value='Personal Transfer';$('fCategory').value='';$('fDesc').value='Transfer'}else{$('fType').value=types[mode];if(mode==='income')$('fCategory').value='Income';if(mode==='investment')$('fCategory').value='Investment';if(mode==='cc'){$('fCategory').value='Credit Card Bill';$('fSubcategory').value='Monthly Bill';$('fDesc').value='Credit Card Bill'}}}
-}
-
-function resetForm(){
-  $('fDate').value=today();$('fAmount').value='';$('fDesc').value='';$('fBillMonth').value=activeMonth||monthNow();
-  ['fAccount','fType','fCategory','fSubcategory','fNeed','fPayment','fCard'].forEach(id=>$(id).value='');
-  
-  removeExistingReceipt = false;
-  let btn = $('receiptBtn');
-  btn.textContent = '📸 Attach Receipt Photo';
-  btn.style.background = 'var(--btn-sec-bg)';
-  btn.style.color = 'var(--ink)';
-  btn.onclick = () => document.getElementById('fReceipt').click();
-  $('delReceiptBtn').classList.add('hidden');
-  receiptBase64 = null;
-}
-
-function closeModal(){$('entryModal').classList.remove('show');editRow=null}
-function saveEntry(){
-  let raw=String($('fAmount').value??'').trim().replace(/,/g,'');
-  if(raw===''){toast('Enter an amount');return}
-  let amount=Number(raw);if(!Number.isFinite(amount)){toast('Enter a valid number');return}
-  
-  let typeVal = $('fType').value;
-  let d={row:editRow,date:$('fDate').value,amount:amount,account:$('fAccount').value,type:typeVal,category:$('fCategory').value,subcategory:$('fSubcategory').value,need:$('fNeed').value,payment:$('fPayment').value,accountCard:$('fCard').value,billMonth:$('fBillMonth').value,description:$('fDesc').value};
-  
-  if(receiptBase64) d.receipt = receiptBase64;
-  d.removeReceipt = removeExistingReceipt;
-
-  if(!navigator.onLine) {
-     offlineQueue.push(d);
-     localStorage.setItem('expenseOfflineQueue', JSON.stringify(offlineQueue));
-     updateOfflineUI();
-     closeModal();
-     toast("Saved offline. Will sync later.");
-     return;
-  }
-
-  let ok=()=>{
-      closeModal();refresh(false);toast('Saved ✓'); 
-      if(!editRow && (typeVal === 'Investment' || typeVal === 'CC Bill' || typeVal === 'Income')) triggerConfetti(); 
-  };
-  
-  if(editRow)google.script.run.withSuccessHandler(ok).withFailureHandler(showErr).updateTransaction(d,authToken);
-  else google.script.run.withSuccessHandler(ok).withFailureHandler(showErr).saveTransaction(d,authToken)
-}
-
-function appConfirm(title,message,okText='OK',cancelText='Cancel'){
-  return new Promise(resolve=>{
-    const old=document.getElementById('appConfirmOverlay'); if(old) old.remove();
-    const ov=document.createElement('div'); ov.id='appConfirmOverlay';
-    ov.style.cssText='position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;padding:20px;box-sizing:border-box;';
-    ov.innerHTML=`<div style="width:min(420px,100%);background:var(--card);border-radius:28px;box-shadow:0 20px 60px rgba(0,0,0,.4);padding:24px;box-sizing:border-box;font-family:inherit;color:var(--ink);">
-      <div style="font-size:23px;font-weight:800;margin-bottom:14px;line-height:1.2;letter-spacing:-.5px">${title}</div>
-      <div style="font-size:15px;line-height:1.55;white-space:pre-line;color:var(--muted);">${message}</div>
-      <div style="display:flex;justify-content:flex-end;gap:12px;margin-top:28px;">
-        ${cancelText ? `<button id="appConfirmCancel" style="border:0;border-radius:16px;padding:14px 20px;background:var(--btn-sec-bg);color:var(--ink);font-size:16px;font-weight:700;">${cancelText}</button>` : ''}
-        <button id="appConfirmOk" style="border:0;border-radius:16px;padding:14px 20px;background:var(--red);color:#fff;font-size:16px;font-weight:800;">${okText}</button>
-      </div></div>`;
-    document.body.appendChild(ov); const finish=v=>{ov.remove();resolve(v)};
-    if(cancelText) ov.querySelector('#appConfirmCancel').onclick=()=>finish(false); 
-    ov.querySelector('#appConfirmOk').onclick=()=>finish(true);
-    ov.addEventListener('click',e=>{if(e.target===ov)finish(false)});
-  });
-}
-
-async function quickDelete(rowId, fromModal=false){
-  const r=DATA.rows.find(x=>Number(x.row)===Number(rowId));
-  const label=r ? ((r.type||'Transaction')+' • '+money(r.amount)+(r.description?' • '+r.description:'')) : 'this transaction';
-  const first=await appConfirm('Delete transaction?',label+'\n\nThis will permanently remove it from the master sheet.','Delete','Cancel');
-  if(!first) return;
-  const second=await appConfirm('Are you absolutely sure?','You are about to permanently delete this transaction. This cannot be undone.','Yes, Delete','Cancel');
-  if(!second) return;
-  const ok=()=>{ if(fromModal) closeModal(); refresh(false); toast('Transaction deleted ✓'); };
-  google.script.run.withSuccessHandler(ok).withFailureHandler(showErr).deleteTransaction(Number(rowId),authToken);
-}
-function deleteEntryFromModal() { if(editRow) quickDelete(editRow, true); }
-
-function editTx(row){let r=DATA.rows.find(x=>x.row===row);if(!r)return;let mode=r.type==='CC Bill'?'cc':(r.type==='ATM'||r.type==='Personal Transfer')?'transfer':r.type.toLowerCase();openAdd(mode,row)}
-
-function refresh(showToast = true){
-  google.script.run.withSuccessHandler(d=>{
-    DATA=d.appData||{rows:[],options:{}};
-    SETTINGS=d.settings||{};
-    localStorage.setItem('expense_data_cache', JSON.stringify(DATA));
-    localStorage.setItem('expense_settings_cache', JSON.stringify(SETTINGS));
-    buildForms();initGlobal();renderAll();
-    if(showToast) toast('Data refreshed ✓');
-  }).withFailureHandler(showErr).getAppPayload(authToken)
-}
-
-/* RECURRING MANAGER */
-function addRecurring() {
-   let t=$('recTitle').value.trim(), a=$('recAmt').value.trim();
-   if(!t || !a) { toast("Enter name and amount"); return; }
-   let s=mergedSettings(); if(!s.recurring) s.recurring=[];
-   s.recurring.push({title:t, amt:Number(a)});
-   google.script.run.withSuccessHandler(v=>{SETTINGS=v||s; $('recTitle').value=''; $('recAmt').value=''; renderRecurringSettings(); toast("Saved ✓"); }).saveSettings(s, authToken);
-}
-function deleteRecurring(idx) {
-   let s=mergedSettings(); s.recurring.splice(idx,1);
-   google.script.run.withSuccessHandler(v=>{SETTINGS=v||s; renderRecurringSettings(); toast("Deleted ✓"); }).saveSettings(s, authToken);
-}
-function renderRecurringSettings() {
-   let r = mergedSettings().recurring || [];
-   $('recurringList').innerHTML = r.map((x,i) => `
-     <div class="manage-item" style="grid-template-columns: 1fr auto;"><div style="font-size:15px;font-weight:800;color:var(--ink)">${esc(x.title)} <span style="color:var(--muted);font-weight:700">· ₹${x.amt}</span></div><button class="redbtn" onclick="deleteRecurring(${i})">Delete</button></div>
-   `).join('') || '<div class="mini" style="margin-bottom:8px">No recurring charges added.</div>';
-}
-
-const LOCKED_OPTIONS={Type:['Spend','Income','Investment','CC Bill','ATM','Personal Transfer'],Category:['Income','Investment','Credit Card Bill']}
-function managedOptionFields(){return ['Account','Type','Category','Sub-category','Need','Payment','Account/Card']}
-function renderOptionManager(){let wrap=$('optionManager');if(!wrap)return;let fields=managedOptionFields();wrap.innerHTML=fields.map(k=>{let vals=(DATA.options[k]||[]);return `<div class="card" style="padding:16px;margin-bottom:12px"><div class="sectionhead"><h3>${esc(k)}</h3><span class="pill">${vals.length} options</span></div><div class="manage-list">${vals.map((v,i)=>{let locked=(LOCKED_OPTIONS[k]||[]).includes(v);return `<div class="manage-item"><input data-opt-field="${esc(k)}" data-opt-index="${i}" value="${esc(v)}" ${locked?'disabled':''}><button class="secondary" ${locked?'disabled':''} onclick="renameManagedOption('${esc(k).replace(/'/g,"\'")}',${i})">Rename</button><button class="redbtn" ${locked?'disabled':''} onclick="deleteManagedOption('${esc(k).replace(/'/g,"\'")}',${i})">Delete</button></div>`}).join('')||'<div class="mini">No options yet.</div>'}</div><div class="manage-add"><input id="addOpt_${fields.indexOf(k)}" placeholder="Add new ${esc(k)}"><button class="primary" onclick="addManagedOption('${esc(k).replace(/'/g,"\'")}',${fields.indexOf(k)})">＋ Add</button></div></div>`}).join('')}
-function renderTabSettings(){let s=mergedSettings();$('tabSettings').innerHTML=s.tabOrder.map((id,i)=>{let m=TAB_META[id],locked=id==='more';return `<div class="layout-item"><span class="draglabel">${m[0]} ${esc(m[1])}${locked?' <span class="pill">Settings access</span>':''}</span><label class="switch"><input type="checkbox" data-layout-tab="${id}" ${s.tabs[id]!==false?'checked':''} ${locked?'disabled':''}><span class="slider"></span></label><button class="secondary" ${i===0?'disabled':''} onclick="moveTab('${id}',-1)">↑</button><button class="secondary" ${i===s.tabOrder.length-1?'disabled':''} onclick="moveTab('${id}',1)">↓</button></div>`}).join('')}
-function renderSectionOrderUI(){let s=mergedSettings(),sel=$('sectionOrderTab');if(!sel)return;let tabs=['home','spends','income','investment','money','cc','transfers','insights','more'];sel.innerHTML=tabs.map(id=>`<option value="${id}">${id==='cc'?'CC Bills':TAB_META[id]?.[1]||id}</option>`).join('');let screen=sectionSettingsTab||sel.value||currentScreen;if(!SECTION_META[screen])screen='home';sel.value=screen;sectionSettingsTab=screen;let order=sectionOrderFor(screen);$('sectionSettings').innerHTML=order.map((id,i)=>{let meta=(SECTION_META[screen]||[]).find(x=>x[0]===id);return `<div class="layout-item"><span class="draglabel">${meta?meta[1]:id}</span><button class="secondary" ${i===0?'disabled':''} onclick="moveSection('${screen}','${id}',-1)">↑</button><button class="secondary" ${i===order.length-1?'disabled':''} onclick="moveSection('${screen}','${id}',1)">↓</button></div>`}).join('')||'<div class="mini">No reorderable sections in this tab.</div>'}
-
-function openSettings(){
-  let s=mergedSettings();
-  $('setTitle').value=s.title; $('setBudget').value=s.budget;
-  $('setGoalName').value=s.goalName; $('setGoalAmount').value=s.goalAmount;
-  $('setDarkMode').checked = document.body.classList.contains('dark-mode');
-  $('setSwipeTabs').checked = s.swipeTabs; $('setSwipeRows').checked = s.swipeRows;
-  
-  if(localStorage.getItem('bio_enabled')==='true'){ $('bioSetupBtn').classList.add('hidden'); $('bioRemoveBtn').classList.remove('hidden'); } 
-  else { $('bioSetupBtn').classList.remove('hidden'); $('bioRemoveBtn').classList.add('hidden'); }
-  
-  renderTabSettings();renderSectionOrderUI();renderOptionManager();renderRecurringSettings();$('settingsModal').classList.add('show');
-}
-function closeSettings(){$('settingsModal').classList.remove('show')}
-function saveSettingsUI(){
-  let s=mergedSettings();
-  s.title=$('setTitle').value.trim()||'My Expense Analyzer'; s.budget=$('setBudget').value.trim();
-  s.goalName=$('setGoalName').value.trim(); s.goalAmount=$('setGoalAmount').value.trim();
-  s.swipeTabs=$('setSwipeTabs').checked; s.swipeRows=$('setSwipeRows').checked;
-  document.querySelectorAll('[data-layout-tab]').forEach(x=>s.tabs[x.dataset.layoutTab]=x.checked);
-  google.script.run.withSuccessHandler(v=>{SETTINGS=v||s;applySettings();closeSettings();toast('Settings saved ✓')}).withFailureHandler(showErr).saveSettings(s,authToken)
-}
-
-function persistManagedOptions(field,values,done){google.script.run.withSuccessHandler(d=>{DATA.options[field]=d.options[field]||values;buildForms();renderOptionManager();if(done)done();toast('Options saved ✓')}).withFailureHandler(showErr).saveOptionList(field,values,authToken)}
-function addManagedOption(field,idx){let e=$('addOpt_'+idx),v=(e&&e.value||'').trim();if(!v){toast('Enter a value first');return}let vals=[...(DATA.options[field]||[])];if(vals.some(x=>x.toLowerCase()===v.toLowerCase())){toast('Already exists');return}vals.push(v);persistManagedOptions(field,vals,()=>{if(e)e.value=''})}
-function renameManagedOption(field,idx){let inputs=document.querySelectorAll('[data-opt-field="'+CSS.escape(field)+'"]');let input=inputs[idx],nv=(input&&input.value||'').trim(),vals=[...(DATA.options[field]||[])];if(!input||!nv||!vals[idx])return;if(nv===vals[idx]){toast('No change');return}if(vals.some((x,i)=>i!==idx&&x.toLowerCase()===nv.toLowerCase())){toast('Already exists');return}let old=vals[idx];vals[idx]=nv;google.script.run.withSuccessHandler(d=>{DATA.options[field]=d.options[field]||vals;buildForms();renderOptionManager();refresh();toast(old+' → '+nv)}).withFailureHandler(showErr).renameOption(field,old,nv,authToken)}
-function deleteManagedOption(field,idx){let vals=[...(DATA.options[field]||[])],old=vals[idx];if(!old)return;if(!confirm('Remove "'+old+'" from future dropdown choices? Existing transactions are kept.'))return;vals.splice(idx,1);persistManagedOptions(field,vals)}
-function changePinUI(){let old=$('oldPinChange').value.trim(),nw=$('newPinChange').value.trim(),cf=$('confirmPinChange').value.trim();if(!/^\d{4,6}$/.test(old)||!/^[0-9]{4,6}$/.test(nw)){toast('PIN must be 4–6 digits');return}if(nw!==cf){toast('New PINs do not match');return}google.script.run.withSuccessHandler(()=>{['oldPinChange','newPinChange','confirmPinChange'].forEach(id=>$(id).value='');toast('PIN changed ✓')}).withFailureHandler(showErr).changeAppPin(old,nw,authToken)}
-function resetSettings(){let d={title:'My Expense Analyzer',budget:'',goalName:'',goalAmount:'',recurring:[],recState:{},swipeTabs:true,swipeRows:true,tabs:{home:true,spends:true,income:true,investment:true,money:true,cc:true,transfers:true,insights:true,more:true},tabOrder:DEFAULT_TAB_ORDER.slice(),sectionOrders:{},sections:{secBudget:true,secSnapshot:true,secAccount:true,secMonth:true,secCategory:true,secRecent:true,...(SETTINGS.sections||{})}};google.script.run.withSuccessHandler(v=>{SETTINGS=v||d;applySettings();openSettings();toast('Reset ✓')}).withFailureHandler(showErr).saveSettings(d,authToken)}
-function showErr(e){alert(e&&e.message?e.message:String(e))}function toast(t){$('toast').textContent=t;$('toast').style.display='block';setTimeout(()=>$('toast').style.display='none',2000)}
-window.onload=function(){
-  if(localStorage.getItem('theme') === 'dark') document.body.classList.add('dark-mode');
-  
-  const urlParams = new URLSearchParams(window.location.search);
-  const passedToken = urlParams.get('t');
-
-  if (passedToken) {
-     authToken = passedToken;
-     $('pinGate').classList.add('hidden');
-     document.body.classList.remove('pin-locked');
-     init();
-  } else {
-     renderPinDots();
-     if(localStorage.getItem('bio_enabled') === 'true') $('bioBtn').style.display = 'block';
-  }
-};
-</script>
-</body>
-</html>
+**3. Check POST Request Redirects**
+Google Apps Script handles `POST` requests with a 302 redirect. Standard `fetch()` calls in JavaScript usually follow this automatically, but if you are strictly parsing the initial response without allowing redirects, it will fail. Ensure your frontend fetch call looks similar to this basic structure:
+```javascript
+fetch('YOUR_API_URL', {
+  method: 'POST',
+  body: JSON.stringify(data)
+  // Do not set 'Content-Type': 'application/json' for Apps Script, use text/plain or URL encoded if you face preflight CORS errors.
+})
